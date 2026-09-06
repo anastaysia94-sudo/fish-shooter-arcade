@@ -1,0 +1,46 @@
+name: Build F.S.A. Android Complex Shell v10
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [fsa-android-complex-v10]
+    paths:
+      - "android-fsa/**"
+      - ".github/workflows/build-fsa-android.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "android-fsa/**"
+      - ".github/workflows/build-fsa-android.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android 36 SDK
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build F.S.A. Android v10
+        working-directory: android-fsa
+        run: gradle :app:assembleDebug --stacktrace
+      - name: Verify APK
+        run: test -f android-fsa/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FSA-Android-Complex-Shell-v10-debug-apk
+          path: android-fsa/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
