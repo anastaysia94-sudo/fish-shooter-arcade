@@ -111,3 +111,9 @@ window.addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P')&&!e.ctrlKey&
   if(!document.querySelector('link[data-fsa-v6]')){const l=document.createElement('link');l.rel='stylesheet';l.href='generated-art-v6.css?v=20260906';l.dataset.fsaV6='1';document.head.appendChild(l)}
   if(!document.querySelector('script[data-fsa-v6]')){const s=document.createElement('script');s.src='generated-art-v6.js?v=20260906';s.defer=false;s.dataset.fsaV6='1';document.body.appendChild(s)}
 })();
+
+/* v7 literal generated-image layer: only requests HD WebP assets on non-2G/non-Data-Saver connections. */
+(()=>{
+  if(!document.querySelector('link[data-fsa-v7]')){const l=document.createElement('link');l.rel='stylesheet';l.href='hd-art-v7.css?v=20260906a';l.dataset.fsaV7='1';document.head.appendChild(l)}
+  if(!document.querySelector('script[data-fsa-v7]')){const s=document.createElement('script');s.src='hd-art-v7.js?v=20260906a';s.defer=false;s.dataset.fsaV7='1';document.body.appendChild(s)}
+})();
