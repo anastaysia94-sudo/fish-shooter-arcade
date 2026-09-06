@@ -7,6 +7,8 @@ const saveUi=()=>{try{localStorage.setItem(uiKey,JSON.stringify(ui))}catch{}};
 
 function profile(){
   try{
+    const v6=JSON.parse(localStorage.getItem('fsa.arcade.v6')||'null');
+    if(v6)return v6;
     const v5=JSON.parse(localStorage.getItem('fsa.arcade.v5')||'null');
     if(v5)return v5;
     return JSON.parse(localStorage.getItem('fsa.arcade.v4')||'{}');
@@ -21,17 +23,17 @@ function syncProfile(){
 }
 
 function syncSession(){
-  const m0=$('#m0')?.textContent||'0/50',m1=$('#m1')?.textContent||'0/3',m2=$('#m2')?.textContent||'0/25';
+  const m0=$('#m0')?.textContent||$('#vm0 b')?.textContent||'0/50',m1=$('#m1')?.textContent||$('#vm1 b')?.textContent||'0/3',m2=$('#m2')?.textContent||$('#vm2 b')?.textContent||'0/25';
   const parse=(v,max)=>{const n=Math.max(0,Number(String(v).split('/')[0])||0);return [n,max,Math.min(100,n/max*100)]};
   const a=parse(m0,50),b=parse(m1,3),c=parse(m2,25);
   $('#cxM0')&&($('#cxM0').textContent=`${a[0]} / ${a[1]}`);$('#cxM1')&&($('#cxM1').textContent=`${b[0]} / ${b[1]}`);$('#cxM2')&&($('#cxM2').textContent=`${c[0]} / ${c[1]}`);
   $('#cxM0Bar')&&($('#cxM0Bar').style.width=a[2]+'%');$('#cxM1Bar')&&($('#cxM1Bar').style.width=b[2]+'%');$('#cxM2Bar')&&($('#cxM2Bar').style.width=c[2]+'%');
-  const score=Number(String($('#pCredit')?.textContent||$('#wallet')?.textContent||'0').replace(/,/g,''))||0;
+  const score=Number(String($('#v6credits')?.textContent||$('#pCredit')?.textContent||$('#wallet')?.textContent||'0').replace(/,/g,''))||0;
   $('#cxRankScore')&&($('#cxRankScore').textContent=score.toLocaleString());
 }
 
 function syncVersionLabels(){
-  const replace=(el)=>{if(el)el.innerHTML=el.innerHTML.replaceAll('Engine v4','Engine v5').replaceAll('ENGINE v4','ENGINE v5').replaceAll('Premium Table Engine v4','Premium Table Engine v5').replaceAll('PREMIUM TABLE ENGINE v4','PREMIUM TABLE ENGINE v5').replaceAll('>v4<','>v5<')};
+  const replace=(el)=>{if(el)el.innerHTML=el.innerHTML.replaceAll('Engine v4','Engine v6').replaceAll('ENGINE v4','ENGINE v6').replaceAll('Engine v5','Engine v6').replaceAll('ENGINE v5','ENGINE v6').replaceAll('Premium Table Engine v4','Premium Table Engine v6').replaceAll('PREMIUM TABLE ENGINE v4','PREMIUM TABLE ENGINE v6').replaceAll('Premium Table Engine v5','Premium Table Engine v6').replaceAll('PREMIUM TABLE ENGINE v5','PREMIUM TABLE ENGINE v6').replaceAll('>v4<','>v6<').replaceAll('>v5<','>v6<')};
   replace($('.cxRailStatus small'));
   replace($('.cxHeroCopy p'));
   replace($('.cxHeroFacts'));
@@ -75,7 +77,7 @@ function enhanceFishModal(){
   if(!root.querySelector('.fidelityStrip')){
     const strip=document.createElement('div');
     strip.className='fidelityStrip';
-    strip.innerHTML='<span><b>Table v5</b> four-seat cannon layout</span><span>moving target schools</span><span>traveling projectiles</span><span>auto + lock controls</span><span>boss + special-weapon targets</span><span class="exact">original F.S.A. simulation</span>';
+    strip.innerHTML='<span><b>Table v6</b> three-gun advanced layout</span><span>moving target schools</span><span>traveling projectiles</span><span>auto + lock controls</span><span>boss + special-weapon targets</span><span class="exact">original F.S.A. simulation</span>';
     root.querySelector('.fsa4bottom')?.before(strip);
   }
   root.querySelectorAll('#fire,#auto,#lock,.power,#minus,#plus').forEach(btn=>{
@@ -102,4 +104,10 @@ const observer=new MutationObserver(()=>{syncVersionLabels();enhanceFishModal()}
 observer.observe(document.body,{childList:true,subtree:true});
 
 window.addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P')&&!e.ctrlKey&&!e.metaKey&&document.activeElement?.tagName!=='INPUT')window.openFish?.(0);});
+})();
+
+/* Load the v6 generated-art layer after the stable v4/v5 compatibility shell. */
+(()=>{
+  if(!document.querySelector('link[data-fsa-v6]')){const l=document.createElement('link');l.rel='stylesheet';l.href='generated-art-v6.css?v=20260906';l.dataset.fsaV6='1';document.head.appendChild(l)}
+  if(!document.querySelector('script[data-fsa-v6]')){const s=document.createElement('script');s.src='generated-art-v6.js?v=20260906';s.defer=false;s.dataset.fsaV6='1';document.body.appendChild(s)}
 })();
