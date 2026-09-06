@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" role="img" aria-label="F.S.A. neon underwater arcade lobby">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#02090f"/><stop offset=".42" stop-color="#073247"/><stop offset="1" stop-color="#16091f"/></linearGradient>
+<radialGradient id="cyan"><stop stop-color="#55efff" stop-opacity=".85"/><stop offset="1" stop-color="#55efff" stop-opacity="0"/></radialGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe69a"/><stop offset=".45" stop-color="#f2ad3d"/><stop offset="1" stop-color="#7c3f08"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1600" height="560" fill="url(#bg)"/>
+<ellipse cx="800" cy="250" rx="520" ry="240" fill="url(#cyan)" opacity=".25"/>
+<path d="M0 480C200 430 330 505 550 470s410-15 610-20 300 18 440 44v66H0Z" fill="#031116"/>
+<g opacity=".35" stroke="#40dfff" fill="none"><path d="M90 0v560M1510 0v560"/><path d="M0 95h1600M0 465h1600"/></g>
+<g transform="translate(590 72)">
+<path d="M90 130L40 80l50 5 28-53 27 53 51-5-49 50z" fill="url(#gold)" stroke="#ffda6e" stroke-width="5"/>
+<rect x="-150" y="145" width="535" height="190" rx="28" fill="#04111ddd" stroke="#2f7895" stroke-width="4"/>
+<text x="118" y="220" text-anchor="middle" fill="#ffe09a" font-family="system-ui" font-size="48" font-weight="900">FISH SHOOTER</text>
+<text x="118" y="274" text-anchor="middle" fill="#6cecff" font-family="system-ui" font-size="64" font-weight="950">ARCADE</text>
+<text x="118" y="312" text-anchor="middle" fill="#9fc7d4" font-family="system-ui" font-size="18" font-weight="700" letter-spacing="5">OCEAN OF POSSIBILITIES</text>
+</g>
+<g filter="url(#glow)">
+<path d="M210 295c70-49 151-36 202 4-50 41-129 62-202 5l-44 24 13-37-13-34z" fill="#4be7ff"/><path d="M1260 310c58-39 124-29 165 3-40 34-106 51-165 4l-35 19 10-29-10-28z" fill="#a65eff"/>
+<path d="M350 155c38-25 81-19 109 2-27 23-69 34-109 3l-22 12 6-18-6-17z" fill="#ff9b3d"/>
+<path d="M1180 145c40-27 86-20 115 2-29 24-73 36-115 3l-23 12 7-19-7-18z" fill="#5df1b5"/>
+</g>
+<g transform="translate(105 375)"><rect width="275" height="92" rx="18" fill="#061823" stroke="#2d708a" stroke-width="3"/><text x="24" y="34" fill="#79eaff" font-family="system-ui" font-size="16" font-weight="800">REEF RUN</text><text x="24" y="66" fill="#fff" font-family="system-ui" font-size="22" font-weight="900">CLASSIC TABLE</text></g>
+<g transform="translate(660 395)"><rect width="280" height="92" rx="18" fill="#1c0e0a" stroke="#b5762d" stroke-width="3"/><text x="24" y="34" fill="#ffc869" font-family="system-ui" font-size="16" font-weight="800">DRAGON DEPTHS</text><text x="24" y="66" fill="#fff" font-family="system-ui" font-size="22" font-weight="900">BOSS HUNT</text></g>
+<g transform="translate(1218 375)"><rect width="275" height="92" rx="18" fill="#11091b" stroke="#8550b5" stroke-width="3"/><text x="24" y="34" fill="#d2a0ff" font-family="system-ui" font-size="16" font-weight="800">KRAKEN'S LAIR</text><text x="24" y="66" fill="#fff" font-family="system-ui" font-size="22" font-weight="900">SURVIVAL</text></g>
+<g fill="#8deaff" opacity=".55"><circle cx="120" cy="90" r="4"/><circle cx="160" cy="120" r="7"/><circle cx="240" cy="78" r="3"/><circle cx="1370" cy="100" r="5"/><circle cx="1440" cy="128" r="3"/></g>
+</svg>

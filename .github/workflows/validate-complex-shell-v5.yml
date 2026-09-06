@@ -1,0 +1,46 @@
+name: Validate F.S.A. Complex Shell v5
+
+on:
+  push:
+    branches: [fsa-ui-complexity-v5]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate v5 shell over v4 engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in index.html styles.css premium-ui-v4.css complex-shell-v5.css app.js premium-engine-v4.js complex-shell-v5.js sw.js manifest.webmanifest assets/fsa-mark.svg assets/fsa-boss-event.svg assets/fsa-gameplay.svg assets/fsa-lobby.svg; do test -f "$f"; done
+          node --check app.js
+          node --check premium-engine-v4.js
+          node --check complex-shell-v5.js
+          node --check sw.js
+          python3 - <<'PY'
+          import pathlib
+          html=pathlib.Path('index.html').read_text()
+          css=pathlib.Path('complex-shell-v5.css').read_text()
+          js=pathlib.Path('complex-shell-v5.js').read_text()
+          eng=pathlib.Path('premium-engine-v4.js').read_text()
+          for phrase in ['REEF OPS','DRAGON KING','Captain\'s Orders','Cannon Systems','Achievements','Reef Board','Fish Shooter Games · 15','Slot Games · 20']:
+              assert phrase in html, phrase
+          for phrase in ['cxHero','cxRail','cxDash','cxOps','cxAchievements','cxTelemetry']:
+              assert phrase in css, phrase
+          for phrase in ['fsa.telemetry.v4','Premium Table Engine','HD ADAPTIVE','2G / DATA SAVER','openFish']:
+              assert phrase in eng or phrase in html, phrase
+          for phrase in ['cxEventTimer','cxM0Bar','cxRankScore','fsa.arcade.v4']:
+              assert phrase in js, phrase
+          print('FSA_COMPLEX_SHELL_V5=PASS')
+          print('PREMIUM_ENGINE_V4_PRESERVED=PASS')
+          PY
