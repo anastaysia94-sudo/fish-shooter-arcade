@@ -1,13 +1,15 @@
-const CACHE='fsa-arcade-v5-complex-shell-20260906';
+const CACHE='fsa-arcade-v6-generated-art-20260906';
 const CORE=[
   './',
   './index.html',
   './styles.css',
   './premium-ui-v4.css',
   './complex-shell-v5.css',
+  './generated-art-v6.css',
   './app.js',
   './premium-engine-v4.js',
   './complex-shell-v5.js',
+  './generated-art-v6.js',
   './manifest.webmanifest',
   './assets/fsa-mark.svg',
   './assets/fsa-boss-event.svg',
