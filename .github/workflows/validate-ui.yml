@@ -1,0 +1,41 @@
+name: Validate F.S.A. UI Complexity Pass
+
+on:
+  push:
+    branches: [fsa-ui-complexity-pass]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate complex FSA UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in index.html styles.css app.js ui-enhancements.js sw.js manifest.webmanifest assets/fsa-mark.svg assets/fsa-boss-event.svg assets/fsa-gameplay.svg assets/fsa-lobby.svg; do test -f "$f"; done
+          node --check app.js
+          node --check ui-enhancements.js
+          node --check sw.js
+          python3 - <<'PY'
+          import pathlib
+          html=pathlib.Path('index.html').read_text()
+          css=pathlib.Path('styles.css').read_text()
+          ui=pathlib.Path('ui-enhancements.js').read_text()
+          for phrase in ['REEF OPS','DRAGON KING','Captain\'s Orders','Cannon Systems','Achievements','Reef Board','Exact telemetry']:
+              assert phrase in html, phrase
+          for phrase in ['commandRail','heroComplex','dashboardGrid','visualDeck','radarWidget','targetLegend','metricQuad']:
+              assert phrase in css, phrase
+          for phrase in ['fsa-boss-event.svg','fsa-gameplay.svg','fsa-lobby.svg','mFishBar','rankScore']:
+              assert phrase in ui, phrase
+          print('FSA_COMPLEX_UI=PASS')
+          PY
