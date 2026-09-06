@@ -13,17 +13,19 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Validate expanded arcade and Founder Console
+      - name: Validate premium arcade and Founder Console
         shell: bash
         run: |
           set -euo pipefail
           test -f index.html
           test -f styles.css
+          test -f premium-ui-v4.css
           test -f app.js
+          test -f premium-engine-v4.js
           test -f manifest.webmanifest
           test -f sw.js
           test -f assets/fsa-mark.svg
@@ -38,23 +40,41 @@ jobs:
           assert manifest['name'].startswith('F.S.A.')
           assert manifest['display']=='standalone'
           html=(root/'index.html').read_text()
-          js=(root/'app.js').read_text()
+          legacy=(root/'app.js').read_text()
+          premium=(root/'premium-engine-v4.js').read_text()
+          premium_css=(root/'premium-ui-v4.css').read_text()
+          sw=(root/'sw.js').read_text()
           admin=(root/'admin/app.js').read_text()
-          for phrase in ['virtual/non-cash','Reef Run','Fish Shooter Games · 15','Slot Games · 20','serviceWorker']:
-              assert phrase in html or phrase in js, phrase
-          for phrase in ['fsa.telemetry.v3','openRoomSelect','Bronze Reef','Silver Current','Gold Abyss','HOLD TO RAPID FIRE','multiplier','lock_on','auto_fire']:
-              assert phrase in js or phrase in html, phrase
+          admin_html=(root/'admin/index.html').read_text()
+
+          for phrase in ['Reef Run','Fish Shooter Games · 15','Slot Games · 20']:
+              assert phrase in html or phrase in legacy or phrase in premium, phrase
+
+          safety=(html+'\n'+legacy+'\n'+premium).lower()
+          assert 'virtual/non-cash' in safety
+
           fish_titles=['Reef Run','Dragon Depths',"Pirate's Plunder",'Atlantis Rising','Ice Tide','Lava Reef','Storm Seas','Jade Dragon','Neon Ocean','Ancient Ruins','Mecha Marine','Coral Chaos',"Kraken's Lair",'Treasure Trials','Boss Rush']
           slot_titles=['Ocean Fortune','Treasure Reels',"Siren's Gold",'Legend of Atlantis','Shark Jackpot','Pearl Rush','Kraken Spins','Reef Riches','Lucky Tide','Deep Diamonds','Golden Anchor',"Mermaid's Treasure",'Pirate Jackpot','Coral Cash',"Neptune's Wheel",'Sea King 777','Ocean Wilds','Diamond Dolphin','Wild Pearls','Treasure Temple']
-          assert all(x in js for x in fish_titles)
-          assert all(x in js for x in slot_titles)
+          assert all(x in premium for x in fish_titles)
+          assert all(x in legacy for x in slot_titles)
+
+          for phrase in ['fsa.telemetry.v4','Bronze Reef','Silver Current','Gold Abyss','FEVER MODE','Ocean Radar','auto_fire','lock_on','freeze','lightning','bomb','net','navigator.connection','saveData','slow-2g']:
+              assert phrase in premium or phrase in premium_css, phrase
+
+          for phrase in ['premium-ui-v4.css','premium-engine-v4.js']:
+              assert phrase in html, phrase
+              assert phrase in sw, phrase
+
           for phrase in ['creditLimit','cashier','moderator','reverseLedger','audit','Bulk create']:
-              assert phrase in admin or phrase in (root/'admin/index.html').read_text(), phrase
+              assert phrase in admin or phrase in admin_html, phrase
+
           print('CATALOG_VALIDATION=PASS fish=15 slots=20')
-          print('FISH_TABLE_ENGINE=PASS telemetry=v3 rooms=3')
+          print('FISH_TABLE_ENGINE=PASS telemetry=v4 rooms=3 premium_hud=1 powers=4 fever=1 radar=1')
+          print('LOW_DATA_VALIDATION=PASS adaptive_2g=1 cache_shell=v4')
           print('FOUNDER_CONSOLE_VALIDATION=PASS')
           PY
           node --check app.js
+          node --check premium-engine-v4.js
           node --check admin/app.js
           node --check sw.js
           echo 'JS_SYNTAX=PASS'
