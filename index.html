@@ -1,1 +1,149 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>F.S.A. — Fish Shooter Arcade</title><meta name="theme-color" content="#061825"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css"><style>.roomShell{width:min(900px,96vw);background:#020a12;border:1px solid #9a6c33;border-radius:18px;overflow:hidden;box-shadow:0 40px 120px #000}.roomGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px}.roomCard{display:flex;flex-direction:column;gap:8px;text-align:left;min-height:190px;border:1px solid #2e7796;border-radius:16px;padding:18px;background:radial-gradient(circle at 70% 0,#1c7ea244,transparent 38%),linear-gradient(145deg,#0d2638,#06121d);color:#fff;box-shadow:inset 0 0 30px #26dfff0b,0 12px 35px #0006}.roomCard:hover{border-color:#efb65a;transform:translateY(-2px)}.roomCard b{font-size:22px;color:#ffe09b}.roomCard span{display:inline-block;width:max-content;padding:4px 8px;border:1px solid #3fd2f3;border-radius:999px;color:#8decff;font-size:11px;font-weight:900}.roomCard small{color:#a8cbd8;line-height:1.5}.seatHud{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}.seat{background:#07131ddd;border:1px solid #3b7891;border-radius:8px;padding:5px 8px;font-size:11px}.seat.you{border-color:#ffd15c;color:#ffe8a7}.cannonCore{min-width:82px;text-align:center;border:1px solid #e2a444;border-radius:12px;padding:6px 10px;background:linear-gradient(#713d08,#241305);color:#ffe49a}.cannonCore b{font-size:22px}.cannonCore small{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase}.arena:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 -80px 100px #0008,inset 0 0 80px #0005}.overlayHud,.cannonTray{z-index:4}@media(max-width:760px){.roomGrid{grid-template-columns:1fr}.roomCard{min-height:130px}.seatHud{display:none}.overlayHud{font-size:11px}.cannonTray{gap:4px;padding:5px}.cannonTray .btn{padding:8px 10px}.cannonCore{min-width:66px;padding:4px 7px}.cannonCore b{font-size:18px}}</style></head><body><div class="app"><header class="top"><div class="brand"><img class="mark" src="assets/fsa-mark.svg"><div><strong>F.S.A.</strong><small>Fish Shooter Arcade</small></div></div><nav class="nav"><button class="on" data-scroll="home">Home</button><button data-scroll="fishers">Fish Games</button><button data-scroll="slots">Slots</button><button data-scroll="research">Blueprint</button></nav><div class="wallet"><span class="chip">🪙 <b id="wallet">12,450</b></span><span class="chip">LV <b id="level">12</b></span></div></header><section class="hero" id="home"><img src="assets/captain-reef.jpg" alt="F.S.A. premium arcade visual blueprint"><div class="heroCopy"><div class="eyebrow">SmartPickShop Holdings · Premium virtual arcade</div><h1>FISH SHOOTER ARCADE</h1><p>Rebuilt around the fast, dense fish-table experience: room selection, shared-table action, visible target multipliers, rapid-fire cannons, bosses, power fish, special effects and simulated table rivals.</p><div class="heroActions"><button class="btn primary" onclick="openRoomSelect(0)">Play Reef Run</button><button class="btn" data-scroll="fishers">Browse 15 Fish Games</button><button class="btn" data-scroll="slots">Browse 20 Slots</button></div></div></section><div class="blueprintNote" id="research"><b>Genre research translated into original F.S.A. mechanics:</b> fishing-building/title/table flow, selectable room tiers, shared cabinet-style play, cost-per-shot cannons, target multipliers, dense schools, bosses, lock-on, auto-fire, hold-to-fire, effect fish and feature rounds. Virtual/non-cash credits only.</div><section class="section" id="fishers"><div class="sectionHead"><div><h2>Fish Shooter Games · 15</h2><p>Choose a title, then choose a table. Each room changes pace, shot range and simulated table activity.</p></div></div><div class="cards" id="fishCards"></div></section><section class="section" id="slots"><div class="sectionHead"><div><h2>Slot Games · 20</h2><p>Original five-reel virtual-credit mini games; no deposits, withdrawals or cash prizes.</p></div></div><div class="cards" id="slotCards"></div></section><footer class="footer">F.S.A. · Virtual games, real entertainment. No real-money wagering or redemption in this build.</footer></div><div class="modal" id="roomModal"><div class="roomShell"><div class="shellHead"><div><h3 id="roomTitle">Choose Table</h3><div class="sub">Different rooms change shot range, pace and table activity.</div></div><button class="close" onclick="closeModal('roomModal')">Close</button></div><div class="roomGrid" id="roomCards"></div></div></div><div class="modal" id="fishModal"><div class="shell"><div class="shellHead"><div><h3 id="fishTitle"></h3><div class="sub" id="fishSub"></div></div><button class="close" onclick="closeModal('fishModal')">Close</button></div><div class="fishGame"><div class="arena"><canvas id="arena" width="1280" height="720"></canvas><div class="overlayHud"><span class="chip">🪙 <b id="fgCredits"></b></span><div id="seatHud" class="seatHud"></div><span class="chip">Score <b id="fgScore">0</b></span><span class="chip">Boss <b id="fgBoss">—</b></span></div><div class="cannonTray" id="cannonTray"></div></div><aside class="side"><h4>Table Rules</h4><div id="rules"></div><h4>Your Session</h4><div class="row"><span>Shots</span><b id="shots">0</b></div><div class="row"><span>Kills</span><b id="kills">0</b></div><div class="row"><span>Accuracy</span><b id="acc">0%</b></div><h4>Boss meter</h4><div class="meter"><i id="bossMeter"></i></div><button class="btn primary" onclick="startFishSession()">New Session</button><button class="btn" onclick="toggleAuto()">Toggle Auto Fire</button><button class="btn" onclick="toggleLock()">Toggle Lock-On</button><button class="btn" onclick="exportTelemetry()">Export Telemetry</button><p style="color:#87a8b5;font-size:12px">Exact telemetry describes only this owned F.S.A. simulation.</p></aside></div></div></div><div class="modal" id="slotModal"><div class="shell"><div class="shellHead"><div><h3 id="slotHead"></h3><div class="sub">Original virtual-credit slot-style mini game</div></div><button class="close" onclick="closeModal('slotModal')">Close</button></div><div class="slotGame"><div class="slotStage"><div class="slotTitle"><div class="eyebrow" id="slotTag"></div><h2 id="slotTitle"></h2><p id="slotDesc" style="color:#aac6d4"></p></div><div class="reels" id="reels"></div><div class="slotControls"><button class="btn" onclick="changeBet(-1)">Bet −</button><span class="chip">Bet <b id="bet">5</b></span><button class="btn" onclick="changeBet(1)">Bet +</button><button class="btn primary" onclick="spinSlot()">SPIN</button><span class="chip">🪙 <b id="slotWallet"></b></span></div><div class="slotResult" id="slotResult"></div></div></div></div></div><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04121d">
+<meta name="description" content="F.S.A. Fish Shooter Arcade — premium virtual/non-cash fish-shooter arcade with Reef Run, room selection, boss hunts, progression and exact owned-game telemetry.">
+<title>F.S.A. — Fish Shooter Arcade</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="fxGrid" aria-hidden="true"></div>
+<div class="appShell">
+  <header class="topbar">
+    <a class="brandBlock" href="#home" aria-label="Fish Shooter Arcade home">
+      <img class="brandMark" src="assets/fsa-mark.svg" alt="F.S.A. mark">
+      <div><strong>FISH SHOOTER ARCADE</strong><small>SmartPickShop Holdings · virtual/non-cash arcade</small></div>
+    </a>
+    <nav class="topNav" aria-label="Primary">
+      <button class="on" data-scroll="home">Arcade</button>
+      <button data-scroll="fishers">Fish Games</button>
+      <button data-scroll="operations">Operations</button>
+      <button data-scroll="slots">Slots</button>
+    </nav>
+    <div class="playerStrip">
+      <div class="avatar">RR</div>
+      <div class="playerMeta"><b>ReefRider</b><span>Level <strong id="level">12</strong></span></div>
+      <div class="xpTrack"><i id="xpFill"></i></div>
+      <span class="resourceChip coin">● <b id="wallet">12,450</b></span>
+      <button class="iconBtn" id="soundToggle" title="Toggle UI sound" aria-label="Toggle UI sound">◉</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="commandRail" aria-label="Arcade command rail">
+      <div class="railTitle">REEF OPS</div>
+      <button class="railBtn on" data-scroll="home"><span>⌂</span><b>Home</b></button>
+      <button class="railBtn" onclick="openRoomSelect(0)"><span>▶</span><b>Play Now</b></button>
+      <button class="railBtn" data-scroll="fishers"><span>🐟</span><b>Fish Games</b></button>
+      <button class="railBtn" data-scroll="operations"><span>⚙</span><b>Loadout</b></button>
+      <button class="railBtn" data-scroll="bossIntel"><span>☠</span><b>Boss Intel</b></button>
+      <button class="railBtn" data-scroll="missions"><span>◎</span><b>Missions</b></button>
+      <button class="railBtn" data-scroll="achievements"><span>★</span><b>Achievements</b></button>
+      <button class="railBtn" data-scroll="rankings"><span>♛</span><b>Rankings</b></button>
+      <button class="railBtn" data-scroll="slots"><span>777</span><b>Slots</b></button>
+      <div class="railStatus"><i></i><span>LOCAL ENGINE<br><b>READY</b></span></div>
+      <div class="railLegal">Virtual credits only.<br>No cash redemption.</div>
+    </aside>
+
+    <main class="content">
+      <section class="heroComplex" id="home">
+        <div class="heroVisual" role="img" aria-label="Legendary dragon boss event underwater arcade scene"></div>
+        <div class="heroShade"></div>
+        <div class="heroContent">
+          <div class="eyebrow">LIVE REEF EVENT · OWNED F.S.A. SIMULATION</div>
+          <h1>DRAGON KING<br><span>ABYSS ASSAULT</span></h1>
+          <p>Drop into the upgraded Reef Run engine with dense target schools, simulated table rivals, boss phases, special fish, lock-on, auto-fire and exact telemetry from this owned virtual game.</p>
+          <div class="heroActions">
+            <button class="btn primary xl" onclick="openRoomSelect(1)">HUNT NOW</button>
+            <button class="btn" onclick="openRoomSelect(0)">CLASSIC REEF RUN</button>
+          </div>
+          <div class="heroFacts">
+            <span><b>15</b> Fish Games</span><span><b>3</b> Room Tiers</span><span><b>20</b> Mini Slots</span><span><b>1.0</b> Exact Owned Telemetry</span>
+          </div>
+        </div>
+        <div class="eventTimerPanel">
+          <span class="liveDot"></span><b>EVENT LIVE</b>
+          <strong id="eventTimer">02:14:37</strong>
+          <small>Dragon King rotation</small>
+          <div class="eventPills"><span>Boss phases</span><span>Treasure bursts</span><span>Power fish</span></div>
+        </div>
+      </section>
+
+      <section class="dashboardGrid">
+        <article class="glassPanel quickLaunch">
+          <div class="panelHead"><div><span class="kicker">QUICK DEPLOY</span><h2>Choose Your Water</h2></div><span class="statusBadge">ONLINE</span></div>
+          <div class="modeTiles">
+            <button onclick="openRoomSelect(0)"><span class="modeIcon">🦈</span><b>Reef Run</b><small>Balanced classic</small></button>
+            <button onclick="openRoomSelect(1)"><span class="modeIcon">🐉</span><b>Dragon Depths</b><small>Boss-heavy</small></button>
+            <button onclick="openRoomSelect(12)"><span class="modeIcon">🐙</span><b>Kraken's Lair</b><small>Survival</small></button>
+            <button onclick="openRoomSelect(14)"><span class="modeIcon">👹</span><b>Boss Rush</b><small>Endgame</small></button>
+          </div>
+        </article>
+        <article class="glassPanel missionPanel" id="missions">
+          <div class="panelHead"><div><span class="kicker">DAILY MISSIONS</span><h2>Captain's Orders</h2></div><span id="missionReset">08:24:16</span></div>
+          <div class="mission"><span>Defeat 50 fish</span><b id="mFish">0 / 50</b><i><u id="mFishBar"></u></i></div>
+          <div class="mission"><span>Fire 100 shots</span><b id="mShots">0 / 100</b><i><u id="mShotsBar"></u></i></div>
+          <div class="mission"><span>Fight one boss</span><b id="mBoss">0 / 1</b><i><u id="mBossBar"></u></i></div>
+          <button class="btn compact" id="dailyClaim">Claim Daily Supply</button>
+        </article>
+        <article class="glassPanel telemetryPanel">
+          <div class="panelHead"><div><span class="kicker">OWNED GAME SIGNAL</span><h2>Telemetry Link</h2></div><span class="statusBadge cyan">EXACT</span></div>
+          <div class="telemetryMap"><div class="pulseNode">F.S.A.</div><i></i><div class="pulseNode">EVENTS</div><i></i><div class="pulseNode">EGM</div></div>
+          <p>Gameplay events generated by this owned arcade can be exported as exact telemetry for EGM4000's controlled validation lab. Third-party games are not modified.</p>
+        </article>
+      </section>
+
+      <section class="visualDeck" id="operations">
+        <article class="visualCard gameplayPreview">
+          <img src="assets/fsa-gameplay.webp" alt="F.S.A. advanced fish-shooter combat interface">
+          <div class="visualOverlay"><span class="kicker">REEF RUN COMBAT HUD</span><h2>Cannon cockpit rebuilt for dense table play</h2><p>Target values, boss meter, player seats, ammo control, lock-on, auto-fire, session stats and event feedback stay visible without covering the arena.</p><button class="btn primary" onclick="openRoomSelect(0)">Enter Reef Run</button></div>
+        </article>
+        <div class="opsStack">
+          <article class="glassPanel" id="bossIntel"><div class="panelHead"><div><span class="kicker">BOSS INTEL</span><h2>Threat Rotation</h2></div></div><div class="bossRows"><div><span>🐉</span><p><b>Abyss Dragon</b><small>Heavy armor · Inferno Chain</small></p><em>120×</em></div><div><span>🐙</span><p><b>Prime Kraken</b><small>Long phases · Tentacle Storm</small></p><em>120×</em></div><div><span>👹</span><p><b>Abyss King</b><small>Endgame · Overdrive</small></p><em>120×</em></div></div></article>
+          <article class="glassPanel loadoutPanel"><div class="panelHead"><div><span class="kicker">LOADOUT BAY</span><h2>Cannon Systems</h2></div></div><div class="cannonRender"><div class="barrel">◈</div><div><b>Pulse Cannon Mk VI</b><small>Power / Range / Rate / Control</small></div></div><div class="statBars"><span>POWER<i><u style="width:78%"></u></i></span><span>RANGE<i><u style="width:65%"></u></i></span><span>RATE<i><u style="width:88%"></u></i></span><span>CONTROL<i><u style="width:72%"></u></i></span></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="fishers">
+        <div class="sectionHead"><div><span class="kicker">ARCADE LIBRARY</span><h2>Fish Shooter Games · 15</h2><p>Pick a game, then choose Bronze Reef, Silver Current or Gold Abyss. Each table changes shot range, pace and simulated activity.</p></div><div class="filterChips"><span>ALL</span><span>BOSS</span><span>TREASURE</span><span>SURVIVAL</span></div></div>
+        <div class="cards" id="fishCards"></div>
+      </section>
+
+      <section class="rankAchievementGrid">
+        <article class="glassPanel" id="achievements">
+          <div class="panelHead"><div><span class="kicker">PROGRESSION</span><h2>Achievements</h2></div><span>7 / 24</span></div>
+          <div class="achievementGrid"><div class="achievement earned"><span>★</span><b>First Blood</b><small>First catch</small></div><div class="achievement earned"><span>🐉</span><b>Dragon Hunter</b><small>Boss encounter</small></div><div class="achievement earned"><span>💰</span><b>Treasure Seeker</b><small>Gold target</small></div><div class="achievement"><span>🎯</span><b>Sharpshooter</b><small>75% accuracy</small></div><div class="achievement"><span>🌊</span><b>Ocean Legend</b><small>Level 50</small></div></div>
+        </article>
+        <article class="glassPanel" id="rankings">
+          <div class="panelHead"><div><span class="kicker">LOCAL TABLE RANKING</span><h2>Reef Board</h2></div><span>SESSION</span></div>
+          <div class="rankRows"><div><b>1</b><span>Captain Reef AI</span><em>48,220</em></div><div class="you"><b>2</b><span>ReefRider · YOU</span><em id="rankScore">0</em></div><div><b>3</b><span>Blue Current AI</span><em>31,880</em></div><div><b>4</b><span>Coral Hunter AI</span><em>26,540</em></div></div>
+        </article>
+      </section>
+
+      <section class="section slotsSection" id="slots">
+        <div class="sectionHead"><div><span class="kicker">SIDE ARCADE</span><h2>Virtual-Credit Mini Slots · 20</h2><p>Original five-reel mini games using the same virtual/non-cash local credit wallet. No deposits, withdrawals or cash prizes.</p></div></div>
+        <div class="cards" id="slotCards"></div>
+      </section>
+
+      <section class="closingBanner">
+        <img src="assets/fsa-lobby.webp" alt="F.S.A. neon underwater arcade lobby">
+        <div><span class="kicker">OCEAN OF POSSIBILITIES</span><h2>More games. More systems. One owned arcade.</h2><p>F.S.A. stays its own product and codebase. Founder Console can administer owned-game settings; EGM4000 can consume exact telemetry for controlled analysis.</p></div>
+      </section>
+      <footer class="footer">F.S.A. · Fish Shooter Arcade · Virtual/non-cash entertainment build. No real-money wagering, deposits, withdrawals or redemption.</footer>
+    </main>
+  </div>
+</div>
+
+<div class="modal" id="roomModal"><div class="roomShell"><div class="shellHead"><div><span class="kicker">TABLE SELECT</span><h3 id="roomTitle">Choose Table</h3><div class="sub">Different rooms change shot range, pace and simulated table activity.</div></div><button class="close" onclick="closeModal('roomModal')">Close</button></div><div class="roomGrid" id="roomCards"></div></div></div>
+
+<div class="modal" id="fishModal"><div class="shell gameShell"><div class="shellHead gameHead"><div><span class="kicker">LIVE OWNED SIMULATION</span><h3 id="fishTitle"></h3><div class="sub" id="fishSub"></div></div><div class="gameHeadActions"><span class="statusBadge">EXACT TELEMETRY</span><button class="close" onclick="closeModal('fishModal')">Close</button></div></div><div class="fishGame"><div class="arenaWrap"><div class="arena"><canvas id="arena" width="1280" height="720"></canvas><div class="arenaTexture" aria-hidden="true"></div><div class="overlayHud"><span class="chip">🪙 <b id="fgCredits"></b></span><span class="chip threat">THREAT <b id="fgBoss">—</b></span><div id="seatHud" class="seatHud"></div><span class="chip">SCORE <b id="fgScore">0</b></span></div><div class="radarWidget" aria-hidden="true"><i></i><i></i><i></i><b>SONAR</b></div><div class="targetLegend"><span>🐟 2×</span><span>🐡 8×</span><span>🐢 12×</span><span>🦈 35×</span><span>💰 60×</span></div><div class="cannonTray" id="cannonTray"></div></div><div class="underArena"><span>LOCK-ON</span><span>AUTO-FIRE</span><span>SPECIAL FISH</span><span>BOSS PHASES</span><span>SIMULATED RIVALS</span></div></div><aside class="side"><div class="sideImage"><img src="assets/fsa-gameplay.webp" alt="F.S.A. battle visual"></div><h4>Table Rules</h4><div id="rules"></div><h4>Your Session</h4><div class="metricQuad"><div><span>Shots</span><b id="shots">0</b></div><div><span>Kills</span><b id="kills">0</b></div><div><span>Accuracy</span><b id="acc">0%</b></div><div><span>Mode</span><b>LIVE</b></div></div><h4>Boss meter</h4><div class="meter"><i id="bossMeter"></i></div><button class="btn primary" onclick="startFishSession()">New Session</button><button class="btn" onclick="toggleAuto()">Toggle Auto Fire</button><button class="btn" onclick="toggleLock()">Toggle Lock-On</button><button class="btn" onclick="exportTelemetry()">Export Telemetry</button><p class="safetyCopy">Exact telemetry describes only this owned F.S.A. simulation.</p></aside></div></div></div>
+
+<div class="modal" id="slotModal"><div class="shell"><div class="shellHead"><div><span class="kicker">SIDE ARCADE</span><h3 id="slotHead"></h3><div class="sub">Original virtual-credit slot-style mini game</div></div><button class="close" onclick="closeModal('slotModal')">Close</button></div><div class="slotGame"><div class="slotStage"><div class="slotTitle"><div class="eyebrow" id="slotTag"></div><h2 id="slotTitle"></h2><p id="slotDesc"></p></div><div class="reels" id="reels"></div><div class="slotControls"><button class="btn" onclick="changeBet(-1)">Bet −</button><span class="chip">Bet <b id="bet">5</b></span><button class="btn" onclick="changeBet(1)">Bet +</button><button class="btn primary" onclick="spinSlot()">SPIN</button><span class="chip">🪙 <b id="slotWallet"></b></span></div><div class="slotResult" id="slotResult"></div></div></div></div></div>
+
+<script src="app.js"></script>
+<script src="ui-enhancements.js"></script>
+</body>
+</html>
