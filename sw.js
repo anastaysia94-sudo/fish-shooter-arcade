@@ -1,13 +1,18 @@
-const CACHE='fsa-arcade-v4-shell-20260906';
+const CACHE='fsa-arcade-v5-complex-shell-20260906';
 const CORE=[
   './',
   './index.html',
   './styles.css',
   './premium-ui-v4.css',
+  './complex-shell-v5.css',
   './app.js',
   './premium-engine-v4.js',
+  './complex-shell-v5.js',
   './manifest.webmanifest',
-  './assets/fsa-mark.svg'
+  './assets/fsa-mark.svg',
+  './assets/fsa-boss-event.svg',
+  './assets/fsa-gameplay.svg',
+  './assets/fsa-lobby.svg'
 ];
 
 self.addEventListener('install',event=>{
