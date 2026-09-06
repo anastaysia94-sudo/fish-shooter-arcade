@@ -1,4 +1,4 @@
-const CACHE='fsa-arcade-v6-generated-art-20260906b';
+const CACHE='fsa-arcade-v7-hd-generated-art-20260906a';
 const CORE=[
   './',
   './index.html',
@@ -6,11 +6,13 @@ const CORE=[
   './premium-ui-v4.css',
   './complex-shell-v5.css',
   './generated-art-v6.css',
+  './hd-art-v7.css',
   './app.js',
   './premium-engine-v4.js',
   './complex-shell-v5.js',
   './generated-art-v6.js',
   './advanced-engine-v6.js',
+  './hd-art-v7.js',
   './manifest.webmanifest',
   './assets/fsa-mark.svg',
   './assets/fsa-boss-event.svg',
@@ -18,6 +20,13 @@ const CORE=[
   './assets/fsa-lobby.svg'
 ];
 
+/*
+  Intentionally NOT precached:
+  assets/fsa-fish-hd-atlas.webp
+  assets/fsa-slots-hd-atlas.webp
+  assets/reef-run-hd-battle.webp
+  The v7 runtime requests these only when Data Saver / 2G is not active.
+*/
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });
