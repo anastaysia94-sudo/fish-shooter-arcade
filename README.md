@@ -1,42 +1,64 @@
 # F.S.A. — Fish Shooter Arcade
 
-**SmartPickShop Holdings · SV04 Launch-Today RC3**
+**SmartPickShop Holdings · Multi-Game Arcade v2**
 
 ![Captain Reef — F.S.A. key art](assets/captain-reef.jpg)
 
-F.S.A. is a standalone owned fish-shooter arcade product with a playable **Reef Run** game, configurable owned-game experiments, exact telemetry, responsive cyberpunk/steampunk presentation, and installable PWA support.
+F.S.A. is a standalone owned virtual arcade with **15 original fish-shooter tables** and **20 original slot-style mini games**. The product uses the approved cyber-aquatic / nautical-steampunk visual direction, persistent local virtual credits, touch/mouse controls, PWA support, and exact telemetry for the owned fish-game engine.
 
-## Launch boundary
+## Live site
 
-This repository is **F.S.A.-only**. EGM4000 and Founder Console remain separate products/codebases. F.S.A. uses **virtual/non-cash credits only**. No real-money deposits, withdrawals, cash prizes, or gambling operation is enabled by this release.
+GitHub Pages deploys automatically from `main` after pushes:
 
-## Run locally
+`https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
 
-```bash
-python3 -m http.server 8080
-```
+## Fish-shooter catalog
 
-Open `http://127.0.0.1:8080/`.
+1. Reef Run
+2. Dragon Depths
+3. Pirate's Plunder
+4. Atlantis Rising
+5. Ice Tide
+6. Lava Reef
+7. Storm Seas
+8. Jade Dragon
+9. Neon Ocean
+10. Ancient Ruins
+11. Mecha Marine
+12. Coral Chaos
+13. Kraken's Lair
+14. Treasure Trials
+15. Boss Rush
 
-## GitHub Pages deployment
+Each title runs on the owned F.S.A. engine but has a different theme, spawn rate, target HP model, reward tuning, speed profile, boss, special-event identity, and preferred weapon style.
 
-The release is fully uploaded. GitHub requires the repository owner to enable Pages once at the account/repository settings level; GitHub Apps cannot perform that administration call. Open **Settings → Pages**, choose **GitHub Actions** as the source, then run the **Deploy F.S.A. to GitHub Pages** workflow from the Actions tab. After that, later deployments can use the same workflow.
+## Slot catalog
 
-## Included
+20 original five-reel, three-row virtual-credit mini games are included, from Ocean Fortune and Treasure Reels through Wild Pearls and Treasure Temple. They are entertainment-only simulations and do not provide deposits, withdrawals, cash prizes, or redemption.
 
-- Playable Canvas fish-shooter
-- Local arcade profile
-- Virtual-credit balance and shot costs
+## Core mechanics
+
+- Mouse/touch aiming and shooting
 - Cannon levels 1–10
-- Spawn/HP/reward/speed experiment controls
-- Exact owned-game telemetry (`fsa.telemetry.v1`)
-- Session results and achievements
-- Telemetry JSON export
+- Per-shot virtual-credit cost
+- Small, medium and large target tiers
+- Boss meter and boss encounters
+- Auto-fire and lock-on tools
+- Exact owned-game telemetry (`fsa.telemetry.v2`)
+- JSON telemetry export
+- Persistent virtual-credit wallet and XP/level state
+- Responsive desktop/tablet/mobile lobby
 - Offline-capable PWA shell
-- Responsive desktop/tablet/mobile layout
-- Original F.S.A. targeting mark and Captain Reef key art
-- Automated release validation on pushes and pull requests
+- 20 playable five-reel slot-style mini games
+
+## Architecture boundary
+
+This repository is **F.S.A.-only**. EGM4000 and Founder Console remain separate products/codebases. F.S.A. telemetry is designed so EGM4000 can later consume owned-game events through an explicit interface without merging the products.
 
 ## Safety / integrity
 
-Third-party services are not modified or bypassed. Telemetry in this repository describes only the owned F.S.A. environment.
+F.S.A. uses **virtual/non-cash credits only**. No real-money deposits, withdrawals, cash prizes, or gambling operation is enabled by this release. Third-party services are not modified or bypassed, and no proprietary third-party game logic or assets are copied.
+
+## Validation
+
+GitHub Actions validates the complete 15-fish / 20-slot catalog, PWA files, required assets, `fsa.telemetry.v2`, and JavaScript syntax. GitHub Pages deployment is automated on pushes to `main`.
