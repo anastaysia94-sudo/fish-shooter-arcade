@@ -5,12 +5,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.App"
         android:label="F.S.A."
+        android:hardwareAccelerated="true"
         android:usesCleartextTraffic="false">
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity
+            android:name=".GameActivity"
+            android:exported="true"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" android:exported="false"/>
     </application>
 </manifest>
