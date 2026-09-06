@@ -1,0 +1,47 @@
+name: Validate F.S.A. Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html
+          test -f manifest.webmanifest
+          test -f sw.js
+          test -f assets/fsa-mark.svg
+          test -f assets/captain-reef.jpg
+          test -f SECURITY.md
+          test -f docs/DEPLOY.md
+          python3 - <<'PY'
+          import json, pathlib, re
+          root = pathlib.Path('.')
+          manifest = json.loads((root/'manifest.webmanifest').read_text())
+          assert manifest['name'].startswith('F.S.A.')
+          assert manifest['display'] == 'standalone'
+          html = (root/'index.html').read_text()
+          for phrase in ['virtual/non-cash', 'Reef Run', 'fsa.telemetry.v1', 'serviceWorker']:
+              assert phrase in html, phrase
+          scripts = re.findall(r'<script>(.*?)</script>', html, flags=re.S)
+          assert scripts, 'inline JS missing'
+          (root/'.validate-inline.js').write_text('\n'.join(scripts))
+          print('STATIC_VALIDATION=PASS')
+          PY
+          node --check .validate-inline.js
+          node --check sw.js
+          echo 'JS_SYNTAX=PASS'
