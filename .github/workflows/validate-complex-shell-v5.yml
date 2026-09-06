@@ -1,8 +1,20 @@
-name: Validate F.S.A. Complex Shell v5
+name: Validate F.S.A. Premium Table Engine v5
 
 on:
   push:
-    branches: [fsa-ui-complexity-v5]
+    branches: [fsa-ui-complexity-v5, fsa-android-complex-v10, main]
+    paths:
+      - "index.html"
+      - "styles.css"
+      - "premium-ui-v4.css"
+      - "complex-shell-v5.css"
+      - "app.js"
+      - "premium-engine-v4.js"
+      - "complex-shell-v5.js"
+      - "sw.js"
+      - "manifest.webmanifest"
+      - "assets/**"
+      - ".github/workflows/validate-complex-shell-v5.yml"
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -18,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate v5 shell over v4 engine
+      - name: Validate Premium Table Engine v5
         shell: bash
         run: |
           set -euo pipefail
@@ -37,10 +49,12 @@ jobs:
               assert phrase in html, phrase
           for phrase in ['cxHero','cxRail','cxDash','cxOps','cxAchievements','cxTelemetry']:
               assert phrase in css, phrase
-          for phrase in ['fsa.telemetry.v4','Premium Table Engine','HD ADAPTIVE','2G / DATA SAVER','openFish']:
-              assert phrase in eng or phrase in html, phrase
+          for phrase in ['fsa.telemetry.v5','PREMIUM TABLE ENGINE v5','shot_fired','school_spawned','boss_spawned','Laser Shrimp','Rocket Shrimp','Twin Dragon','species_filter','PROJECTILES']:
+              assert phrase in eng, phrase
           for phrase in ['cxEventTimer','cxM0Bar','cxRankScore','fsa.arcade.v4']:
               assert phrase in js, phrase
-          print('FSA_COMPLEX_SHELL_V5=PASS')
-          print('PREMIUM_ENGINE_V4_PRESERVED=PASS')
+          print('FSA_COMPLEX_SHELL=PASS')
+          print('PREMIUM_TABLE_ENGINE_V5=PASS')
+          print('PROJECTILE_AND_SCHOOL_MODEL=PASS')
+          print('SPECIAL_TARGET_SYSTEM=PASS')
           PY
