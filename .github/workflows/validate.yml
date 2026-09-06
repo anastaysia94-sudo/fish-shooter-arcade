@@ -58,7 +58,7 @@ jobs:
           assert all(x in premium for x in fish_titles)
           assert all(x in legacy for x in slot_titles)
 
-          for phrase in ['fsa.telemetry.v4','Bronze Reef','Silver Current','Gold Abyss','FEVER MODE','Ocean Radar','auto_fire','lock_on','freeze','lightning','bomb','net','navigator.connection','saveData','slow-2g']:
+          for phrase in ['fsa.telemetry.v4','Bronze Reef','Silver Current','Gold Abyss','FEVER MODE','Ocean Radar','auto_fire','lock_on','freeze','lightning','bomb','net','navigator.connection','saveData','effectiveType','2g']:
               assert phrase in premium or phrase in premium_css, phrase
 
           for phrase in ['premium-ui-v4.css','premium-engine-v4.js']:
@@ -70,7 +70,7 @@ jobs:
 
           print('CATALOG_VALIDATION=PASS fish=15 slots=20')
           print('FISH_TABLE_ENGINE=PASS telemetry=v4 rooms=3 premium_hud=1 powers=4 fever=1 radar=1')
-          print('LOW_DATA_VALIDATION=PASS adaptive_2g=1 cache_shell=v4')
+          print('LOW_DATA_VALIDATION=PASS adaptive_network=1 saveData=1 2g=1 cache_shell=v4')
           print('FOUNDER_CONSOLE_VALIDATION=PASS')
           PY
           node --check app.js
