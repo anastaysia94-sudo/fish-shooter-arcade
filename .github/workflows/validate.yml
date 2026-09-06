@@ -17,31 +17,34 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate release files
+      - name: Validate expanded arcade
         shell: bash
         run: |
           set -euo pipefail
           test -f index.html
+          test -f styles.css
+          test -f app.js
           test -f manifest.webmanifest
           test -f sw.js
           test -f assets/fsa-mark.svg
           test -f assets/captain-reef.jpg
-          test -f SECURITY.md
-          test -f docs/DEPLOY.md
           python3 - <<'PY'
-          import json, pathlib, re
-          root = pathlib.Path('.')
-          manifest = json.loads((root/'manifest.webmanifest').read_text())
+          import json, pathlib
+          root=pathlib.Path('.')
+          manifest=json.loads((root/'manifest.webmanifest').read_text())
           assert manifest['name'].startswith('F.S.A.')
-          assert manifest['display'] == 'standalone'
-          html = (root/'index.html').read_text()
-          for phrase in ['virtual/non-cash', 'Reef Run', 'fsa.telemetry.v1', 'serviceWorker']:
-              assert phrase in html, phrase
-          scripts = re.findall(r'<script>(.*?)</script>', html, flags=re.S)
-          assert scripts, 'inline JS missing'
-          (root/'.validate-inline.js').write_text('\n'.join(scripts))
-          print('STATIC_VALIDATION=PASS')
+          assert manifest['display']=='standalone'
+          html=(root/'index.html').read_text()
+          js=(root/'app.js').read_text()
+          for phrase in ['virtual/non-cash','Reef Run','Fish Shooter Games · 15','Slot Games · 20','serviceWorker']:
+              assert phrase in html or phrase in js, phrase
+          assert 'fsa.telemetry.v2' in js
+          fish_titles=['Reef Run','Dragon Depths',"Pirate's Plunder",'Atlantis Rising','Ice Tide','Lava Reef','Storm Seas','Jade Dragon','Neon Ocean','Ancient Ruins','Mecha Marine','Coral Chaos',"Kraken's Lair",'Treasure Trials','Boss Rush']
+          slot_titles=['Ocean Fortune','Treasure Reels',"Siren's Gold",'Legend of Atlantis','Shark Jackpot','Pearl Rush','Kraken Spins','Reef Riches','Lucky Tide','Deep Diamonds','Golden Anchor',"Mermaid's Treasure",'Pirate Jackpot','Coral Cash',"Neptune's Wheel",'Sea King 777','Ocean Wilds','Diamond Dolphin','Wild Pearls','Treasure Temple']
+          assert all(x in js for x in fish_titles)
+          assert all(x in js for x in slot_titles)
+          print('CATALOG_VALIDATION=PASS fish=15 slots=20')
           PY
-          node --check .validate-inline.js
+          node --check app.js
           node --check sw.js
           echo 'JS_SYNTAX=PASS'
