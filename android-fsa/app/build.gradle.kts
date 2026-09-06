@@ -12,8 +12,8 @@ android {
         applicationId = "com.smartpickshop.fsa"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.10.0-complex-shell-v10"
+        versionCode = 11
+        versionName = "0.11.0-premium-table-v5"
     }
 
     compileOptions {
