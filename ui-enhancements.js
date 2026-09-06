@@ -5,6 +5,14 @@ const stateKey='fsa.ui.v4';
 let ui={claimed:false,sound:true,...(()=>{try{return JSON.parse(localStorage.getItem(stateKey)||'{}')}catch{return{}}})()};
 const save=()=>localStorage.setItem(stateKey,JSON.stringify(ui));
 
+function wireArtwork(){
+  const hero=$('.heroVisual'); if(hero) hero.style.backgroundImage="url('assets/fsa-boss-event.svg')";
+  const arenaTexture=$('.arenaTexture'); if(arenaTexture) arenaTexture.style.backgroundImage="url('assets/fsa-gameplay.svg')";
+  $$('.sideImage img').forEach(img=>img.src='assets/fsa-gameplay.svg');
+  $$('.closingBanner img').forEach(img=>img.src='assets/fsa-lobby.svg');
+}
+wireArtwork();
+
 function sync(){
   const shots=Number($('#shots')?.textContent||0), kills=Number($('#kills')?.textContent||0), score=Number(String($('#fgScore')?.textContent||'0').replace(/,/g,''))||0;
   const boss=($('#fgBoss')?.textContent||'—').trim();
