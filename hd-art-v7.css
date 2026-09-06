@@ -1,0 +1,15 @@
+/* F.S.A. HD Generated Art v7 — literal image assets, never mandatory on 2G/Data Saver */
+.hd-art-v7{position:absolute;left:0;right:0;top:0;z-index:1;pointer-events:none;background-repeat:no-repeat;background-color:#03111b;opacity:0;transition:opacity .35s ease;filter:saturate(1.12) contrast(1.04)}
+.hd-art-v7.ready{opacity:1}
+.v6-card.hd-v7{isolation:isolate}
+.v6-card.hd-v7>canvas{opacity:.08}
+.v6-card.hd-v7 .hd-art-v7{height:auto;aspect-ratio:16/9;border-bottom:1px solid #36dfff44}
+.v6-slot-card.hd-v7 .hd-art-v7{aspect-ratio:8/5}
+.v6-card.hd-v7 .v6-num,.v6-card.hd-v7 .v6-badge,.v6-card.hd-v7 .v6-info{position:relative;z-index:3}
+.v6-card.hd-v7 .v6-num,.v6-card.hd-v7 .v6-badge{position:absolute}
+.v6-card.hd-v7:after{content:"HD ART";position:absolute;z-index:4;top:7px;left:38px;padding:2px 5px;border:1px solid #5cefff88;border-radius:99px;background:#011018c9;color:#8ff4ff;font:800 6px/1.2 system-ui;letter-spacing:.08em;pointer-events:none}
+.v6table.hd-reef-v7:before{content:"";position:absolute;z-index:1;inset:0;background-image:linear-gradient(180deg,rgba(0,9,18,.10),rgba(0,6,12,.30)),url('assets/reef-run-hd-battle.webp');background-size:cover;background-position:center;opacity:.22;mix-blend-mode:screen;pointer-events:none;filter:saturate(1.16) contrast(1.06)}
+.v6table.hd-reef-v7 .v6shade{z-index:2}.v6table.hd-reef-v7 .v6canvas{z-index:0}
+.hd-v7-indicator{position:fixed;z-index:9999;right:8px;bottom:8px;padding:4px 7px;border:1px solid #2d819d;border-radius:99px;background:#02111bd9;color:#75deef;font:700 7px/1.2 system-ui;letter-spacing:.07em;pointer-events:none;opacity:.8}
+@media(max-width:700px){.v6-card.hd-v7:after{display:none}.hd-v7-indicator{font-size:6px;padding:3px 5px}}
+@media(prefers-reduced-motion:reduce){.hd-art-v7{transition:none}}
