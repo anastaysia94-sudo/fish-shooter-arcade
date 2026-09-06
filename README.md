@@ -1,30 +1,37 @@
-# Fish Shooter Arcade (F.S.A.)
+# F.S.A. — Fish Shooter Arcade
 
-Owned playable fish-shooter arcade product under SmartPickShop Holdings.
+**SmartPickShop Holdings · SV04 Launch-Today RC3**
 
-## Launch build
+F.S.A. is a standalone owned fish-shooter arcade product with a playable **Reef Run** game, configurable owned-game experiments, exact telemetry, responsive cyberpunk/steampunk presentation, and installable PWA support.
 
-This repository contains the SV04 Launch-Today RC3 F.S.A. web/PWA build.
+## Launch boundary
 
-- Virtual/non-cash credits only.
-- Exact telemetry for owned-game analytics.
-- Separate product/codebase from EGM4000.
-- Can stream signed-in telemetry to the SmartPickShop launch backend when served from the full ecosystem deployment.
+This repository is **F.S.A.-only**. EGM4000 and Founder Console remain separate products/codebases. F.S.A. uses **virtual/non-cash credits only**. No real-money deposits, withdrawals, cash prizes, or gambling operation is enabled by this release.
 
 ## Run locally
-
-Serve this directory over HTTP (do not rely on `file://` for PWA/service-worker behavior):
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then open `http://127.0.0.1:8080/`.
+Open `http://127.0.0.1:8080/`.
 
-## Production
+## Deploy
 
-For the full authenticated/cloud deployment, use the SmartPickShop Holdings Launch-Today RC3 package and its Docker/Caddy backend. This standalone repository is the F.S.A. product surface.
+The included GitHub Pages workflow publishes the static PWA from `main`. In GitHub, open **Settings → Pages** and select **GitHub Actions** as the source if it is not already enabled.
 
-## Boundary
+## Included
 
-This build uses virtual/non-cash credits. It does not enable real-money deposits, withdrawals, or cash wagering.
+- Playable Canvas fish-shooter
+- Local arcade profile
+- Virtual-credit balance and shot costs
+- Cannon levels 1–10
+- Spawn/HP/reward/speed experiment controls
+- Exact owned-game telemetry
+- Session results and achievements
+- Offline-capable PWA shell
+- Responsive desktop/tablet/mobile layout
+
+## Safety / integrity
+
+Third-party services are not modified or bypassed. Telemetry in this repository describes only the owned F.S.A. environment.
