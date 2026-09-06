@@ -42,7 +42,8 @@ jobs:
           admin=(root/'admin/app.js').read_text()
           for phrase in ['virtual/non-cash','Reef Run','Fish Shooter Games · 15','Slot Games · 20','serviceWorker']:
               assert phrase in html or phrase in js, phrase
-          assert 'fsa.telemetry.v2' in js
+          for phrase in ['fsa.telemetry.v3','openRoomSelect','Bronze Reef','Silver Current','Gold Abyss','HOLD TO RAPID FIRE','multiplier','lock_on','auto_fire']:
+              assert phrase in js or phrase in html, phrase
           fish_titles=['Reef Run','Dragon Depths',"Pirate's Plunder",'Atlantis Rising','Ice Tide','Lava Reef','Storm Seas','Jade Dragon','Neon Ocean','Ancient Ruins','Mecha Marine','Coral Chaos',"Kraken's Lair",'Treasure Trials','Boss Rush']
           slot_titles=['Ocean Fortune','Treasure Reels',"Siren's Gold",'Legend of Atlantis','Shark Jackpot','Pearl Rush','Kraken Spins','Reef Riches','Lucky Tide','Deep Diamonds','Golden Anchor',"Mermaid's Treasure",'Pirate Jackpot','Coral Cash',"Neptune's Wheel",'Sea King 777','Ocean Wilds','Diamond Dolphin','Wild Pearls','Treasure Temple']
           assert all(x in js for x in fish_titles)
@@ -50,6 +51,7 @@ jobs:
           for phrase in ['creditLimit','cashier','moderator','reverseLedger','audit','Bulk create']:
               assert phrase in admin or phrase in (root/'admin/index.html').read_text(), phrase
           print('CATALOG_VALIDATION=PASS fish=15 slots=20')
+          print('FISH_TABLE_ENGINE=PASS telemetry=v3 rooms=3')
           print('FOUNDER_CONSOLE_VALIDATION=PASS')
           PY
           node --check app.js
