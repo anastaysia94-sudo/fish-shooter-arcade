@@ -1,9 +1,9 @@
-name: Build F.S.A. Android Complex Shell v10
+name: Build F.S.A. Android Premium Table v11
 
 on:
   workflow_dispatch:
   push:
-    branches: [fsa-android-complex-v10]
+    branches: [main, fsa-android-complex-v10]
     paths:
       - "android-fsa/**"
       - ".github/workflows/build-fsa-android.yml"
@@ -34,13 +34,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Build F.S.A. Android v10
+      - name: Build F.S.A. Android v11
         working-directory: android-fsa
         run: gradle :app:assembleDebug --stacktrace
       - name: Verify APK
         run: test -f android-fsa/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: FSA-Android-Complex-Shell-v10-debug-apk
+          name: FSA-Android-Premium-Table-v11-debug-apk
           path: android-fsa/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
