@@ -1,60 +1,8 @@
-name: Validate F.S.A. Premium Table Engine v5
-
+name: Legacy F.S.A. v5 Shell Validator
 on:
-  push:
-    branches: [fsa-ui-complexity-v5, fsa-android-complex-v10, main]
-    paths:
-      - "index.html"
-      - "styles.css"
-      - "premium-ui-v4.css"
-      - "complex-shell-v5.css"
-      - "app.js"
-      - "premium-engine-v4.js"
-      - "complex-shell-v5.js"
-      - "sw.js"
-      - "manifest.webmanifest"
-      - "assets/**"
-      - ".github/workflows/validate-complex-shell-v5.yml"
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
-permissions:
-  contents: read
-
 jobs:
-  validate-v5:
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Validate Premium Table Engine v5
-        shell: bash
-        run: |
-          set -euo pipefail
-          for f in index.html styles.css premium-ui-v4.css complex-shell-v5.css app.js premium-engine-v4.js complex-shell-v5.js sw.js manifest.webmanifest assets/fsa-mark.svg assets/fsa-boss-event.svg assets/fsa-gameplay.svg assets/fsa-lobby.svg; do test -f "$f"; done
-          node --check app.js
-          node --check premium-engine-v4.js
-          node --check complex-shell-v5.js
-          node --check sw.js
-          python3 - <<'PY'
-          import pathlib
-          html=pathlib.Path('index.html').read_text()
-          css=pathlib.Path('complex-shell-v5.css').read_text()
-          js=pathlib.Path('complex-shell-v5.js').read_text()
-          eng=pathlib.Path('premium-engine-v4.js').read_text()
-          for phrase in ['REEF OPS','DRAGON KING','Captain\'s Orders','Cannon Systems','Achievements','Reef Board','Fish Shooter Games · 15','Slot Games · 20']:
-              assert phrase in html, phrase
-          for phrase in ['cxHero','cxRail','cxDash','cxOps','cxAchievements','cxTelemetry']:
-              assert phrase in css, phrase
-          for phrase in ['fsa.telemetry.v5','PREMIUM TABLE ENGINE v5','shot_fired','school_spawned','boss_spawned','Laser Shrimp','Rocket Shrimp','Twin Dragon','species_filter','PROJECTILES']:
-              assert phrase in eng, phrase
-          for phrase in ['cxEventTimer','cxM0Bar','cxRankScore','fsa.arcade.v4']:
-              assert phrase in js, phrase
-          print('FSA_COMPLEX_SHELL=PASS')
-          print('PREMIUM_TABLE_ENGINE_V5=PASS')
-          print('PROJECTILE_AND_SCHOOL_MODEL=PASS')
-          print('SPECIAL_TARGET_SYSTEM=PASS')
-          PY
+      - run: echo 'Legacy v5 shell validator retained for manual historical checks; current release is F.S.A. v8.'
