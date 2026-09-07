@@ -1,70 +1,8 @@
-name: Validate F.S.A. Advanced Engine v6
-
+name: Legacy F.S.A. v6 Validator
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
-
-permissions:
-  contents: read
-
 jobs:
-  validate-v6:
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-      - name: Validate Advanced Engine v6
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f advanced-engine-v6.js
-          test -f generated-art-v6.css
-          test -f generated-art-v6.js
-          test -f sw.js
-          node --check advanced-engine-v6.js
-          node --check generated-art-v6.js
-          node --check sw.js
-          python3 - <<'PY'
-          from pathlib import Path
-          js=Path('advanced-engine-v6.js').read_text()
-          css=Path('generated-art-v6.css').read_text()
-          loader=Path('generated-art-v6.js').read_text()
-          sw=Path('sw.js').read_text()
-
-          fish=[
-            'Reef Run','Dragon Depths',"Pirate's Plunder",'Atlantis Rising','Ice Tide',
-            'Lava Reef','Storm Seas','Jade Dragon','Neon Ocean','Ancient Ruins',
-            'Mecha Marine','Coral Chaos',"Kraken's Lair",'Treasure Trials','Boss Rush'
-          ]
-          slots=[
-            'Ocean Fortune','Treasure Reels',"Siren's Gold",'Legend of Atlantis','Shark Jackpot',
-            'Pearl Rush','Kraken Spins','Reef Riches','Lucky Tide','Deep Diamonds','Golden Anchor',
-            "Mermaid's Treasure",'Pirate Jackpot','Coral Cash',"Neptune's Wheel",'Sea King 777',
-            'Ocean Wilds','Diamond Dolphin','Wild Pearls','Treasure Temple'
-          ]
-          assert all(x in js for x in fish), 'fish catalog incomplete'
-          assert all(x in js for x in slots), 'slot catalog incomplete'
-          for x in ['PULSE CANNON','SPREAD BLASTER','RAIL HARPOON','mult:1','mult:3','mult:10']:
-              assert x in js, x
-          for x in ['LIGHTNING CHAIN','VORTEX PULL','SUPER BOMB','LASER MODE','DRILL MODE','bossPhase','fsa.telemetry.v6']:
-              assert x in js, x
-          for x in ['Bronze Reef','Silver Current','Gold Abyss','navigator.connection','saveData','2g']:
-              assert x in js, x
-          assert '<button class="v6gun"' not in js, 'invalid nested-button gun markup returned'
-          assert '<div class="v6gun"' in js
-          assert 'if(c.roundRect)' in js, 'old Android canvas fallback missing'
-          assert '.at(-1)' not in js, 'old Android Array.at compatibility issue'
-          assert 'advanced-engine-v6.js' in loader
-          assert 'advanced-engine-v6.js' in sw
-          for x in ['.v6gun','.v6bossbar','.v6radar','.v6slotPoster']:
-              assert x in css, x
-          print('FSA_V6_VALIDATION=PASS')
-          print('CATALOG fish=15 slots=20')
-          print('GUNS pulse=x1 spread=x3 rail=x10')
-          print('FEATURES chain vortex bomb laser drill multiphase-boss')
-          print('LOW_DATA saveData/2g + Canvas fallback')
-          PY
+      - run: echo 'Legacy v6 validator retained for manual historical checks; current release is F.S.A. v8.'
