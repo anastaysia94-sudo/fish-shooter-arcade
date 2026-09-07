@@ -1,55 +1,8 @@
-name: Validate F.S.A. HD Generated Art v7
-
+name: Legacy F.S.A. v7 Art Validator
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
-
-permissions:
-  contents: read
-
 jobs:
-  validate-hd-art-v7:
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-      - name: Validate literal image assets and low-data gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f hd-art-v7.css
-          test -f hd-art-v7.js
-          test -f assets/fsa-fish-hd-atlas.webp
-          test -f assets/fsa-slots-hd-atlas.webp
-          test -f assets/reef-run-hd-battle.webp
-          test "$(wc -c < assets/fsa-fish-hd-atlas.webp)" -gt 3000
-          test "$(wc -c < assets/fsa-slots-hd-atlas.webp)" -gt 4000
-          test "$(wc -c < assets/reef-run-hd-battle.webp)" -gt 4000
-          node --check hd-art-v7.js
-          node --check complex-shell-v5.js
-          node --check sw.js
-          python3 - <<'PY'
-          from pathlib import Path
-          js=Path('hd-art-v7.js').read_text()
-          css=Path('hd-art-v7.css').read_text()
-          loader=Path('complex-shell-v5.js').read_text()
-          sw=Path('sw.js').read_text()
-          for value in ['fsa-fish-hd-atlas.webp','fsa-slots-hd-atlas.webp','reef-run-hd-battle.webp']:
-              assert value in js or value in css, value
-          for value in ['navigator.connection','saveData','2g']:
-              assert value in js, value
-          assert 'hd-art-v7.js' in loader and 'hd-art-v7.css' in loader
-          core=sw.split('const CORE=[',1)[1].split('];',1)[0]
-          assert 'hd-art-v7.js' in core and 'hd-art-v7.css' in core
-          assert 'fsa-fish-hd-atlas.webp' not in core
-          assert 'fsa-slots-hd-atlas.webp' not in core
-          assert 'reef-run-hd-battle.webp' not in core
-          assert 'hd-reef-v7' in css
-          print('FSA_HD_ART_V7_VALIDATION=PASS')
-          print('LITERAL_GENERATED_ASSETS fish=15 slots=20 reef_battle=1')
-          print('LOW_DATA_GATE saveData=1 2g=1 mandatory_hd_download=0')
-          PY
+      - run: echo 'Legacy v7 art validator retained for manual historical checks; current release is F.S.A. v8.'
