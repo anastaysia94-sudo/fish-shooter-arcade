@@ -1,0 +1,32 @@
+name: F.S.A. Low-Data Budget
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "fsa-v8.css"
+      - "gameplay-layout-v9.css"
+      - "fsa-v9.js"
+      - "sw.js"
+      - "guide.html"
+      - "robots.txt"
+      - "sitemap.xml"
+      - "tests/low-data-budget.mjs"
+      - ".github/workflows/low-data-budget.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  low-data-budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enforce cold-start source budget and Lite-mode contract
+        run: node tests/low-data-budget.mjs
