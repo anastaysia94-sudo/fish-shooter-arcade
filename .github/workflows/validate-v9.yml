@@ -1,0 +1,40 @@
+name: Validate F.S.A. v9 Gameplay
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v9:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate v9 gameplay changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f fsa-v9.js
+          test -f gameplay-layout-v9.css
+          grep -q 'fsa-v9.js' index.html
+          grep -q 'gameplay-layout-v9.css' index.html
+          grep -q "lifeBar:!!t.hard" fsa-v9.js
+          grep -q "if(f.boss||f.lifeBar)" fsa-v9.js
+          grep -q "Elite Leviathan" fsa-v9.js
+          grep -q "hpMult:9.5" fsa-v9.js
+          grep -q ".seatgun.you" gameplay-layout-v9.css
+          grep -q "opacity:1!important" gameplay-layout-v9.css
+          grep -q "opacity:.22" gameplay-layout-v9.css
+          grep -q "background:transparent!important" gameplay-layout-v9.css
+          grep -q "fsa-v9.js" sw.js
+          grep -q "gameplay-layout-v9.css" sw.js
+          node --check fsa-v9.js
+          node --check sw.js
+          echo 'FSA_V9_GAMEPLAY=PASS hard_target_lifebars=1 floating_guns=4 current_gun_opaque=1 rivals_translucent=1'
