@@ -1,9 +1,10 @@
-const CACHE='fsa-arcade-v8-reference-shell-20260907';
+const CACHE='fsa-arcade-v9-gameplay-shell-20260908';
 const CORE=[
   './',
   './index.html',
   './fsa-v8.css',
-  './fsa-v8.js',
+  './gameplay-layout-v9.css',
+  './fsa-v9.js',
   './manifest.webmanifest',
   './assets/fsa-mark.svg',
   './assets/fsa-boss-event.svg',
