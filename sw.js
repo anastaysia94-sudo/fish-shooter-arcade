@@ -1,4 +1,4 @@
-const CACHE='fsa-arcade-v9-closure-20260908';
+const CACHE='fsa-arcade-v10-founder-backend-20260908';
 const CORE=[
   './',
   './index.html',
@@ -37,6 +37,18 @@ self.addEventListener('fetch',event=>{
         if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(fallback,copy));}
         return response;
       }).catch(()=>caches.match(fallback))
+    );
+    return;
+  }
+
+  // Founder Console code is security-sensitive. Prefer the newest same-origin
+  // static assets while retaining an offline copy of the sign-in shell.
+  if(/\/admin\/(?:app\.js|styles\.css|index\.html)$/.test(url.pathname)){
+    event.respondWith(
+      fetch(event.request).then(response=>{
+        if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
+        return response;
+      }).catch(()=>caches.match(event.request))
     );
     return;
   }
