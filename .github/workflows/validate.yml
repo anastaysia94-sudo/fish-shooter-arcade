@@ -2,7 +2,7 @@ name: Validate F.S.A. Release
 
 on:
   push:
-    branches: [main]
+    branches: [main, closure-started-scope-20260908]
   pull_request:
   workflow_dispatch:
 
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Validate cinematic arcade v9 and Founder Console
+      - name: Validate cinematic arcade v9 closure and Founder Console
         shell: bash
         run: |
           set -euo pipefail
@@ -25,6 +25,7 @@ jobs:
           test -f fsa-v8.css
           test -f gameplay-layout-v9.css
           test -f fsa-v9.js
+          test -f gameplay-selftest.js
           test -f manifest.webmanifest
           test -f sw.js
           test -f assets/fsa-mark.svg
@@ -34,6 +35,7 @@ jobs:
           test -f admin/index.html
           test -f admin/styles.css
           test -f admin/app.js
+          test -f admin/logic-selftest.js
           python3 - <<'PY'
           import json, pathlib
           root=pathlib.Path('.')
@@ -59,23 +61,32 @@ jobs:
           assert 'lifeBar:!!t.hard' in js
           assert 'if(f.boss||f.lifeBar)' in js
           assert 'hpMult:9.5' in js
+          assert 'ROOM_BETS' in js
+          assert 'autoLimit=bet()*50' in js
           assert 'opacity:.22' in css and 'opacity:1!important' in css
+          assert '.seatgun:nth-child(4){left:50%;top:8px' in css
           safety=html.lower()
           assert 'virtual/non-cash' in safety and 'no cash redemption' in safety
           for phrase in ['fsa-v8.css','gameplay-layout-v9.css','fsa-v9.js']:
               assert phrase in html or phrase in sw, phrase
           assert 'gameplay-layout-v9.css' in html and 'gameplay-layout-v9.css' in sw
           assert 'fsa-v9.js' in html and 'fsa-v9.js' in sw
-          for phrase in ['creditLimit','cashier','moderator','reverseLedger','audit','Bulk create']:
+          assert "const fallback=isAdmin?'./admin/index.html':'./index.html'" in sw
+          for phrase in ['creditLimit','cashier','moderator','reverseEntry','audit','Bulk create','scopedUsers','Agent credit ceiling exceeded','reversedBy']:
               assert phrase in admin or phrase in admin_html, phrase
+          assert 'actorAgent' in admin_html
           print('FSA_V9_VISUAL_SHELL=PASS')
           print('CATALOG=PASS fish=15 slots=20')
-          print('GAMEPLAY=PASS guns=3 rooms=3 bosses=1 missions=1 radar=1 fever=1 powers=4 rivals=4 hard_target_lifebars=1')
-          print('LANDSCAPE_HUD=PASS player_boxes=0 floating_guns=4 current_opaque=1 rivals_translucent=1')
-          print('LOW_DATA=PASS network_api=1 saveData=1 2g=1 offline_shell=1')
-          print('FOUNDER_CONSOLE=PASS')
+          print('GAMEPLAY=PASS guns=3 rooms=3 bosses=1 missions=4 radar=1 fever=1 powers=4 rivals=4 hard_target_lifebars=1 auto_guard=1')
+          print('LANDSCAPE_HUD=PASS player_boxes=0 floating_guns=4 current_opaque=1 rivals_translucent=1 p4_top_station=1')
+          print('LOW_DATA=PASS network_api=1 saveData=1 2g=1 constrained_device=1 reduced_motion=1 offline_shell=1')
+          print('FOUNDER_CONSOLE_BROWSER_CLOSURE=PASS role_scope=1 cashier_separation=1 ceilings=1 reversals=1 inheritance=1')
           PY
           node --check fsa-v9.js
+          node --check gameplay-selftest.js
           node --check admin/app.js
+          node --check admin/logic-selftest.js
           node --check sw.js
-          echo 'JS_SYNTAX=PASS'
+          node gameplay-selftest.js
+          node admin/logic-selftest.js
+          echo 'JS_AND_LOGIC_TESTS=PASS'
