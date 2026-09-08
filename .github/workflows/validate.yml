@@ -2,7 +2,7 @@ name: Validate F.S.A. Release
 
 on:
   push:
-    branches: [main, closure-started-scope-20260908]
+    branches: [main, closure-started-scope-20260908, fsa-production-backend-v1]
   pull_request:
   workflow_dispatch:
 
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Validate cinematic arcade v9 closure and Founder Console
+      - name: Validate cinematic arcade and production Founder Console
         shell: bash
         run: |
           set -euo pipefail
@@ -36,6 +36,8 @@ jobs:
           test -f admin/styles.css
           test -f admin/app.js
           test -f admin/logic-selftest.js
+          test -f backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql
+          test -f backend/supabase/functions/fsa-founder-admin/index.ts
           python3 - <<'PY'
           import json, pathlib
           root=pathlib.Path('.')
@@ -46,6 +48,8 @@ jobs:
           sw=(root/'sw.js').read_text()
           admin=(root/'admin/app.js').read_text()
           admin_html=(root/'admin/index.html').read_text()
+          sql=(root/'backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql').read_text()
+          edge=(root/'backend/supabase/functions/fsa-founder-admin/index.ts').read_text()
           assert manifest['name'].startswith('F.S.A.')
           assert manifest['display']=='standalone'
           for phrase in ['FISH SHOOTER ARCADE','Fish Shooter Alliance','OCEAN LEGENDS','MEGA JACKPOT','OCEAN FEVER','DAILY MISSIONS','ROOM SELECTION','BOSS HUNT','LIVE REWARDS']:
@@ -72,19 +76,28 @@ jobs:
           assert 'gameplay-layout-v9.css' in html and 'gameplay-layout-v9.css' in sw
           assert 'fsa-v9.js' in html and 'fsa-v9.js' in sw
           assert "const fallback=isAdmin?'./admin/index.html':'./index.html'" in sw
-          for phrase in ['creditLimit','cashier','moderator','reverseEntry','audit','Bulk create','scopedUsers','Agent credit ceiling exceeded','reversedBy']:
-              assert phrase in admin or phrase in admin_html, phrase
-          assert 'actorAgent' in admin_html
+          for phrase in ['signInWithPassword','resetPasswordForEmail','getAuthenticatorAssuranceLevel','fsa_rpc_adjust_credits','fsa-founder-admin']:
+              assert phrase in admin, phrase
+          for phrase in ['Secure operator sign in','server-authoritative','MFA required for mutations','localStorage is not authority']:
+              assert phrase in admin_html, phrase
+          assert 'actorRole' not in admin_html and 'actorAgent' not in admin_html
+          assert 'localStorage.setItem(' not in admin
+          assert 'SUPABASE_SERVICE_ROLE_KEY' not in admin
+          assert 'enable row level security' in sql.lower()
+          assert 'FSA_MFA_REQUIRED' in sql
+          assert 'fsa_credit_ledger_immutable' in sql
+          assert "Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')" in edge
+          assert "claims.aal !== 'aal2'" in edge
           print('FSA_V9_VISUAL_SHELL=PASS')
           print('CATALOG=PASS fish=15 slots=20')
           print('GAMEPLAY=PASS guns=3 rooms=3 bosses=1 missions=4 radar=1 fever=1 powers=4 rivals=4 hard_target_lifebars=1 auto_guard=1')
           print('LANDSCAPE_HUD=PASS player_boxes=0 floating_guns=4 current_opaque=1 rivals_translucent=1 p4_top_station=1')
           print('LOW_DATA=PASS network_api=1 saveData=1 2g=1 constrained_device=1 reduced_motion=1 offline_shell=1')
-          print('FOUNDER_CONSOLE_BROWSER_CLOSURE=PASS role_scope=1 cashier_separation=1 ceilings=1 reversals=1 inheritance=1')
+          print('FOUNDER_CONSOLE_PRODUCTION=PASS auth=1 rls=1 mfa=1 immutable_ledger=1 immutable_audit=1 local_authority=0')
           PY
           node --check fsa-v9.js
           node --check gameplay-selftest.js
-          node --check admin/app.js
+          node --input-type=module --check < admin/app.js
           node --check admin/logic-selftest.js
           node --check sw.js
           node gameplay-selftest.js
