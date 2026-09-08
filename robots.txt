@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Sitemap: https://anastaysia94-sudo.github.io/fish-shooter-arcade/sitemap.xml
