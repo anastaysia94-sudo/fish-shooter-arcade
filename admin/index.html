@@ -1,14 +1,100 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>F.S.A. Founder Console</title><link rel="stylesheet" href="styles.css"></head>
-<body><header><div><b>F.S.A. FOUNDER CONSOLE</b><small> SmartPickShop Holdings · virtual/non-cash control plane</small></div><div class="role">Viewing as <select id="actorRole"><option>Founder</option><option>Agent</option></select></div></header>
-<nav><button data-tab="dashboard" class="active">Dashboard</button><button data-tab="users">Users</button><button data-tab="agents">Agents</button><button data-tab="ledger">Credits</button><button data-tab="games">Game Access</button><button data-tab="audit">Audit</button></nav>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>F.S.A. Founder Console</title>
+  <meta name="theme-color" content="#071827">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="brand"><b>F.S.A. FOUNDER CONSOLE</b><small>SmartPickShop Holdings · virtual/non-cash control plane</small></div>
+  <div class="role">
+    <label>Viewing as
+      <select id="actorRole" aria-label="Role simulation"><option>Founder</option><option>Agent</option></select>
+    </label>
+    <select id="actorAgent" aria-label="Agent identity"></select>
+  </div>
+</header>
+<div class="scope-note" id="scopeNote"></div>
+<nav aria-label="Founder Console sections">
+  <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="users">Users</button>
+  <button data-tab="agents">Agents</button>
+  <button data-tab="ledger">Credits</button>
+  <button data-tab="games">Game Access</button>
+  <button data-tab="audit">Audit</button>
+  <a href="../">← Arcade</a>
+</nav>
 <main>
-<section id="dashboard" class="tab active"><div class="cards" id="stats"></div><div class="grid2"><article><h2>Quick user</h2><form id="quickUser"><input id="quName" placeholder="Username" required><select id="quAgent"></select><input id="quCredits" type="number" min="0" value="1000"><button>Create user</button></form></article><article><h2>Quick credit</h2><form id="quickCredit"><select id="qcUser"></select><input id="qcAmount" type="number" min="1" value="100"><input id="qcReason" placeholder="Reason" value="Founder adjustment"><button>Apply</button></form></article></div><article><h2>Low-balance watch</h2><div id="lowBalances"></div></article></section>
-<section id="users" class="tab"><div class="bar"><h2>Users</h2><button id="addUser">+ Add user</button><button id="bulkUsers">Bulk create</button><button id="exportData">Export JSON</button></div><input id="userSearch" placeholder="Search users..."><div id="usersTable"></div></section>
-<section id="agents" class="tab"><div class="bar"><h2>Agents</h2><button id="addAgent">+ Add agent</button></div><div id="agentsTable"></div></section>
-<section id="ledger" class="tab"><div class="bar"><h2>Append-only virtual-credit ledger</h2></div><input id="ledgerSearch" placeholder="Search ledger..."><div id="ledgerTable"></div></section>
-<section id="games" class="tab"><div class="bar"><h2>Game access</h2><span>Agents may only grant games they themselves are allowed.</span></div><div id="gamesPanel"></div></section>
-<section id="audit" class="tab"><div class="bar"><h2>Audit trail</h2></div><div id="auditTable"></div></section>
+  <section id="dashboard" class="tab active">
+    <div class="cards" id="stats"></div>
+    <div class="grid2">
+      <article>
+        <h2>Quick user</h2>
+        <form id="quickUser">
+          <input id="quName" placeholder="Username" maxlength="50" required>
+          <select id="quAgent" aria-label="Agent"></select>
+          <input id="quCredits" type="number" min="0" step="1" value="1000" aria-label="Opening virtual credits">
+          <button>Create user</button>
+        </form>
+      </article>
+      <article>
+        <h2>Quick credit</h2>
+        <form id="quickCredit">
+          <select id="qcUser" aria-label="User"></select>
+          <input id="qcAmount" type="number" min="1" step="1" value="100" aria-label="Credit amount">
+          <input id="qcReason" placeholder="Reason" value="Founder adjustment" maxlength="250">
+          <button>Apply</button>
+        </form>
+      </article>
+    </div>
+    <article><h2>Low-balance watch</h2><div id="lowBalances"></div></article>
+    <article class="integrity"><h2>Integrity rules active</h2><div class="rule-grid"><span>✓ Agent isolation</span><span>✓ Cashier ≠ moderator</span><span>✓ Credit ceilings enforced</span><span>✓ No negative balances</span><span>✓ One compensating reversal only</span><span>✓ User games inherit Agent limits</span></div></article>
+  </section>
+
+  <section id="users" class="tab">
+    <div class="bar"><h2>Users</h2><button id="addUser">+ Add user</button><button id="bulkUsers">Bulk create</button><button id="exportData">Export JSON</button></div>
+    <input id="userSearch" class="search" placeholder="Search users, agents or notes...">
+    <div id="usersTable"></div>
+  </section>
+
+  <section id="agents" class="tab">
+    <div class="bar"><h2>Agents</h2><button id="addAgent">+ Add agent</button></div>
+    <p class="muted">Credit ceiling means the maximum combined virtual-credit balance held by users assigned to that Agent.</p>
+    <div id="agentsTable"></div>
+  </section>
+
+  <section id="ledger" class="tab">
+    <div class="bar"><h2>Append-only virtual-credit ledger</h2></div>
+    <p class="muted">Corrections create an equal-and-opposite entry. Original ledger records stay in history and cannot be reversed more than once.</p>
+    <input id="ledgerSearch" class="search" placeholder="Search ledger by user, reason or actor...">
+    <div id="ledgerTable"></div>
+  </section>
+
+  <section id="games" class="tab">
+    <div class="bar"><h2>Game access</h2><span>Users can only receive games allowed by their Agent.</span></div>
+    <div id="gamesPanel"></div>
+  </section>
+
+  <section id="audit" class="tab">
+    <div class="bar"><h2>Audit trail</h2></div>
+    <div id="auditTable"></div>
+  </section>
 </main>
-<dialog id="modal"><form method="dialog" id="modalForm"><h2 id="modalTitle"></h2><div id="modalBody"></div><menu><button value="cancel">Cancel</button><button id="modalSave" value="default">Save</button></menu></form></dialog>
-<footer>Prototype security boundary: local-browser control plane only. Production deployment requires server authentication, RBAC enforcement, database-backed append-only ledger, CSRF/session controls, and MFA.</footer>
-<script src="app.js"></script></body></html>
+
+<dialog id="modal">
+  <form method="dialog" id="modalForm">
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+    <menu><button value="cancel" type="button" onclick="this.closest('dialog').close()">Cancel</button><button id="modalSave" value="default">Save</button></menu>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<footer>
+  Local-prototype security boundary: this page now fully enforces the already-started Founder → Agent → User demo workflows in-browser, including role scoping, cashier separation, credit ceilings, inherited game access and compensating ledger reversals. It is still not production authority; server authentication/RBAC/database/MFA remain a separate not-yet-started deployment layer in this repository.
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
