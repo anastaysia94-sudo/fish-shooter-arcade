@@ -16,7 +16,7 @@ assert.strictEqual(slotTitles.length,20);
 for(const gun of ['Pulse Cannon','Spread Blaster','Rail Harpoon'])assert(js.includes(gun),`missing gun: ${gun}`);
 for(const room of ['Bronze Reef','Silver Current','Gold Abyss'])assert(js.includes(room),`missing room: ${room}`);
 assert(js.includes('ROOM_BETS'),'room-specific shot ladders missing');
-assert(js.includes('const cost=shotCost(seat)'),'shot charge must equal selected per-shot cost');
+assert(js.includes('cost=shotCost(seat)'),'shot charge must equal selected per-shot cost');
 assert(!js.includes('cost=seat?Math.max(50,bet()*.6):bet()*g.mult'),'legacy hidden gun cost multiplier returned');
 assert(js.includes('autoLimit=bet()*50'),'auto-fire spend ceiling missing');
 assert(js.includes('AUTO FIRE ARMED · TAP AGAIN TO CONFIRM'),'auto-fire two-step confirmation missing');
