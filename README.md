@@ -1,46 +1,67 @@
 # F.S.A. — Fish Shooter Arcade
 
-**SmartPickShop Holdings · current development line: v8 cutover**
+**SmartPickShop Holdings · current development line: cinematic v9 + production Founder Console backend**
 
-> **AI / Work continuation:** read [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md) before changing the project, then use [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md) for the approved F.S.A. / Fish Shooter Alliance visual target.
+> **AI / Work continuation:** read [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md) before changing the project, then use [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md) for the approved F.S.A. / Fish Shooter Alliance visual target. Founder Console/backend work must also read [`backend/README.md`](backend/README.md).
 
 ![Captain Reef — F.S.A. key art](assets/captain-reef.jpg)
 
-F.S.A. is a standalone owned virtual arcade with **15 fish-shooter tables** and **20 original slot-style virtual-credit mini games**. The product target is the dense cinematic neon-Atlantis F.S.A. / Fish Shooter Alliance presentation defined in the canonical checkpoint — not a generic dashboard and not a static concept image.
+F.S.A. is a standalone owned virtual arcade with **15 fish-shooter tables** and **20 original slot-style virtual-credit mini games**. The product target is the dense cinematic neon-Atlantis F.S.A. / Fish Shooter Alliance presentation defined in the canonical checkpoint, not a generic dashboard and not a static concept image.
 
 ## Canonical links
 
 - Repository: `https://github.com/anastaysia94-sudo/fish-shooter-arcade`
 - Canonical branch: `main`
 - Live Pages target: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
-- Founder Console prototype: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`
-- Full project requirements: [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md)
+- Founder Console: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`
+- Full project/status checkpoint: [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md)
 - Visual implementation target: [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md)
+- Production backend architecture: [`backend/README.md`](backend/README.md)
 
-## Current runtime line
+## Current arcade runtime
 
-The repository currently contains the v8 arcade cutover (`fsa-v8.js` / `fsa-v8.css`) plus earlier engines retained for migration/reference. v8 includes:
+The current arcade line includes:
 
 - all 15 fish-game titles
 - all 20 slot-game titles
 - Pulse Cannon / Spread Blaster / Rail Harpoon
-- different bet-per-shot ladders and distinct gun behavior
-- Bronze Reef / Silver Current / Gold Abyss room tiers
-- boss, combo/Fever, powers, auto-fire and lock-on concepts
-- Data Saver / 2G detection
-- browser-local virtual-credit/profile persistence
+- room-specific shot ladders and distinct gun behavior
+- Bronze Reef / Silver Current / Gold Abyss
+- scaled hard targets and bosses
+- life bars only for hard targets/elites/bosses
+- four floating landscape gun stations instead of giant player boxes
+- missions, Ocean Radar, combo/Fever, powers, safer Auto Fire and Lock On
+- Data Saver / 2G / constrained-device fallback
+- service-worker/offline shell
 
-The next priority is **visual/runtime fidelity**: make the actual lobby and games look and operate like the approved cinematic F.S.A. reference images, while keeping the 2G/Android fallback.
+The continuing arcade priority is **visual/runtime fidelity**: make the actual lobby and games match the approved cinematic F.S.A. references while preserving fast Android/2G startup.
 
-## Founder Console
+## Founder Console production backend
 
-`/admin/` currently demonstrates Agent/User creation, virtual credits, cashier/moderator separation, game access, suspensions, ledger reversals, audit history, bulk creation and export. It is still a browser-local prototype.
+`/admin/` is no longer a browser-local authority. Its production control plane is backed by Supabase Auth and PostgreSQL.
 
-Production target is:
+Implemented production boundary:
 
-**Founder / Root → Distributor → Agent → User**
+**Founder → Agent → User**
 
-with secure server authentication, MFA, RBAC, database persistence and a server-authoritative append-only virtual-credit ledger.
+with:
+
+- real authenticated operator accounts
+- password recovery
+- TOTP MFA enrollment/challenge
+- database-enforced `aal2` for administrative mutations
+- server-side Founder/Agent scope through Row Level Security
+- durable Agents/users/permissions/balances
+- cashier permission separate from moderator permission
+- Agent virtual-credit ceilings
+- append-only credit ledger with compensating reversals
+- immutable audit log
+- inherited game access
+- protected Founder-only Edge Function for authenticated Agent invitation/provisioning
+- no service-role credential in browser code
+- no `localStorage` authority for users, balances, permissions, ledger or audit data
+
+The broader **Founder → Distributor → Agent → User** production hierarchy remains a separate future workstream; Distributor support is not falsely included in this backend release.
 
 ## Product boundaries
 
@@ -50,4 +71,4 @@ with secure server authentication, MFA, RBAC, database persistence and a server-
 
 ## Working rule
 
-Do not generate standalone concept images as a substitute for implementation. Build, test, fix, push, deploy Pages and verify the **actual runtime**.
+Do not generate standalone concept images as a substitute for implementation. Build, test, fix, push, deploy Pages and verify the **actual runtime/backend** before calling a release complete.

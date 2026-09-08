@@ -1,209 +1,114 @@
 # F.S.A. — CANONICAL PROJECT CHECKPOINT
 
-> **READ THIS FIRST in ChatGPT Work, Codex, Copilot, Grok, Perplexity, or any other continuation environment.**
+> **READ THIS FIRST in ChatGPT Work, Codex, Copilot, Grok, Perplexity, or any continuation environment.**
 >
-> This file is the canonical product checkpoint for **Fish Shooter Arcade (F.S.A.)**. When older prompts, mockups, legacy files, or prior notes conflict with this document, use this document plus the current `main` branch as the source of truth.
+> This is the canonical product/status checkpoint for **Fish Shooter Arcade (F.S.A.)**. When older prompts, mockups, legacy notes, or previous status reports conflict with this file plus the current `main`, use this file and the current repository state.
 
-## 1. Canonical repository and branch
+## 1. Canonical repository and deployment
 
 - Repository: `https://github.com/anastaysia94-sudo/fish-shooter-arcade`
-- Canonical branch: `main`
-- Baseline inspected before this checkpoint: `d7d1f241ca52f7b4a60500610d6004b487c4ebbc`
-- That baseline is the **v8 cutover** state and includes `fsa-v8.js` / `fsa-v8.css` plus earlier engines and assets retained for migration/reference.
-- Always `git pull` / refresh `main` before making changes. Do not overwrite newer Work-session commits with an older local snapshot.
-- Public Pages target: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
+- Canonical release branch: `main`
+- Public arcade: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
+- Founder Console: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`
+- Parent organization: **SmartPickShop Holdings**
+- Always refresh `main` before editing. Never overwrite newer commits with an older snapshot.
 
-## 2. Product identity
+## 2. Product boundary
 
-**F.S.A. = Fish Shooter Arcade / Fish Shooter Alliance** under **SmartPickShop Holdings**.
+**F.S.A. = Fish Shooter Arcade / Fish Shooter Alliance.**
 
-F.S.A. is its own owned playable arcade product. It is **not EGM4000**.
-
-- **F.S.A.** = playable fish-shooter + slot-style virtual arcade + operator/founder control plane.
-- **EGM4000** = separate analytics/coaching/research product that may consume exact F.S.A. telemetry through an explicit API boundary.
-- **Founder Console** = control plane for F.S.A. accounts, agents, virtual credits, game access, moderation, audit, and configuration.
-- Keep the codebases/logical products separate. Do not merge F.S.A. into EGM4000.
+- **F.S.A.** is the owned playable fish-shooter + slot-style virtual arcade and its operator control plane.
+- **Founder Console** is the F.S.A. administration/control plane.
+- **EGM4000** is a separate analytics/coaching/research product. Any telemetry connection must cross an explicit, versioned boundary.
+- Do not merge EGM4000 into F.S.A. or silently let EGM4000 mutate F.S.A. rules.
+- F.S.A. remains **virtual/non-cash entertainment** by default. No cash deposits, withdrawals, redemption, or real-money wagering belong in this default product.
 
 ## 3. Non-negotiable visual directive
 
-**The actual live runtime must look and operate like the approved F.S.A. / Fish Shooter Alliance reference images. Do not stop at concept art. Do not merely place a hero image over a simple game. Build the interface, interaction model, density, hierarchy, game feel, and effects shown in the references.**
+**The actual live runtime must look and operate like the approved F.S.A. / Fish Shooter Alliance reference images. Do not substitute concept art, screenshots, or hero images for implementation.**
 
-The approved visual language is:
+Canonical visual language:
 
 - cinematic neon Atlantis / underwater megacity
-- metallic **gold F.S.A. trident branding**
-- saturated cyan / electric blue / violet / coral / molten-orange effects
-- adult, sharp, premium arcade tone — not childish, flat, sparse, or emoji-first
-- dense fish-table cabinet presentation with readable information hierarchy
-- large illustrated fish, sharks, dragons, jellyfish, rays, turtles, sea monsters, mechanical creatures, treasure, coral, ruins, lightning, beams, coins and boss effects
-- dark ocean depth behind luminous HUD framing
-- high-energy but organized UI: many systems visible without feeling like a generic developer dashboard
+- metallic gold F.S.A. / trident branding
+- deep cobalt/cyan ocean lighting with gold, violet, coral, electric and molten accents
+- premium adult arcade-machine presentation, not childish/emoji-first UI
+- dense but readable fish-table HUD
+- illustrated fish, sharks, dragons, rays, jellyfish, mechanical creatures, sea monsters, treasure, ruins, lightning, beams, coins and bosses
+- rich lobby/game cards, missions, events, room selection, rewards and boss presentation
 
-### Canonical screen structure from the latest references
+Primary visual references and implementation guidance are indexed in:
 
-#### Main arcade lobby
-
-The live main page should visually resemble a premium online arcade lobby:
-
-- large centered gold **F.S.A. Fish Shooter Arcade / Fish Shooter Alliance** masthead
-- underwater Atlantis skyline / statues / sharks in the header environment
-- player identity/avatar + level/XP
-- balances/resources strip
-- top navigation for All Games / Fish Games / Slots / Events / Missions / Boss Hunt / Rewards / Settings or equivalent
-- large cinematic **Ocean Legends / featured-event** hero
-- adjacent jackpot/event cards
-- daily missions panel
-- dense, illustrated game-card grid rather than plain cards
-- fish-game and slot sections that feel like one connected premium arcade
-- Bronze Reef / Silver Current / Gold Abyss room selection integrated into the flow
-- mobile layout must preserve the same visual identity rather than collapsing into a generic list
-
-#### Fish-game library
-
-The fish-game catalog should include:
-
-- side or top filters: All / Featured / New / Jackpot / Boss Hunt / Ocean Worlds / Classic / Multiplayer / Favorites
-- 15 illustrated fish-title cards with distinct art and identity
-- 1–4 player indicators
-- tags such as Boss / Event / Treasure / High Bet / New / Hot where appropriate
-- daily missions / event / jackpot side modules on wide screens
-- room selection cards with obvious shot range / difficulty / seats
-
-#### Fish-table gameplay
-
-The actual game table should operate and visually present like the approved battle references:
-
-- full-screen underwater battlefield
-- large animated targets and dense schools crossing multiple depths
-- top-center **boss banner + HP bar + boss phase / multiplier**
-- mission stack on the left
-- **Ocean Radar / minimap**
-- combo and Ocean Fever system
-- right-side live rewards / table feed / room info
-- four player stations around the bottom/edges
-- three visually distinct gun systems
-- per-shot value controls visible at the player station
-- auto-fire and lock-on
-- special powers in a central power bar
-- visible target multipliers
-- critical-hit / chain / treasure / feature event bursts
-- boss entrances, phase transitions and finishing-shot ownership
-- coins/treasure/energy effects that feel satisfying without blocking play
-- all HUD elements remain usable on Android touch devices
-
-#### Slot annex
-
-The 20 slot-style games should visually resemble the F.S.A. slot references:
-
-- premium blue/gold/coral cabinet frames
-- unique background/key art per title
-- custom symbol set per title
-- five-reel presentation
-- bet controls, spin, auto, balance
-- visible wild/scatter/bonus identity
-- jackpot / bonus / free-spin style presentation where appropriate
-- animated reel/symbol/feature effects
-- no generic identical slot skins with only the title changed
-
-## 4. Visual implementation anchors already in the repository
-
-Use these repo assets as implementation anchors and replace/improve them when better production art is added:
-
+- `docs/visual-reference/REFERENCE_INDEX.md`
 - `assets/fsa-lobby.svg`
 - `assets/fsa-gameplay.svg`
 - `assets/fsa-boss-event.svg`
 - `assets/fsa-fish-hd-atlas.webp`
 - `assets/reef-run-hd-battle.webp`
 - `assets/fsa-slots-hd-atlas.webp`
-- `assets/captain-reef.jpg`
 - `assets/fsa-mark.svg`
 
-The latest ChatGPT-generated F.S.A. reference images used to derive this specification include the visual concepts named:
+If a continuation environment can see the earlier generated F.S.A. images, use those exact images as visual references. The runtime, not the mockup, is the deliverable.
 
-- `neon_underwater_fish_shooter_arcade_brand_board`
-- `neon_atlantis_fish_shooter_arcade_lobby`
-- `neon_atlantis_fish_shooter_lobby`
-- `neon_atlantis_kraken_arcade_battle`
-- `abyssal_kraken_fish_shooter_arcade`
-- `ocean_legends_jackpot_lobby`
-- `f.s.a._ocean_legends_slot_collection`
+## 4. Fish Shooter catalog — exactly 15
 
-If ChatGPT Work has access to the project image history, use those exact images as the primary visual references. If it does not, the detailed screen specifications in this checkpoint are authoritative and should be implemented literally.
+All 15 remain required playable owned tables with distinct themes and tuning:
 
-## 5. Required fish games — exactly 15
+1. Reef Run
+2. Dragon Depths
+3. Pirate's Plunder
+4. Atlantis Rising
+5. Ice Tide
+6. Lava Reef
+7. Storm Seas
+8. Jade Dragon
+9. Neon Ocean
+10. Ancient Ruins
+11. Mecha Marine
+12. Coral Chaos
+13. Kraken's Lair
+14. Treasure Trials
+15. Boss Rush
 
-All 15 must be real playable tables on the owned F.S.A. engine, not renamed clones with only colors changed.
+Shared table requirements include:
 
-1. **Reef Run** — balanced flagship table; colorful reef; treasure events; Kraken Lord.
-2. **Dragon Depths** — inferno/dragon world; fire chains; Inferno Dragon; aggressive boss phases.
-3. **Pirate's Plunder** — shipwrecks, treasure chests, bomb events, Dread Kraken, gold-rush feature.
-4. **Atlantis Rising** — lost-city / relic hunt; vortex/trident effects; Atlantis Guardian.
-5. **Ice Tide** — glacier world; freeze fish; slow-field mechanics; Frost Leviathan.
-6. **Lava Reef** — volcanic ocean; magma bursts; heat hazards; Magma Behemoth.
-7. **Storm Seas** — lightning-heavy table; chain attacks; weather events; Thunder Leviathan.
-8. **Jade Dragon** — emerald temple; precision play; elite targets; Jade Dragon King.
-9. **Neon Ocean** — cyber-ocean; fastest pacing; Fever emphasis; neon feature chains.
-10. **Ancient Ruins** — relic/artifact table; ruins guardians; artifact beam events.
-11. **Mecha Marine** — armored fish / machines; EMP/armor systems; Leviathan X.
-12. **Coral Chaos** — dense colorful schools; crowd-control emphasis; spread-gun friendly.
-13. **Kraken's Lair** — hazard/tentacle survival; frequent Kraken encounters; high-pressure table.
-14. **Treasure Trials** — chest/coin/vault features; treasure multipliers; Poseidon-style guardian boss.
-15. **Boss Rush** — short waves, frequent elite/boss encounters, endgame pacing and highest spectacle.
-
-### Shared advanced fish-table systems
-
-Every table should support the common engine while applying title-specific tuning/art/behavior:
-
-- 1–4 player table presentation
-- simulated co-shooters until real multiplayer is implemented
-- Bronze Reef / Silver Current / Gold Abyss room tiers
+- Bronze Reef / Silver Current / Gold Abyss rooms
 - moving schools, formations and depth lanes
-- visible target multipliers
-- common / fast / armored / chain / vortex / treasure / bomb / laser / drill / elite / boss target classes
-- boss phases, enrages, entrances and finishing-shot ownership
+- target multipliers
+- common / fast / armored / chain / vortex / treasure / bomb / laser / drill / elite / boss classes
+- bosses with phases/entrances/finishing-shot ownership
 - missions
 - Ocean Radar
-- combo / hit streak
-- Ocean Fever
+- combo + Ocean Fever
 - lock-on
-- auto-fire
-- hold-to-fire on Android/touch
-- feature-event announcements
-- treasure bursts / chain reactions / screen effects
-- exact owned-game telemetry with provenance
+- auto-fire with deliberate activation/spend guard
+- touch/hold-to-fire
+- feature events and satisfying hit/treasure effects
+- four table gun stations without giant player boxes covering landscape play
+- P1/current gun fully visible and interactive; rivals visually subordinate/translucent
+- ordinary fish do **not** show life bars; only genuinely hard targets/elites/bosses do
 
-## 6. Three-gun requirement
-
-The player must be able to switch between **three genuinely different weapons**, each with a different cost-per-shot and gameplay role.
+## 5. Three-gun requirement
 
 ### Pulse Cannon
-
-- lowest cost per shot
+- lowest shot cost
 - fast precision fire
-- best for common / fast targets
-- base ladder: **2 / 5 / 10 / 20 / 50** virtual credits per shot
+- common/fast-target role
+- base ladder: 2 / 5 / 10 / 20 / 50 virtual credits
 
 ### Spread Blaster
-
-- medium cost per trigger
-- multi-projectile / wide coverage
-- crowd-control and school clearing
-- base ladder: **10 / 20 / 50 / 100 / 200** virtual credits per trigger
+- medium trigger cost
+- multi-projectile crowd-control role
+- base ladder: 10 / 20 / 50 / 100 / 200 virtual credits
 
 ### Rail Harpoon
+- highest shot cost
+- slower heavy/piercing boss and armor role
+- base ladder: 50 / 100 / 200 / 500 / 1000 virtual credits
 
-- highest cost per shot
-- slower heavy piercing / beam-style attack
-- strongest against armor, elites and bosses
-- base ladder: **50 / 100 / 200 / 500 / 1000** virtual credits per shot
+Room tiers can scale ladders, but displayed shot cost must equal the virtual-credit amount actually deducted. Weapon models/effects/behavior must visibly differ, not merely the label.
 
-Room tiers may expand/scale those ranges, but the ordering must remain clear: **Pulse < Spread < Rail** in cost and destructive role.
-
-Gun selection must visibly change the weapon model, muzzle effect, projectile behavior, recoil/charge treatment and HUD accent — not only a label.
-
-## 7. Required slot games — exactly 20
-
-All 20 remain original F.S.A. virtual-credit mini games and each needs its own art direction, symbol set, background, frame and bonus identity.
+## 6. Slot catalog — exactly 20
 
 1. Ocean Fortune
 2. Treasure Reels
@@ -226,195 +131,165 @@ All 20 remain original F.S.A. virtual-credit mini games and each needs its own a
 19. Wild Pearls
 20. Treasure Temple
 
-### Slot requirements
+All remain virtual-credit mini games. Each ultimately needs its own cabinet/background/symbol/bonus visual identity rather than twenty title swaps over one generic skin.
 
-- five reels
-- responsive reel animation
-- unique symbol set per title
-- title-specific wild/scatter/bonus visual identity
-- bet +/- and spin
-- auto-spin option
-- payline / win visualization
-- bonus/free-spin-style feature presentation where used
-- jackpot-style UI may be simulated with virtual credits only
-- title-specific music/SFX hooks can be added later, but the architecture should support them
-- no cash deposits, withdrawals, redemption or real-money wagering in the default build
+## 7. Founder Console — current production state
 
-## 8. Founder Console requirements
+**The earlier browser-local prototype is no longer the authority. Production backend #1 has been implemented.**
 
-Founder Console is the F.S.A. operator/control plane. Current `/admin/` code is a **browser-local prototype** and is not yet a production authority.
+Production authority is now:
 
-### Required hierarchy
+`Supabase Auth → authenticated Founder/Agent identity → PostgreSQL RLS → audited RPC mutation layer → durable F.S.A. database`
 
-**Founder / Root → Distributor → Agent → User**
+Canonical backend documentation:
 
-Current code already demonstrates Agent/User workflows, virtual credits, game access, cashier/moderator separation, audit and reversal concepts. Production work must add the full hierarchy and enforce it server-side.
+- `backend/README.md`
+- `backend/supabase/migrations/`
+- `backend/supabase/functions/fsa-founder-admin/index.ts`
 
-### Founder/root capabilities
+### Implemented production backend
 
-- create / edit / suspend / reactivate distributors
-- create / edit / suspend / reactivate agents
-- create / edit / suspend / reactivate users
-- assign agents to distributors
-- assign users to agents
-- add/remove virtual credits
-- append-only credit ledger
-- compensating reversals instead of deleting/rewriting history
-- per-distributor and per-agent credit ceilings
+- real Supabase Auth operator identity
+- password sign-in
+- PKCE password-recovery flow
+- durable PostgreSQL records
+- server-enforced Founder vs Agent scope
+- active/suspended operator enforcement
+- TOTP MFA enrollment/challenge UI
+- `aal2` MFA required **inside the database** for administrative mutations
+- RLS on every exposed F.S.A. backend table
+- Founder reads all F.S.A. operator records
+- Agent reads only their own Agent/user/ledger/audit scope
+- direct browser table writes are not the administrative authority
 - cashier permission separate from moderator permission
-- per-role game-access controls for all 15 fish + 20 slots
-- user notes and support/moderation cases
-- low-balance warnings
-- search/filter/export
-- bulk user creation
-- audit trail for every administrative write
-- session/event/game configuration controls
-- owned-game difficulty/config experiment controls with audit history
+- per-Agent aggregate virtual-credit ceiling
+- no-negative-balance enforcement
+- append-only virtual-credit ledger
+- immutable audit log
+- compensating reversals rather than editing/deleting ledger history
+- exactly one reversal of an original ledger entry
+- Agent game access plus inherited Player game access
+- server-side authenticated Agent invitation/provisioning through a JWT-verified Edge Function
+- browser never receives a Supabase service-role credential
+- legacy `localStorage` records can be downloaded only as a backup; they are not production authority
 
-### Agent capabilities
+### Current backend tables
 
-When permitted by Founder:
+- `fsa_games`
+- `fsa_agents`
+- `fsa_operator_profiles`
+- `fsa_players`
+- `fsa_agent_game_access`
+- `fsa_player_game_access`
+- `fsa_credit_ledger`
+- `fsa_audit_log`
+- `fsa_backend_meta`
 
-- create/manage their own users
-- add/remove virtual credits within enforced ceiling/authority
-- suspend/reactivate their own users
-- manage allowed game access within inherited limits
-- see their own user/credit activity
-- no access to other agents' users
-- no privilege escalation
+### Current audited RPC mutation surface
 
-### Production security requirements
+- `fsa_rpc_create_player`
+- `fsa_rpc_adjust_credits`
+- `fsa_rpc_reverse_credit`
+- `fsa_rpc_update_player`
+- `fsa_rpc_update_agent`
+- `fsa_rpc_set_agent_games`
+- `fsa_rpc_set_player_games`
 
-Move authority from `localStorage` to a server/database:
+### Current role model
 
-- secure authentication
-- password hashing
-- secure sessions/cookies
-- MFA for Founder/admin
-- CSRF protection
-- rate limiting
-- server-enforced RBAC
-- immutable/append-only ledger semantics
-- idempotency keys for credit/event writes
-- audit logging
-- account lockout/recovery
-- concurrency/version checks
-- database migrations
-- backups + restore drill
-- privacy/export/delete-account operations where applicable
+The implemented production backend covers the **existing Founder → Agent → User** workflows.
 
-## 9. Current inspected repo state
+The broader **Founder → Distributor → Agent → User** hierarchy remains a separate future scope and must not be falsely described as already implemented. Distributor creation/assignment/limits belong to that later project stage.
 
-As of the baseline commit named above:
+### Backend verification completed
 
-### Present in code
+Transactional production-database smoke tests have verified:
 
-- `fsa-v8.js` defines all **15 fish titles**.
-- `fsa-v8.js` defines all **20 slot titles**.
-- `fsa-v8.js` defines **Pulse Cannon / Spread Blaster / Rail Harpoon** with different bet ladders and weapon behavior.
-- `fsa-v8.js` defines **Bronze Reef / Silver Current / Gold Abyss**.
-- v8 contains a Data Saver / 2G network check via `navigator.connection` / `effectiveType`.
-- the gameplay loop includes fish spawning, target multipliers, boss spawning, auto/lock behavior, combo/Fever concepts and multiple powers.
-- local player/profile state currently persists via browser storage.
-- `/admin/app.js` contains Agent/User management, virtual-credit changes, reversals, cashier/moderator separation, game access, bulk creation, audit and export concepts.
-- GitHub Pages is the current public deployment route.
+- an active Founder at `aal1` can read authorized data but administrative mutation is denied;
+- direct execution of private mutation helpers by ordinary authenticated users is denied;
+- an active Founder at `aal2` can create a test user, add virtual credits, reverse that adjustment, retain the original ledger history, and return to the expected balance;
+- Agent game inheritance and ledger entry counts remain correct;
+- tests are rolled back so synthetic smoke-test users/Agents are not retained;
+- performance hardening added the missing F.S.A. foreign-key indexes and optimized Auth/RLS initialization-plan calls.
 
-### Still not acceptable as “finished”
+### Account-level Auth settings
 
-- visual fidelity is still behind the approved reference images
-- many gameplay targets still use lightweight/icon-like rendering instead of production-quality animated creatures
-- all 15 tables need individually art-directed live backgrounds, target sets, bosses, guns and FX
-- the lobby must be rebuilt so the **actual DOM/runtime** matches the cinematic reference composition, not merely show reference images
-- the slots need production-quality individual cabinets/symbols/animations/features
-- Founder Console is not yet server-authenticated/authoritative
-- real multiplayer is not implemented; current shared-table feel is simulated
-- cloud persistence/cross-device player state is not production-complete
-- production telemetry API boundary to EGM4000 still needs server-side implementation
-- broad real-device Android QA still needs to be performed
+Two settings cannot be truthfully represented as repository code:
+
+1. Supabase security advisor currently reports **Leaked Password Protection disabled** for the shared Auth project. Enable it in the Supabase Auth dashboard if the project/plan exposes that option.
+2. Agent invitation/password-recovery emails return to `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`. That URL must be present in Supabase Auth's allowed redirect URLs. The available connector does not expose a redirect-allowlist mutation, so this setting requires dashboard verification.
+
+These are account-level Auth configuration checks, not a return to browser-local authority.
+
+## 8. Current arcade/runtime state
+
+Implemented and regression-tested in the existing runtime:
+
+- 15 fish titles
+- 20 slot titles
+- Pulse / Spread / Rail weapon systems
+- room-specific shot ladders
+- correct displayed-vs-deducted shot cost
+- tougher hard targets and scaled bosses
+- hard-target/boss-only life bars
+- four-gun landscape layout without large player panels
+- P1 opaque/current; rivals translucent
+- P4 upper station aligned with simulated origin
+- simulated co-shooters with their own weapon/bet/virtual-credit state
+- missions, Radar, combo/Fever, powers, Auto/Lock behavior
+- safer two-step Auto Fire / Lock On activation and Auto spending ceiling
+- title/slot filters
+- service-worker/offline shell
+- weak-network/device detection and low-data fallback
+- background animation pause
+
+## 9. Still separate/unstarted or future scope
+
+Do **not** confuse completion of production backend #1 with completion of the entire F.S.A. roadmap. The following remain separate future projects/workstreams unless explicitly started:
+
+- Distributor hierarchy backend (Founder → Distributor → Agent → User)
+- real network multiplayer
+- cloud/cross-device **player arcade account** system beyond the operator console
+- production F.S.A. → EGM4000 telemetry API
+- comprehensive final bespoke production art/sprite/audio pass for every title
+- broad physical Android-device/store QA
+- any real-money deposit/withdrawal/redemption system
+
+Visual fidelity also remains an active product-quality target: the live fish/slot runtime should keep moving toward the approved cinematic reference images rather than being called visually final merely because the backend is production-authoritative.
 
 ## 10. Android / 2G / Data Saver requirement
 
 F.S.A. must remain usable on weak mobile data and older Android hardware.
 
-### Mandatory architecture
+Mandatory architecture:
 
-- **Lite mode** automatically for `saveData`, `2g`, `slow-2g`, reduced-motion or constrained-device conditions when detectable
-- no giant HD atlas in the critical first-load path
+- Lite mode for Data Saver / 2G / slow-2G / reduced-motion / constrained-device signals when detectable
 - lightweight HTML/CSS/JS/Canvas shell first
-- lazy-load HD backgrounds, animated sprite sheets, audio and premium FX only after the table becomes usable
-- service-worker caching for the critical shell
-- aggressive image compression (WebP/AVIF where supported)
-- resolution/particle/fish-count scaling
-- pause expensive effects when hidden/backgrounded
-- avoid blocking render on optional fonts or large art
-- touch targets sized for phones
-- portrait lobby + landscape battle layouts where appropriate
-- continue to function with cached shell when the network becomes intermittent
+- no giant HD atlas in the critical startup path
+- lazy-load richer backgrounds/sprites/audio/FX
+- service-worker cache for the critical shell
+- compressed WebP/AVIF-style production assets where supported
+- dynamic resolution/particle/target scaling
+- pause expensive effects when hidden
+- touch-sized controls
+- portrait-friendly lobby and landscape battle layouts
+- HD is an enhancement, never a prerequisite to start playing
 
-### Quality tiers
+## 11. Continuation rules
 
-- **Lite / 2G:** procedural/simple sprites, fewer particles, lower target cap, smaller textures, reduced animation rate
-- **Balanced:** normal mobile default
-- **HD:** lazy-loaded richer backgrounds, sprite animation, glow, particles, richer boss/gun FX
+Before changing F.S.A.:
 
-HD must enhance the game; it must never be required to start playing.
+1. refresh `main`;
+2. read this checkpoint and `AGENTS.md`;
+3. preserve F.S.A. vs EGM4000 separation;
+4. preserve virtual/non-cash default behavior;
+5. preserve low-data/Android startup;
+6. make actual code/runtime changes rather than generating replacement mockups;
+7. protect the production Founder Console authority boundary;
+8. never expose a service-role key in browser code or GitHub;
+9. run regression/CI checks before merging;
+10. verify the exact GitHub Pages deployment SHA before claiming a release is live.
 
-## 11. EGM4000 boundary
+## 12. Definition of truth
 
-F.S.A. may expose perfect owned telemetry to EGM4000, but they remain separate products.
-
-Desired flow:
-
-`F.S.A. exact telemetry → explicit versioned API/events → EGM4000 normalized gameplay events → metrics/patterns/coaching/replay/experiments`
-
-Do not make EGM4000 silently mutate F.S.A. rules. Any owned-game experiment/config change must be an explicit Founder-controlled action with audit history.
-
-## 12. Virtual-credit / legal boundary
-
-Default F.S.A. remains **virtual/non-cash entertainment**.
-
-Do not claim or implement a production real-money gambling/cash-redemption system without an explicit separate legal/licensing/jurisdiction project and approval gate.
-
-The default product must not offer:
-
-- cash deposits
-- cash withdrawals
-- cash redemption
-- real-money prizes
-- claims of guaranteed profit
-
-## 13. Definition of “the runtime matches the reference images”
-
-A build is **not** complete merely because it has blue gradients, neon borders, or a concept image.
-
-The build is visually acceptable only when:
-
-1. the lobby composition, density and hierarchy resemble the approved F.S.A. lobby references at first glance;
-2. every fish table opens into a battle screen with the boss/mission/radar/4-seat/power/Fever structure shown in the references;
-3. the three guns are visibly and mechanically distinct;
-4. targets/bosses/backgrounds look like premium game art rather than emoji or debug primitives in normal/HD mode;
-5. each of the 15 fish games has a clearly distinct world and boss identity;
-6. the 20 slot games look individually authored rather than reskinned clones;
-7. mobile/2G fallback preserves gameplay without forcing HD downloads;
-8. CI validates catalogs, syntax, low-data path and critical interactions;
-9. GitHub Pages deployment succeeds;
-10. the live URL is manually checked on phone and desktop before calling the visual rebuild complete.
-
-## 14. Next Work-session priority
-
-**Do not generate more standalone concept images unless an implementation asset is genuinely missing.**
-
-The next Work task should operate directly on the current `main` branch and:
-
-1. compare the live v8 DOM/CSS/game runtime against this checkpoint;
-2. rebuild the main lobby to the approved cinematic F.S.A. composition;
-3. rebuild the fish battle shell around the approved boss/radar/missions/4-seat/guns/powers/Fever layout;
-4. replace icon/emoji-first targets with proper animated art assets in HD mode while retaining Lite fallback;
-5. art-direct all 15 fish titles individually;
-6. art-direct all 20 slot titles individually;
-7. test syntax/interaction/catalog/low-data behavior;
-8. fix failures;
-9. push to GitHub;
-10. deploy Pages and verify the live site.
-
-**Primary directive:** MAKE THE ACTUAL ARCADE LOOK AND OPERATE LIKE THE APPROVED F.S.A. / FISH SHOOTER ALLIANCE REFERENCES — NOT JUST THE MOCKUPS.
+A feature is only “done” when the implemented runtime/backend exists, its relevant automated checks pass, and the deployed environment is verified where tool access permits. Do not claim screenshots, prose, TODOs, or a branch-only prototype as production completion.
