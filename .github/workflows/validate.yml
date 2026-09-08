@@ -17,13 +17,14 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Validate cinematic arcade v8 and Founder Console
+      - name: Validate cinematic arcade v9 and Founder Console
         shell: bash
         run: |
           set -euo pipefail
           test -f index.html
           test -f fsa-v8.css
-          test -f fsa-v8.js
+          test -f gameplay-layout-v9.css
+          test -f fsa-v9.js
           test -f manifest.webmanifest
           test -f sw.js
           test -f assets/fsa-mark.svg
@@ -38,8 +39,8 @@ jobs:
           root=pathlib.Path('.')
           manifest=json.loads((root/'manifest.webmanifest').read_text())
           html=(root/'index.html').read_text()
-          js=(root/'fsa-v8.js').read_text()
-          css=(root/'fsa-v8.css').read_text()
+          js=(root/'fsa-v9.js').read_text()
+          css=(root/'fsa-v8.css').read_text()+'\n'+(root/'gameplay-layout-v9.css').read_text()
           sw=(root/'sw.js').read_text()
           admin=(root/'admin/app.js').read_text()
           admin_html=(root/'admin/index.html').read_text()
@@ -53,21 +54,28 @@ jobs:
           assert all(x in js for x in slot_titles)
           for phrase in ['Pulse Cannon','Spread Blaster','Rail Harpoon','Bronze Reef','Silver Current','Gold Abyss','navigator.connection','saveData','slow-','2g','OCEAN FEVER','LIGHTNING CHAIN','DEEP FREEZE','DEPTH BOMB','AUTO FIRE','LOCK ON']:
               assert phrase in js or phrase in html, phrase
-          for phrase in ['v8-game','boss-hud','Ocean Radar'.lower().replace(' ',''),'weapon-switch','seatgun','slot-modal']:
+          for phrase in ['v8-game','boss-hud','oceanradar','weapon-switch','seatgun','slot-modal']:
               assert phrase in css or phrase in html.lower().replace(' ',''), phrase
+          assert 'lifeBar:!!t.hard' in js
+          assert 'if(f.boss||f.lifeBar)' in js
+          assert 'hpMult:9.5' in js
+          assert 'opacity:.22' in css and 'opacity:1!important' in css
           safety=html.lower()
           assert 'virtual/non-cash' in safety and 'no cash redemption' in safety
-          for phrase in ['fsa-v8.css','fsa-v8.js']:
-              assert phrase in html and phrase in sw, phrase
+          for phrase in ['fsa-v8.css','gameplay-layout-v9.css','fsa-v9.js']:
+              assert phrase in html or phrase in sw, phrase
+          assert 'gameplay-layout-v9.css' in html and 'gameplay-layout-v9.css' in sw
+          assert 'fsa-v9.js' in html and 'fsa-v9.js' in sw
           for phrase in ['creditLimit','cashier','moderator','reverseLedger','audit','Bulk create']:
               assert phrase in admin or phrase in admin_html, phrase
-          print('FSA_V8_VISUAL_SHELL=PASS')
+          print('FSA_V9_VISUAL_SHELL=PASS')
           print('CATALOG=PASS fish=15 slots=20')
-          print('GAMEPLAY=PASS guns=3 rooms=3 bosses=1 missions=1 radar=1 fever=1 powers=4 rivals=4')
+          print('GAMEPLAY=PASS guns=3 rooms=3 bosses=1 missions=1 radar=1 fever=1 powers=4 rivals=4 hard_target_lifebars=1')
+          print('LANDSCAPE_HUD=PASS player_boxes=0 floating_guns=4 current_opaque=1 rivals_translucent=1')
           print('LOW_DATA=PASS network_api=1 saveData=1 2g=1 offline_shell=1')
           print('FOUNDER_CONSOLE=PASS')
           PY
-          node --check fsa-v8.js
+          node --check fsa-v9.js
           node --check admin/app.js
           node --check sw.js
           echo 'JS_SYNTAX=PASS'
