@@ -1,74 +1,61 @@
 # F.S.A. — Fish Shooter Arcade
 
-**SmartPickShop Holdings · current development line: cinematic v9 + production Founder Console backend**
+**SmartPickShop Holdings · cinematic v9 arcade + production Founder hierarchy**
 
-> **AI / Work continuation:** read [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md) before changing the project, then use [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md) for the approved F.S.A. / Fish Shooter Alliance visual target. Founder Console/backend work must also read [`backend/README.md`](backend/README.md).
+> **Continuation rule:** read [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md), [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md), and [`backend/README.md`](backend/README.md) before changing this project.
 
-![Captain Reef — F.S.A. key art](assets/captain-reef.jpg)
-
-F.S.A. is a standalone owned virtual arcade with **15 fish-shooter tables** and **20 original slot-style virtual-credit mini games**. The product target is the dense cinematic neon-Atlantis F.S.A. / Fish Shooter Alliance presentation defined in the canonical checkpoint, not a generic dashboard and not a static concept image.
+F.S.A. is a standalone owned virtual arcade with **15 fish-shooter tables** and **20 original slot-style virtual-credit mini games**. The runtime target is the approved dense cinematic neon-Atlantis / blue-gold Fish Shooter Arcade / Fish Shooter Alliance presentation, not a generic dashboard or a static concept image.
 
 ## Canonical links
 
 - Repository: `https://github.com/anastaysia94-sudo/fish-shooter-arcade`
-- Canonical branch: `main`
-- Live Pages target: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
+- Release branch: `main`
+- Arcade: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
 - Founder Console: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`
-- Full project/status checkpoint: [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md)
-- Visual implementation target: [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md)
-- Production backend architecture: [`backend/README.md`](backend/README.md)
+- Project checkpoint: [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md)
+- Backend architecture: [`backend/README.md`](backend/README.md)
 
-## Current arcade runtime
+## Arcade runtime
 
-The current arcade line includes:
+Current gameplay includes all 15 fish titles and 20 slot titles, Pulse Cannon / Spread Blaster / Rail Harpoon, Bronze Reef / Silver Current / Gold Abyss, tougher elite/boss targets, life bars only on hard targets/bosses, four floating landscape gun stations, missions, Ocean Radar, combo/Fever, powers, Auto Fire/Lock On guards, PWA/offline shell, and Data Saver/2G/constrained-device fallback.
 
-- all 15 fish-game titles
-- all 20 slot-game titles
-- Pulse Cannon / Spread Blaster / Rail Harpoon
-- room-specific shot ladders and distinct gun behavior
-- Bronze Reef / Silver Current / Gold Abyss
-- scaled hard targets and bosses
-- life bars only for hard targets/elites/bosses
-- four floating landscape gun stations instead of giant player boxes
-- missions, Ocean Radar, combo/Fever, powers, safer Auto Fire and Lock On
-- Data Saver / 2G / constrained-device fallback
-- service-worker/offline shell
+The continuing arcade priority remains visual fidelity to the approved cinematic references while retaining fast Android/low-data startup.
 
-The continuing arcade priority is **visual/runtime fidelity**: make the actual lobby and games match the approved cinematic F.S.A. references while preserving fast Android/2G startup.
+## Production Founder Console hierarchy
 
-## Founder Console production backend
+The control plane is server-authoritative:
 
-`/admin/` is no longer a browser-local authority. Its production control plane is backed by Supabase Auth and PostgreSQL.
+**Founder → Distributor → Agent → User**
 
-Implemented production boundary:
+Implemented production behavior:
 
-**Founder → Agent → User**
-
-with:
-
-- real authenticated operator accounts
-- password recovery
-- TOTP MFA enrollment/challenge
-- database-enforced `aal2` for administrative mutations
-- server-side Founder/Agent scope through Row Level Security
-- durable Agents/users/permissions/balances
-- cashier permission separate from moderator permission
-- Agent virtual-credit ceilings
-- append-only credit ledger with compensating reversals
-- immutable audit log
-- inherited game access
-- protected Founder-only Edge Function for authenticated Agent invitation/provisioning
+- Supabase Auth operator accounts and password recovery
+- TOTP MFA; administrative mutations require database-verified `aal2`
+- PostgreSQL Row Level Security for Founder / Distributor / Agent scopes
+- Founder creates and manages Distributors
+- permitted Distributors create/manage only their own Agents
+- permitted Founder/Distributor/Agent operators manage users within inherited scope
+- every Agent belongs to exactly one Distributor
+- Distributor aggregate virtual-credit ceilings
+- Agent aggregate virtual-credit ceilings inside the parent Distributor ceiling
+- cashier and moderator authority remain separate
+- Distributor → Agent → User game-access inheritance
+- parent game removals cascade downward
+- parent suspension blocks effective child authority
+- Founder-only cross-Distributor Agent reassignment
+- append-only virtual-credit ledger with Distributor + Agent lineage
+- immutable audit history
+- compensating reversals instead of rewriting ledger rows
+- protected JWT-verified Edge Function for authenticated Distributor/Agent provisioning
 - no service-role credential in browser code
-- no `localStorage` authority for users, balances, permissions, ledger or audit data
+- no browser `localStorage` authority for hierarchy, balances, permissions, ledger, or audit
 
-The broader **Founder → Distributor → Agent → User** production hierarchy remains a separate future workstream; Distributor support is not falsely included in this backend release.
+F.S.A. remains **virtual/non-cash entertainment**. No deposits, withdrawals, cash redemption, or real-money wagering are enabled.
 
-## Product boundaries
+## Product boundary
 
-- F.S.A. remains separate from EGM4000.
-- EGM4000 may consume versioned exact F.S.A. telemetry through an explicit owned-system API.
-- F.S.A. remains **virtual/non-cash entertainment by default**; no cash deposits, withdrawals or redemption are enabled by this build.
+F.S.A. remains separate from EGM4000. Any future F.S.A. → EGM4000 connection must use an explicit versioned telemetry boundary. Real multiplayer, cloud player-account sync, production EGM4000 telemetry, and real-money systems are separate workstreams, not implied by this hierarchy release.
 
 ## Working rule
 
-Do not generate standalone concept images as a substitute for implementation. Build, test, fix, push, deploy Pages and verify the **actual runtime/backend** before calling a release complete.
+Do not substitute generated images for implementation. Build the actual runtime/backend, run tests, fix failures, merge, deploy Pages, and verify the live result before calling a release complete.
