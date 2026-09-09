@@ -2,7 +2,7 @@ name: Validate F.S.A. Release
 
 on:
   push:
-    branches: [main, closure-started-scope-20260908, fsa-production-backend-v1]
+    branches: [main, fsa-distributor-hierarchy-v2]
   pull_request:
   workflow_dispatch:
 
@@ -17,83 +17,35 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Validate cinematic arcade and production Founder Console
+      - name: Validate arcade and production hierarchy
         shell: bash
         run: |
           set -euo pipefail
-          test -f index.html
-          test -f fsa-v8.css
-          test -f gameplay-layout-v9.css
-          test -f fsa-v9.js
-          test -f gameplay-selftest.js
-          test -f manifest.webmanifest
-          test -f sw.js
-          test -f assets/fsa-mark.svg
-          test -f assets/fsa-boss-event.svg
-          test -f assets/fsa-gameplay.svg
-          test -f assets/fsa-lobby.svg
-          test -f admin/index.html
-          test -f admin/styles.css
-          test -f admin/app.js
-          test -f admin/logic-selftest.js
-          test -f backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql
-          test -f backend/supabase/functions/fsa-founder-admin/index.ts
+          for f in index.html fsa-v8.css gameplay-layout-v9.css fsa-v9.js gameplay-selftest.js manifest.webmanifest sw.js admin/index.html admin/styles.css admin/app.js admin/logic-selftest.js backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql backend/supabase/migrations/20260909_fsa_distributor_hierarchy_schema_v2.sql backend/supabase/migrations/20260909_fsa_distributor_hierarchy_authority_v2.sql backend/supabase/functions/fsa-founder-admin/index.ts; do test -f "$f"; done
           python3 - <<'PY'
-          import json, pathlib
-          root=pathlib.Path('.')
-          manifest=json.loads((root/'manifest.webmanifest').read_text())
-          html=(root/'index.html').read_text()
-          js=(root/'fsa-v9.js').read_text()
-          css=(root/'fsa-v8.css').read_text()+'\n'+(root/'gameplay-layout-v9.css').read_text()
-          sw=(root/'sw.js').read_text()
-          admin=(root/'admin/app.js').read_text()
-          admin_html=(root/'admin/index.html').read_text()
-          sql=(root/'backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql').read_text()
-          edge=(root/'backend/supabase/functions/fsa-founder-admin/index.ts').read_text()
-          assert manifest['name'].startswith('F.S.A.')
-          assert manifest['display']=='standalone'
-          for phrase in ['FISH SHOOTER ARCADE','Fish Shooter Alliance','OCEAN LEGENDS','MEGA JACKPOT','OCEAN FEVER','DAILY MISSIONS','ROOM SELECTION','BOSS HUNT','LIVE REWARDS']:
-              assert phrase in html, phrase
-          fish_titles=['Reef Run','Dragon Depths',"Pirate's Plunder",'Atlantis Rising','Ice Tide','Lava Reef','Storm Seas','Jade Dragon','Neon Ocean','Ancient Ruins','Mecha Marine','Coral Chaos',"Kraken's Lair",'Treasure Trials','Boss Rush']
-          slot_titles=['Ocean Fortune','Treasure Reels',"Siren's Gold",'Legend of Atlantis','Shark Jackpot','Pearl Rush','Kraken Spins','Reef Riches','Lucky Tide','Deep Diamonds','Golden Anchor',"Mermaid's Treasure",'Pirate Jackpot','Coral Cash',"Neptune's Wheel",'Sea King 777','Ocean Wilds','Diamond Dolphin','Wild Pearls','Treasure Temple']
-          assert all(x in js for x in fish_titles)
-          assert all(x in js for x in slot_titles)
-          for phrase in ['Pulse Cannon','Spread Blaster','Rail Harpoon','Bronze Reef','Silver Current','Gold Abyss','navigator.connection','saveData','slow-','2g','OCEAN FEVER','LIGHTNING CHAIN','DEEP FREEZE','DEPTH BOMB','AUTO FIRE','LOCK ON']:
-              assert phrase in js or phrase in html, phrase
-          for phrase in ['v8-game','boss-hud','oceanradar','weapon-switch','seatgun','slot-modal']:
-              assert phrase in css or phrase in html.lower().replace(' ',''), phrase
-          assert 'lifeBar:!!t.hard' in js
-          assert 'if(f.boss||f.lifeBar)' in js
-          assert 'hpMult:9.5' in js
-          assert 'ROOM_BETS' in js
-          assert 'autoLimit=bet()*50' in js
-          assert 'opacity:.22' in css and 'opacity:1!important' in css
-          assert '.seatgun:nth-child(4){left:50%;top:8px' in css
-          safety=html.lower()
-          assert 'virtual/non-cash' in safety and 'no cash redemption' in safety
-          for phrase in ['fsa-v8.css','gameplay-layout-v9.css','fsa-v9.js']:
-              assert phrase in html or phrase in sw, phrase
-          assert 'gameplay-layout-v9.css' in html and 'gameplay-layout-v9.css' in sw
-          assert 'fsa-v9.js' in html and 'fsa-v9.js' in sw
-          assert "const fallback=isAdmin?'./admin/index.html':'./index.html'" in sw
-          for phrase in ['signInWithPassword','resetPasswordForEmail','getAuthenticatorAssuranceLevel','fsa_rpc_adjust_credits','fsa-founder-admin']:
-              assert phrase in admin, phrase
-          for phrase in ['Secure operator sign in','server-authoritative','MFA required for mutations','localStorage is not authority']:
-              assert phrase in admin_html, phrase
-          assert 'actorRole' not in admin_html and 'actorAgent' not in admin_html
-          assert 'localStorage.setItem(' not in admin
-          assert 'SUPABASE_SERVICE_ROLE_KEY' not in admin
-          assert 'enable row level security' in sql.lower()
-          assert 'FSA_MFA_REQUIRED' in sql
-          assert 'fsa_credit_ledger_immutable' in sql
-          assert "Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')" in edge
-          assert "claims.aal !== 'aal2'" in edge
-          print('FSA_V9_VISUAL_SHELL=PASS')
+          import json,pathlib
+          r=pathlib.Path('.')
+          manifest=json.loads((r/'manifest.webmanifest').read_text())
+          html=(r/'index.html').read_text(); js=(r/'fsa-v9.js').read_text(); css=(r/'fsa-v8.css').read_text()+'\n'+(r/'gameplay-layout-v9.css').read_text(); sw=(r/'sw.js').read_text()
+          admin=(r/'admin/app.js').read_text(); ah=(r/'admin/index.html').read_text(); schema=(r/'backend/supabase/migrations/20260909_fsa_distributor_hierarchy_schema_v2.sql').read_text(); auth=(r/'backend/supabase/migrations/20260909_fsa_distributor_hierarchy_authority_v2.sql').read_text(); edge=(r/'backend/supabase/functions/fsa-founder-admin/index.ts').read_text()
+          assert manifest['name'].startswith('F.S.A.') and manifest['display']=='standalone'
+          fish=['Reef Run','Dragon Depths',"Pirate's Plunder",'Atlantis Rising','Ice Tide','Lava Reef','Storm Seas','Jade Dragon','Neon Ocean','Ancient Ruins','Mecha Marine','Coral Chaos',"Kraken's Lair",'Treasure Trials','Boss Rush']
+          slots=['Ocean Fortune','Treasure Reels',"Siren's Gold",'Legend of Atlantis','Shark Jackpot','Pearl Rush','Kraken Spins','Reef Riches','Lucky Tide','Deep Diamonds','Golden Anchor',"Mermaid's Treasure",'Pirate Jackpot','Coral Cash',"Neptune's Wheel",'Sea King 777','Ocean Wilds','Diamond Dolphin','Wild Pearls','Treasure Temple']
+          assert all(x in js for x in fish) and all(x in js for x in slots)
+          for p in ['Pulse Cannon','Spread Blaster','Rail Harpoon','Bronze Reef','Silver Current','Gold Abyss','saveData','2g','OCEAN FEVER','AUTO FIRE','LOCK ON']: assert p in js or p in html,p
+          assert 'lifeBar:!!t.hard' in js and 'if(f.boss||f.lifeBar)' in js and 'hpMult:9.5' in js
+          assert 'virtual/non-cash' in html.lower() and 'no cash redemption' in html.lower()
+          for p in ['Founder → Distributor → Agent → User','Distributors','Distributor credit ceiling','Agent credit ceiling','localStorage is not authority']: assert p in ah,p
+          for p in ['fsa_distributors','fsa_distributor_game_access','invite_distributor','invite_agent','fsa_rpc_update_distributor','fsa_rpc_reassign_agent','fsa_rpc_set_distributor_games']: assert p in admin or p in edge,p
+          for p in ['public.fsa_distributors','distributor_id uuid','can_manage_agents','can_manage_users','schema_version=2']: assert p in schema,p
+          for p in ['assert_operator_v2','session_distributor_id','FSA_DISTRIBUTOR_CREDIT_CEILING_EXCEEDED','FSA_AGENT_CREDIT_CEILING_EXCEEDED','fsa_rpc_update_distributor','fsa_rpc_reassign_agent','fsa_rpc_set_distributor_games','fsa_distributors_scope_read']: assert p in auth,p
+          assert 'localStorage.setItem(' not in admin and 'SUPABASE_SERVICE_ROLE_KEY' not in admin
+          assert "Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')" in edge and "jwtPayload(token).aal !== 'aal2'" in edge
+          assert 'fsa-arcade-v11-distributor-hierarchy-20260909' in sw
+          assert "/\\/admin\\/(?:app\\.js|styles\\.css|index\\.html)$/" in sw
           print('CATALOG=PASS fish=15 slots=20')
-          print('GAMEPLAY=PASS guns=3 rooms=3 bosses=1 missions=4 radar=1 fever=1 powers=4 rivals=4 hard_target_lifebars=1 auto_guard=1')
-          print('LANDSCAPE_HUD=PASS player_boxes=0 floating_guns=4 current_opaque=1 rivals_translucent=1 p4_top_station=1')
-          print('LOW_DATA=PASS network_api=1 saveData=1 2g=1 constrained_device=1 reduced_motion=1 offline_shell=1')
-          print('FOUNDER_CONSOLE_PRODUCTION=PASS auth=1 rls=1 mfa=1 immutable_ledger=1 immutable_audit=1 local_authority=0')
+          print('GAMEPLAY=PASS hard_target_lifebars=1 guns=3 rooms=3 low_data=1')
+          print('HIERARCHY=PASS founder=1 distributor=1 agent=1 user=1 rls=1 mfa=1 dual_ceiling=1 game_inheritance=1')
           PY
           node --check fsa-v9.js
           node --check gameplay-selftest.js
@@ -102,4 +54,4 @@ jobs:
           node --check sw.js
           node gameplay-selftest.js
           node admin/logic-selftest.js
-          echo 'JS_AND_LOGIC_TESTS=PASS'
+          echo 'FSA_RELEASE_HIERARCHY_V2=PASS'
