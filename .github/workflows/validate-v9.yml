@@ -2,7 +2,7 @@ name: Validate F.S.A. v9 Gameplay
 
 on:
   push:
-    branches: [main, closure-started-scope-20260908, fsa-production-backend-v1]
+    branches: [main, fsa-distributor-hierarchy-v2]
   pull_request:
   workflow_dispatch:
 
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Validate v9 gameplay and Founder backend contract
+      - name: Validate v9 gameplay and production hierarchy
         shell: bash
         run: |
           set -euo pipefail
@@ -25,10 +25,12 @@ jobs:
           test -f gameplay-layout-v9.css
           test -f gameplay-selftest.js
           test -f admin/logic-selftest.js
-          test -f backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql
+          test -f backend/supabase/migrations/20260909_fsa_distributor_hierarchy_schema_v2.sql
+          test -f backend/supabase/migrations/20260909_fsa_distributor_hierarchy_authority_v2.sql
           test -f backend/supabase/functions/fsa-founder-admin/index.ts
           grep -q 'fsa-v9.js' index.html
           grep -q 'gameplay-layout-v9.css' index.html
+          grep -q 'Founder → Distributor → Agent → User' admin/index.html
           node --check fsa-v9.js
           node --check gameplay-selftest.js
           node --input-type=module --check < admin/app.js
@@ -36,4 +38,4 @@ jobs:
           node --check sw.js
           node gameplay-selftest.js
           node admin/logic-selftest.js
-          echo 'FSA_V9_AND_FOUNDER_BACKEND=PASS'
+          echo 'FSA_V9_AND_HIERARCHY_V2=PASS'
