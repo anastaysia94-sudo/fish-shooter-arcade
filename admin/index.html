@@ -1,153 +1,23 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>F.S.A. Founder Console</title>
-  <meta name="theme-color" content="#071827">
-  <link rel="stylesheet" href="styles.css">
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>F.S.A. Founder Console</title><meta name="theme-color" content="#071827"><link rel="stylesheet" href="styles.css"></head>
 <body>
-<div id="authGate" class="gate">
-  <section class="auth-card">
-    <div class="brand auth-brand"><b>F.S.A. FOUNDER CONSOLE</b><small>SmartPickShop Holdings · production control plane</small></div>
-    <h1>Secure operator sign in</h1>
-    <p class="muted">Founder and Agent permissions are now enforced by Supabase Auth + database RLS. Browser storage is not authority.</p>
-    <form id="loginForm" class="stack">
-      <label>Email<input id="loginEmail" type="email" autocomplete="username" required></label>
-      <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label>
-      <button type="submit">Sign in</button>
-      <button type="button" class="secondary" id="forgotPassword">Send password reset</button>
-    </form>
-    <div id="authMessage" class="message"></div>
-  </section>
-</div>
-
-<div id="recoveryGate" class="gate hidden">
-  <section class="auth-card">
-    <div class="brand auth-brand"><b>ACCOUNT RECOVERY</b><small>Choose a new Founder Console password</small></div>
-    <form id="recoveryForm" class="stack">
-      <label>New password<input id="newPassword" type="password" autocomplete="new-password" minlength="12" required></label>
-      <label>Confirm password<input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></label>
-      <button type="submit">Update password</button>
-    </form>
-    <div id="recoveryMessage" class="message"></div>
-  </section>
-</div>
-
+<div id="authGate" class="gate"><section class="auth-card"><div class="brand auth-brand"><b>F.S.A. FOUNDER CONSOLE</b><small>SmartPickShop Holdings · production hierarchy control plane</small></div><h1>Secure operator sign in</h1><p class="muted">Founder, Distributor and Agent permissions are enforced by Supabase Auth, RLS and MFA-gated server functions.</p><form id="loginForm" class="stack"><label>Email<input id="loginEmail" type="email" autocomplete="username" required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" class="secondary" id="forgotPassword">Send password reset</button></form><div id="authMessage" class="message"></div></section></div>
+<div id="recoveryGate" class="gate hidden"><section class="auth-card"><div class="brand auth-brand"><b>ACCOUNT RECOVERY</b><small>Choose a new Founder Console password</small></div><form id="recoveryForm" class="stack"><label>New password<input id="newPassword" type="password" autocomplete="new-password" minlength="12" required></label><label>Confirm password<input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></label><button type="submit">Update password</button></form><div id="recoveryMessage" class="message"></div></section></div>
 <div id="consoleShell" class="hidden">
-<header>
-  <div class="brand"><b>F.S.A. FOUNDER CONSOLE</b><small>SmartPickShop Holdings · server-authoritative virtual/non-cash control plane</small></div>
-  <div class="role real-role">
-    <span id="operatorBadge" class="pill"></span>
-    <span id="operatorEmail" class="muted"></span>
-    <button id="securityButton">Security</button>
-    <button id="signOutButton">Sign out</button>
-  </div>
-</header>
-<div class="scope-note" id="scopeNote"></div>
-<div id="securityBanner" class="security-banner"></div>
-<nav aria-label="Founder Console sections">
-  <button data-tab="dashboard" class="active">Dashboard</button>
-  <button data-tab="users">Users</button>
-  <button data-tab="agents">Agents</button>
-  <button data-tab="ledger">Credits</button>
-  <button data-tab="games">Game Access</button>
-  <button data-tab="audit">Audit</button>
-  <a href="../">← Arcade</a>
-</nav>
+<header><div class="brand"><b>F.S.A. FOUNDER CONSOLE</b><small>Founder → Distributor → Agent → User · virtual/non-cash</small></div><div class="role real-role"><span id="operatorBadge" class="pill"></span><span id="operatorEmail" class="muted"></span><button id="securityButton">Security</button><button id="signOutButton">Sign out</button></div></header>
+<div class="scope-note" id="scopeNote"></div><div id="securityBanner" class="security-banner"></div>
+<nav aria-label="Founder Console sections"><button data-tab="dashboard" class="active">Dashboard</button><button data-tab="users">Users</button><button data-tab="distributors" id="distributorsNav">Distributors</button><button data-tab="agents">Agents</button><button data-tab="ledger">Credits</button><button data-tab="games">Game Access</button><button data-tab="audit">Audit</button><a href="../">← Arcade</a></nav>
 <main>
-  <section id="dashboard" class="tab active">
-    <div class="cards" id="stats"></div>
-    <div class="grid2">
-      <article>
-        <h2>Quick user</h2>
-        <form id="quickUser">
-          <input id="quName" placeholder="Username" maxlength="60" required>
-          <input id="quDisplay" placeholder="Display name" maxlength="80">
-          <select id="quAgent" aria-label="Agent"></select>
-          <input id="quCredits" type="number" min="0" step="1" value="1000" aria-label="Opening virtual credits">
-          <button id="quickUserSubmit">Create user</button>
-        </form>
-      </article>
-      <article>
-        <h2>Quick credit</h2>
-        <form id="quickCredit">
-          <select id="qcUser" aria-label="User"></select>
-          <input id="qcAmount" type="number" step="1" value="100" aria-label="Credit amount">
-          <input id="qcReason" placeholder="Reason" value="Founder adjustment" maxlength="250">
-          <button id="quickCreditSubmit">Apply</button>
-        </form>
-      </article>
-    </div>
-    <article><h2>Low-balance watch</h2><div id="lowBalances"></div></article>
-    <article class="integrity"><h2>Production integrity rules</h2><div class="rule-grid"><span>✓ Authenticated operator identity</span><span>✓ Server-side RLS scoping</span><span>✓ MFA required for mutations</span><span>✓ Credit ceilings enforced in DB</span><span>✓ Append-only credit ledger</span><span>✓ Immutable audit trail</span><span>✓ No negative balances</span><span>✓ Game access inherits Agent limits</span><span>✓ localStorage is not authority</span></div></article>
-  </section>
-
-  <section id="users" class="tab">
-    <div class="bar"><h2>Users</h2><button id="addUser">+ Add user</button><button id="exportData">Export server data</button><button id="legacyBackup" class="secondary hidden">Download legacy browser backup</button></div>
-    <input id="userSearch" class="search" placeholder="Search users, agents or notes...">
-    <div id="usersTable"></div>
-  </section>
-
-  <section id="agents" class="tab">
-    <div class="bar"><h2>Agents</h2><button id="addAgent">+ Invite Agent</button></div>
-    <p class="muted">Agent accounts are real authenticated operator accounts. Credit ceiling is the maximum combined virtual-credit balance held by that Agent’s users.</p>
-    <div id="agentsTable"></div>
-  </section>
-
-  <section id="ledger" class="tab">
-    <div class="bar"><h2>Append-only virtual-credit ledger</h2></div>
-    <p class="muted">Corrections create an equal-and-opposite entry. Original records cannot be edited or deleted.</p>
-    <input id="ledgerSearch" class="search" placeholder="Search ledger by user or reason...">
-    <div id="ledgerTable"></div>
-  </section>
-
-  <section id="games" class="tab">
-    <div class="bar"><h2>Game access</h2><span>Users can only receive games allowed by their Agent.</span></div>
-    <div id="gamesPanel"></div>
-  </section>
-
-  <section id="audit" class="tab">
-    <div class="bar"><h2>Immutable server audit trail</h2></div>
-    <div id="auditTable"></div>
-  </section>
+<section id="dashboard" class="tab active"><div class="cards" id="stats"></div><div class="grid2"><article><h2>Quick user</h2><form id="quickUser"><input id="quName" placeholder="Username" maxlength="60" required><input id="quDisplay" placeholder="Display name" maxlength="80"><select id="quAgent" aria-label="Agent"></select><input id="quCredits" type="number" min="0" step="1" value="0" aria-label="Opening virtual credits"><button id="quickUserSubmit">Create user</button></form></article><article><h2>Quick credit</h2><form id="quickCredit"><select id="qcUser" aria-label="User"></select><input id="qcAmount" type="number" step="1" value="100" aria-label="Credit amount"><input id="qcReason" placeholder="Reason" value="Operator adjustment" maxlength="250"><button id="quickCreditSubmit">Apply</button></form></article></div><article><h2>Low-balance watch</h2><div id="lowBalances"></div></article><article class="integrity"><h2>Production hierarchy rules</h2><div class="rule-grid"><span>✓ Authenticated operator identity</span><span>✓ Founder → Distributor → Agent → User</span><span>✓ Server-side RLS isolation</span><span>✓ MFA/AAL2 for mutations</span><span>✓ Distributor credit ceiling</span><span>✓ Agent credit ceiling</span><span>✓ Distributor → Agent → User game inheritance</span><span>✓ Append-only credit ledger</span><span>✓ Immutable audit trail</span><span>✓ Parent suspension blocks child authority</span><span>✓ Cashier / moderator separation</span><span>✓ localStorage is not authority</span></div></article></section>
+<section id="users" class="tab"><div class="bar"><h2>Users</h2><button id="addUser">+ Add user</button><button id="exportData">Export server data</button><button id="legacyBackup" class="secondary hidden">Legacy browser backup</button></div><input id="userSearch" class="search" placeholder="Search users, Agents, Distributors or notes..."><div id="usersTable"></div></section>
+<section id="distributors" class="tab"><div class="bar"><h2>Distributors</h2><button id="addDistributor">+ Invite Distributor</button></div><p class="muted">Founder-only creation and top-level policy. A Distributor may manage only its own Agents and users, within inherited permissions and its aggregate virtual-credit ceiling.</p><div id="distributorsTable"></div></section>
+<section id="agents" class="tab"><div class="bar"><h2>Agents</h2><button id="addAgent">+ Invite Agent</button></div><p class="muted">Every Agent belongs to exactly one Distributor. Agent ceilings and game access cannot exceed the parent Distributor.</p><div id="agentsTable"></div></section>
+<section id="ledger" class="tab"><div class="bar"><h2>Append-only virtual-credit ledger</h2></div><p class="muted">Each row records both Distributor and Agent ownership at the time of the transaction. Corrections create compensating entries.</p><input id="ledgerSearch" class="search" placeholder="Search ledger by user, Agent, Distributor or reason..."><div id="ledgerTable"></div></section>
+<section id="games" class="tab"><div class="bar"><h2>Inherited game access</h2><span>Distributor access → Agent access → User access. Children can never self-grant a blocked parent game.</span></div><div id="gamesPanel"></div></section>
+<section id="audit" class="tab"><div class="bar"><h2>Immutable server audit trail</h2></div><div id="auditTable"></div></section>
 </main>
-
-<dialog id="modal">
-  <form method="dialog" id="modalForm">
-    <h2 id="modalTitle"></h2>
-    <div id="modalBody"></div>
-    <menu><button value="cancel" type="button" id="modalCancel">Cancel</button><button id="modalSave" value="default">Save</button></menu>
-  </form>
-</dialog>
-
-<dialog id="securityDialog">
-  <div class="security-box">
-    <h2>Operator security</h2>
-    <p id="aalStatus" class="muted"></p>
-    <div id="mfaExisting" class="stack hidden">
-      <p>A verified authenticator is enrolled. Enter its current 6-digit code to unlock administrative mutations for this session.</p>
-      <input id="mfaLoginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Authenticator code">
-      <button id="verifyExistingMfa">Verify MFA</button>
-    </div>
-    <div id="mfaEnroll" class="stack hidden">
-      <p>No authenticator is enrolled. Set one up before changing credits, users, Agents, or permissions.</p>
-      <button id="beginMfaEnroll">Set up authenticator</button>
-      <div id="mfaEnrollDetails" class="hidden stack">
-        <img id="mfaQr" class="qr" alt="Authenticator QR code">
-        <code id="mfaSecret"></code>
-        <input id="mfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter code from authenticator">
-        <button id="verifyMfaEnroll">Finish MFA setup</button>
-      </div>
-    </div>
-    <menu><button id="securityClose">Close</button></menu>
-  </div>
-</dialog>
-
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-<footer>Production authority: Supabase Auth + PostgreSQL RLS + audited RPCs. F.S.A. credits remain virtual/non-cash. The browser only renders server-authorized state.</footer>
-</div>
-<script type="module" src="app.js"></script>
-</body>
-</html>
+<dialog id="modal"><form method="dialog" id="modalForm"><h2 id="modalTitle"></h2><div id="modalBody"></div><menu><button value="cancel" type="button" id="modalCancel">Cancel</button><button id="modalSave" value="default">Save</button></menu></form></dialog>
+<dialog id="securityDialog"><div class="security-box"><h2>Operator security</h2><p id="aalStatus" class="muted"></p><div id="mfaExisting" class="stack hidden"><p>A verified authenticator is enrolled. Enter its current code to unlock administrative mutations.</p><input id="mfaLoginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Authenticator code"><button id="verifyExistingMfa">Verify MFA</button></div><div id="mfaEnroll" class="stack hidden"><p>No authenticator is enrolled. Set one up before changing hierarchy, credits, users or permissions.</p><button id="beginMfaEnroll">Set up authenticator</button><div id="mfaEnrollDetails" class="hidden stack"><img id="mfaQr" class="qr" alt="Authenticator QR code"><code id="mfaSecret"></code><input id="mfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter code from authenticator"><button id="verifyMfaEnroll">Finish MFA setup</button></div></div><menu><button id="securityClose">Close</button></menu></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div><footer>Production authority: Supabase Auth + PostgreSQL RLS + MFA-gated audited RPCs. Credits remain virtual/non-cash.</footer>
+</div><script type="module" src="app.js"></script></body></html>
