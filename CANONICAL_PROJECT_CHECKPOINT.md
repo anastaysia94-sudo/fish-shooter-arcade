@@ -2,57 +2,44 @@
 
 > **READ THIS FIRST in ChatGPT Work, Codex, Copilot, Grok, Perplexity, or any continuation environment.**
 >
-> This is the canonical product/status checkpoint for **Fish Shooter Arcade (F.S.A.)**. When older prompts, mockups, legacy notes, or previous status reports conflict with this file plus the current `main`, use this file and the current repository state.
+> This file plus the current `main` branch is the source of truth for **Fish Shooter Arcade (F.S.A.)**. Older prompts, screenshots, status reports, and prototype files do not override it.
 
 ## 1. Canonical repository and deployment
 
 - Repository: `https://github.com/anastaysia94-sudo/fish-shooter-arcade`
 - Canonical release branch: `main`
-- Public arcade: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
+- Arcade: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
 - Founder Console: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`
 - Parent organization: **SmartPickShop Holdings**
-- Always refresh `main` before editing. Never overwrite newer commits with an older snapshot.
+- Refresh `main` before editing. Never overwrite newer work with an older snapshot.
 
 ## 2. Product boundary
 
 **F.S.A. = Fish Shooter Arcade / Fish Shooter Alliance.**
 
-- **F.S.A.** is the owned playable fish-shooter + slot-style virtual arcade and its operator control plane.
-- **Founder Console** is the F.S.A. administration/control plane.
-- **EGM4000** is a separate analytics/coaching/research product. Any telemetry connection must cross an explicit, versioned boundary.
-- Do not merge EGM4000 into F.S.A. or silently let EGM4000 mutate F.S.A. rules.
-- F.S.A. remains **virtual/non-cash entertainment** by default. No cash deposits, withdrawals, redemption, or real-money wagering belong in this default product.
+F.S.A. is the owned playable fish-shooter + slot-style virtual arcade and its operator control plane. **EGM4000 is separate.** A future telemetry bridge must be explicit/versioned and must never silently mutate F.S.A. rules.
 
-## 3. Non-negotiable visual directive
+F.S.A. remains **virtual/non-cash entertainment by default**. No cash deposits, withdrawals, redemption, or real-money wagering are enabled.
 
-**The actual live runtime must look and operate like the approved F.S.A. / Fish Shooter Alliance reference images. Do not substitute concept art, screenshots, or hero images for implementation.**
+## 3. Non-negotiable visual/runtime directive
+
+The actual live runtime must look and operate like the approved F.S.A. / Fish Shooter Alliance references. Do not stop at concept art and do not cover a simple game with a pretty hero image.
 
 Canonical visual language:
 
 - cinematic neon Atlantis / underwater megacity
-- metallic gold F.S.A. / trident branding
-- deep cobalt/cyan ocean lighting with gold, violet, coral, electric and molten accents
-- premium adult arcade-machine presentation, not childish/emoji-first UI
-- dense but readable fish-table HUD
-- illustrated fish, sharks, dragons, rays, jellyfish, mechanical creatures, sea monsters, treasure, ruins, lightning, beams, coins and bosses
-- rich lobby/game cards, missions, events, room selection, rewards and boss presentation
+- metallic gold F.S.A. trident identity
+- saturated cyan/electric-blue/violet/coral/molten-orange effects
+- adult, premium arcade tone
+- dense fish-table cabinet presentation with readable hierarchy
+- illustrated fish, sharks, dragons, rays, jellyfish, sea monsters, mechanical creatures, treasure, ruins, lightning, beams and boss effects
+- blue/gold glass-and-metal lobby/game cards
+- full-screen battlefield with missions, radar, boss HP, powers, combo/Fever and floating gun stations
+- Android/touch usability and a Lite/2G fallback must survive visual upgrades
 
-Primary visual references and implementation guidance are indexed in:
+Primary reference index: [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md).
 
-- `docs/visual-reference/REFERENCE_INDEX.md`
-- `assets/fsa-lobby.svg`
-- `assets/fsa-gameplay.svg`
-- `assets/fsa-boss-event.svg`
-- `assets/fsa-fish-hd-atlas.webp`
-- `assets/reef-run-hd-battle.webp`
-- `assets/fsa-slots-hd-atlas.webp`
-- `assets/fsa-mark.svg`
-
-If a continuation environment can see the earlier generated F.S.A. images, use those exact images as visual references. The runtime, not the mockup, is the deliverable.
-
-## 4. Fish Shooter catalog — exactly 15
-
-All 15 remain required playable owned tables with distinct themes and tuning:
+## 4. Required fish games — exactly 15
 
 1. Reef Run
 2. Dragon Depths
@@ -70,45 +57,29 @@ All 15 remain required playable owned tables with distinct themes and tuning:
 14. Treasure Trials
 15. Boss Rush
 
-Shared table requirements include:
+All 15 must remain real playable tables with distinct identity/tuning, not title-only reskins.
 
-- Bronze Reef / Silver Current / Gold Abyss rooms
-- moving schools, formations and depth lanes
-- target multipliers
-- common / fast / armored / chain / vortex / treasure / bomb / laser / drill / elite / boss classes
-- bosses with phases/entrances/finishing-shot ownership
-- missions
-- Ocean Radar
-- combo + Ocean Fever
-- lock-on
-- auto-fire with deliberate activation/spend guard
-- touch/hold-to-fire
-- feature events and satisfying hit/treasure effects
-- four table gun stations without giant player boxes covering landscape play
-- P1/current gun fully visible and interactive; rivals visually subordinate/translucent
-- ordinary fish do **not** show life bars; only genuinely hard targets/elites/bosses do
+Shared table systems include moving schools, target multipliers, common/fast/armored/special/elite/boss targets, boss phases, missions, Ocean Radar, combo, Ocean Fever, lock-on, guarded Auto Fire, hold-to-fire, powers, room tiers and exact owned-game telemetry hooks.
+
+Only intentionally hard targets/elites/bosses get life bars. Ordinary fish do not.
 
 ## 5. Three-gun requirement
 
-### Pulse Cannon
-- lowest shot cost
-- fast precision fire
-- common/fast-target role
-- base ladder: 2 / 5 / 10 / 20 / 50 virtual credits
+- **Pulse Cannon** — lowest cost, rapid precision fire.
+- **Spread Blaster** — medium cost, multi-projectile crowd control.
+- **Rail Harpoon** — highest cost, slow heavy/piercing boss/armor role.
 
-### Spread Blaster
-- medium trigger cost
-- multi-projectile crowd-control role
-- base ladder: 10 / 20 / 50 / 100 / 200 virtual credits
+Gun switching must change weapon behavior and presentation, not merely the label. Current runtime keeps room-aware shot ladders and correct per-shot virtual-credit deductions.
 
-### Rail Harpoon
-- highest shot cost
-- slower heavy/piercing boss and armor role
-- base ladder: 50 / 100 / 200 / 500 / 1000 virtual credits
+## 6. Room tiers
 
-Room tiers can scale ladders, but displayed shot cost must equal the virtual-credit amount actually deducted. Weapon models/effects/behavior must visibly differ, not merely the label.
+- Bronze Reef
+- Silver Current
+- Gold Abyss
 
-## 6. Slot catalog — exactly 20
+Room tiers control shot ranges/difficulty while preserving Pulse < Spread < Rail cost/destructive role.
+
+## 7. Required slot games — exactly 20
 
 1. Ocean Fortune
 2. Treasure Reels
@@ -131,165 +102,189 @@ Room tiers can scale ladders, but displayed shot cost must equal the virtual-cre
 19. Wild Pearls
 20. Treasure Temple
 
-All remain virtual-credit mini games. Each ultimately needs its own cabinet/background/symbol/bonus visual identity rather than twenty title swaps over one generic skin.
+Slots remain original virtual-credit mini games. Production art direction should ultimately give each title a distinct cabinet, background, symbols and feature identity.
 
-## 7. Founder Console — current production state
+## 8. Current gameplay/runtime state
 
-**The earlier browser-local prototype is no longer the authority. Production backend #1 has been implemented.**
+Implemented and protected by CI:
 
-Production authority is now:
+- 15 fish games + 20 slots
+- Pulse / Spread / Rail weapons
+- Bronze/Silver/Gold room tiers
+- room-specific shot values
+- correct shot deductions
+- hard-target and scalable boss durability
+- hard-target/boss-only life bars
+- four floating landscape gun stations; current player opaque, simulated rivals translucent
+- missions, radar, combo/Fever, powers
+- safer two-step Auto Fire/Lock On and Auto Fire spending guard
+- AI shooter balances/weapons
+- Data Saver/2G/constrained-device detection
+- PWA/offline shell
+- network-first security-sensitive Founder Console assets
 
-`Supabase Auth → authenticated Founder/Agent identity → PostgreSQL RLS → audited RPC mutation layer → durable F.S.A. database`
+The remaining arcade priority is visual/content fidelity across all titles, not hierarchy/backend rework.
 
-Canonical backend documentation:
+## 9. Production Founder Console hierarchy — IMPLEMENTED
 
-- `backend/README.md`
-- `backend/supabase/migrations/`
-- `backend/supabase/functions/fsa-founder-admin/index.ts`
+Production authority is:
 
-### Implemented production backend
+**Founder → Distributor → Agent → User**
 
-- real Supabase Auth operator identity
-- password sign-in
-- PKCE password-recovery flow
-- durable PostgreSQL records
-- server-enforced Founder vs Agent scope
-- active/suspended operator enforcement
-- TOTP MFA enrollment/challenge UI
-- `aal2` MFA required **inside the database** for administrative mutations
-- RLS on every exposed F.S.A. backend table
-- Founder reads all F.S.A. operator records
-- Agent reads only their own Agent/user/ledger/audit scope
-- direct browser table writes are not the administrative authority
-- cashier permission separate from moderator permission
-- per-Agent aggregate virtual-credit ceiling
-- no-negative-balance enforcement
-- append-only virtual-credit ledger
-- immutable audit log
-- compensating reversals rather than editing/deleting ledger history
-- exactly one reversal of an original ledger entry
-- Agent game access plus inherited Player game access
-- server-side authenticated Agent invitation/provisioning through a JWT-verified Edge Function
-- browser never receives a Supabase service-role credential
-- legacy `localStorage` records can be downloaded only as a backup; they are not production authority
+This is no longer a browser-local prototype. The authority boundary is **Supabase Auth + PostgreSQL Row Level Security + MFA-gated audited RPCs + protected Auth-admin Edge Function**.
 
-### Current backend tables
+### Founder
 
-- `fsa_games`
-- `fsa_agents`
-- `fsa_operator_profiles`
-- `fsa_players`
-- `fsa_agent_game_access`
-- `fsa_player_game_access`
-- `fsa_credit_ledger`
-- `fsa_audit_log`
-- `fsa_backend_meta`
+- sees complete hierarchy
+- invites/edits/suspends/reactivates Distributors
+- manages any Agent/user
+- reassigns Agents across Distributors when constraints pass
+- defines Distributor game access
+- normal credit/moderation powers after MFA
 
-### Current audited RPC mutation surface
+### Distributor
+
+- authenticated operator tied to exactly one Distributor record
+- sees only its Distributor, its Agents/users, its ledger/audit and inherited access
+- may manage Agents only when `can_manage_agents=true`
+- may manage users only when `can_manage_users=true`
+- cashier and moderator permissions are separate
+- cannot see/mutate sibling Distributors
+- cannot create Agent ceilings above its own ceiling
+- cannot grant games it does not own
+
+### Agent
+
+- authenticated operator tied to exactly one Agent
+- every Agent belongs to exactly one Distributor
+- sees parent Distributor, own Agent/users, own ledger/audit/access
+- may manage users only when `can_manage_users=true`
+- cashier and moderator permissions are separate
+- cannot see/mutate sibling Agents/users
+- cannot grant users games blocked at Agent level
+
+### User
+
+- belongs to exactly one Agent
+- virtual-credit balance is server-authoritative
+- user game access is a subset of Agent access
+- user/credit writes are performed through audited server RPCs
+
+## 10. Hierarchical credit invariants
+
+Every positive credit mutation checks **both** aggregate guards:
+
+1. Agent exposure after the mutation must not exceed `Agent.credit_ceiling`.
+2. Distributor exposure across all child Agents/users after the mutation must not exceed `Distributor.credit_ceiling`.
+
+Additional invariants:
+
+- no negative balances
+- Agent ceiling cannot exceed parent Distributor ceiling
+- Distributor ceiling cannot be lowered below existing exposure or below a child Agent ceiling
+- cross-Distributor user/Agent moves are restricted to authorized parent roles; Agent reassignment across Distributors is Founder-only
+- `fsa_credit_ledger` is append-only
+- corrections use compensating reversals
+- ledger rows record Distributor + Agent lineage
+- `fsa_audit_log` is immutable
+
+## 11. Hierarchical game access
+
+Strict inheritance:
+
+`active F.S.A. game → Distributor → Agent → User`
+
+- Founder controls Distributor access.
+- Founder/permitted Distributor controls Agent access inside the Distributor subset.
+- permitted hierarchy operators control User access inside the Agent subset.
+- removing a Distributor game cascades removal from Agents/users.
+- removing an Agent game cascades removal from users.
+- children cannot self-grant a parent-blocked game.
+
+## 12. Authentication / MFA / provisioning
+
+- Supabase Auth provides operator identity/password verification and recovery.
+- browser uses only the publishable key under RLS.
+- service-role credentials never appear in GitHub Pages/browser code.
+- TOTP MFA is supported.
+- administrative mutations require database-verified `aal2`.
+- `fsa-founder-admin` Edge Function has JWT verification enabled.
+- `invite_distributor` is Founder-only.
+- `invite_agent` is Founder or permitted Distributor; Distributor scope is forced server-side to the caller's own Distributor.
+- invited operators receive real Auth accounts and role mappings.
+
+## 13. Server mutation API
+
+Authenticated hierarchy writes use:
 
 - `fsa_rpc_create_player`
 - `fsa_rpc_adjust_credits`
 - `fsa_rpc_reverse_credit`
 - `fsa_rpc_update_player`
+- `fsa_rpc_update_distributor`
 - `fsa_rpc_update_agent`
+- `fsa_rpc_reassign_agent`
+- `fsa_rpc_set_distributor_games`
 - `fsa_rpc_set_agent_games`
 - `fsa_rpc_set_player_games`
 
-### Current role model
+Each function re-checks role, active parent state, scope, delegated permission and MFA as applicable.
 
-The implemented production backend covers the **existing Founder → Agent → User** workflows.
+## 14. Live hierarchy verification completed
 
-The broader **Founder → Distributor → Agent → User** hierarchy remains a separate future scope and must not be falsely described as already implemented. Distributor creation/assignment/limits belong to that later project stage.
+Disposable transactions were rolled back after verification. The live production database has passed:
 
-### Backend verification completed
+- `aal1` Founder mutation → rejected with `FSA_MFA_REQUIRED`
+- `aal2` Founder create user → +credit → reversal → exact opening balance restored
+- append-only 3-row opening/adjustment/reversal ledger sequence
+- Distributor game removal cascades to Agent and User
+- Agent ceiling overage → `FSA_AGENT_CREDIT_CEILING_EXCEEDED`
+- Distributor ceiling overage → `FSA_DISTRIBUTOR_CREDIT_CEILING_EXCEEDED`
+- in a two-Distributor RLS fixture, Distributor sees exactly 1 Distributor / 1 Agent / 1 User
+- cross-Distributor Agent update → `FSA_SCOPE_DENIED`
+- smoke test fixtures leave no live Distributor/Agent/User/ledger/audit rows after rollback
 
-Transactional production-database smoke tests have verified:
+## 15. Supabase schema/version
 
-- an active Founder at `aal1` can read authorized data but administrative mutation is denied;
-- direct execution of private mutation helpers by ordinary authenticated users is denied;
-- an active Founder at `aal2` can create a test user, add virtual credits, reverse that adjustment, retain the original ledger history, and return to the expected balance;
-- Agent game inheritance and ledger entry counts remain correct;
-- tests are rolled back so synthetic smoke-test users/Agents are not retained;
-- performance hardening added the missing F.S.A. foreign-key indexes and optimized Auth/RLS initialization-plan calls.
+Hierarchy v2 sets `fsa_backend_meta.schema_version=2`.
 
-### Account-level Auth settings
+Tracked migrations include:
 
-Two settings cannot be truthfully represented as repository code:
+- `20260908_fsa_founder_console_backend_v1.sql`
+- `20260908_fsa_harden_trigger_search_paths.sql`
+- `20260908_fsa_least_privilege_execute_v1.sql`
+- `20260908_fsa_performance_hardening_v1.sql`
+- `20260909_fsa_distributor_hierarchy_schema_v2.sql`
+- `20260909_fsa_distributor_hierarchy_authority_v2.sql`
 
-1. Supabase security advisor currently reports **Leaked Password Protection disabled** for the shared Auth project. Enable it in the Supabase Auth dashboard if the project/plan exposes that option.
-2. Agent invitation/password-recovery emails return to `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`. That URL must be present in Supabase Auth's allowed redirect URLs. The available connector does not expose a redirect-allowlist mutation, so this setting requires dashboard verification.
+Backend details: [`backend/README.md`](backend/README.md).
 
-These are account-level Auth configuration checks, not a return to browser-local authority.
+## 16. Low-data / Android rule
 
-## 8. Current arcade/runtime state
+Preserve a Lite path for `saveData`, 2G/slow-2G, reduced-motion and constrained devices. Heavy art/audio must remain optional/lazy. HD enhances play but must not be required to reach a usable table. Keep the service-worker shell, compressed assets, scaled effects and touch-friendly layouts.
 
-Implemented and regression-tested in the existing runtime:
+## 17. Account-level settings outside repository code
 
-- 15 fish titles
-- 20 slot titles
-- Pulse / Spread / Rail weapon systems
-- room-specific shot ladders
-- correct displayed-vs-deducted shot cost
-- tougher hard targets and scaled bosses
-- hard-target/boss-only life bars
-- four-gun landscape layout without large player panels
-- P1 opaque/current; rivals translucent
-- P4 upper station aligned with simulated origin
-- simulated co-shooters with their own weapon/bet/virtual-credit state
-- missions, Radar, combo/Fever, powers, Auto/Lock behavior
-- safer two-step Auto Fire / Lock On activation and Auto spending ceiling
-- title/slot filters
-- service-worker/offline shell
-- weak-network/device detection and low-data fallback
-- background animation pause
+The available connector cannot change these Supabase Auth project settings:
 
-## 9. Still separate/unstarted or future scope
+- **Leaked Password Protection** is currently reported disabled and should be enabled where available.
+- `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/` must be present in the Auth redirect allowlist for invitation/recovery links.
 
-Do **not** confuse completion of production backend #1 with completion of the entire F.S.A. roadmap. The following remain separate future projects/workstreams unless explicitly started:
+Each human Founder/Distributor/Agent must enroll/verify their own TOTP factor. The app cannot scan an operator's authenticator on their behalf.
 
-- Distributor hierarchy backend (Founder → Distributor → Agent → User)
-- real network multiplayer
-- cloud/cross-device **player arcade account** system beyond the operator console
+## 18. Separate future work — NOT implied by hierarchy v2
+
+The hierarchy release does not start or complete:
+
+- cross-device/cloud player-account synchronization outside the operator backend
+- real network multiplayer/shared human tables
 - production F.S.A. → EGM4000 telemetry API
-- comprehensive final bespoke production art/sprite/audio pass for every title
-- broad physical Android-device/store QA
-- any real-money deposit/withdrawal/redemption system
+- final bespoke production art/audio for every title
+- full physical Android/store QA
+- real-money functionality
 
-Visual fidelity also remains an active product-quality target: the live fish/slot runtime should keep moving toward the approved cinematic reference images rather than being called visually final merely because the backend is production-authoritative.
+Do not silently fold these into the hierarchy release or claim they are complete.
 
-## 10. Android / 2G / Data Saver requirement
+## 19. Working rule
 
-F.S.A. must remain usable on weak mobile data and older Android hardware.
-
-Mandatory architecture:
-
-- Lite mode for Data Saver / 2G / slow-2G / reduced-motion / constrained-device signals when detectable
-- lightweight HTML/CSS/JS/Canvas shell first
-- no giant HD atlas in the critical startup path
-- lazy-load richer backgrounds/sprites/audio/FX
-- service-worker cache for the critical shell
-- compressed WebP/AVIF-style production assets where supported
-- dynamic resolution/particle/target scaling
-- pause expensive effects when hidden
-- touch-sized controls
-- portrait-friendly lobby and landscape battle layouts
-- HD is an enhancement, never a prerequisite to start playing
-
-## 11. Continuation rules
-
-Before changing F.S.A.:
-
-1. refresh `main`;
-2. read this checkpoint and `AGENTS.md`;
-3. preserve F.S.A. vs EGM4000 separation;
-4. preserve virtual/non-cash default behavior;
-5. preserve low-data/Android startup;
-6. make actual code/runtime changes rather than generating replacement mockups;
-7. protect the production Founder Console authority boundary;
-8. never expose a service-role key in browser code or GitHub;
-9. run regression/CI checks before merging;
-10. verify the exact GitHub Pages deployment SHA before claiming a release is live.
-
-## 12. Definition of truth
-
-A feature is only “done” when the implemented runtime/backend exists, its relevant automated checks pass, and the deployed environment is verified where tool access permits. Do not claim screenshots, prose, TODOs, or a branch-only prototype as production completion.
+Do not claim completion from code generation alone. A release is complete only after the relevant logic tests/CI pass, the target changes are merged into `main`, GitHub Pages deploys successfully, and the live runtime/backend state is verified where tooling permits.
