@@ -37,3 +37,5 @@ try{
   await writeFile(resolve(out,'manifest.json'),JSON.stringify({schema:'fsa.visual-acceptance.v1',baseUrl:base.toString(),generatedAt:new Date().toISOString(),acceptanceItems:12,screenshots:rows},null,2));
   console.log(`FSA_VISUAL_ACCEPTANCE_CAPTURE=PASS items=12 screenshots=${rows.length}`);
 }finally{await browser.close()}
+
+// Release-gate touchpoint: this file is intentionally part of PR path filters.
