@@ -1,0 +1,23 @@
+name: Validate F.S.A. Cloud Sync v11
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  cloud-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate cloud account and cross-device contract
+        run: node cloud-sync-selftest.js
+      - name: Preserve gameplay regression coverage
+        run: node gameplay-selftest.js
