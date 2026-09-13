@@ -33,9 +33,10 @@ assert(edge.includes('FSA_AGENT_CEILING_OUTSIDE_DISTRIBUTOR'),'Agent provisionin
 assert(edge.includes('fsa_distributor_game_access'),'Agent provisioning game inheritance missing');
 assert(!js.includes('SUPABASE_SERVICE_ROLE_KEY'),'service-role credential reference must never appear in browser client');
 
-const cacheMatch=sw.match(/const CACHE='fsa-arcade-v(\d+)-[^']+'/);
-assert(cacheMatch,'service worker must use an explicit versioned F.S.A. cache generation');
-assert(Number(cacheMatch[1])>=11,'service-worker cache generation must not regress below hierarchy cutover');
+// Cache generations may advance for unrelated public-runtime releases. The hierarchy contract is
+// that the current cache is versioned and security-sensitive Founder assets remain network-first.
+const cacheMatch=sw.match(/const CACHE='fsa-arcade-v(\d+)-/);
+assert(cacheMatch&&Number(cacheMatch[1])>=11,'service-worker cache generation must be at least the hierarchy cutover');
 assert(sw.includes('/\\/admin\\/(?:app\\.js|styles\\.css|index\\.html)$/'),'security-sensitive admin assets must remain network-first');
 
 // Model-level ceiling/inheritance regression checks.
