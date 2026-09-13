@@ -4,29 +4,33 @@ import { resolve } from 'node:path';
 
 const root = resolve(process.cwd());
 const read = path => readFile(resolve(root, path), 'utf8');
-const [html, runtime, cloudRuntime, cssBase, cssLayout, cssVisual, cssCloud, sw, guide, manifestText] = await Promise.all([
-  read('index.html'), read('fsa-v9.js'), read('cloud-sync-v11.js'), read('fsa-v8.css'), read('gameplay-layout-v9.css'), read('visual-fidelity-v10.css'), read('cloud-sync-v11.css'),
+const [html, runtime, intensityRuntime, intensityBridge, cloudRuntime, cssBase, cssLayout, cssVisual, cssCloud, cssIntensity, sw, guide, manifestText] = await Promise.all([
+  read('index.html'), read('fsa-v9.js'), read('arcade-intensity-v12.js'), read('arcade-intensity-v12-bridge.js'), read('cloud-sync-v11.js'),
+  read('fsa-v8.css'), read('gameplay-layout-v9.css'), read('visual-fidelity-v10.css'), read('cloud-sync-v11.css'), read('arcade-intensity-v12.css'),
   read('sw.js'), read('guide.html'), read('manifest.webmanifest')
 ]);
 const manifest = JSON.parse(manifestText);
-const css = `${cssBase}\n${cssLayout}\n${cssVisual}\n${cssCloud}`;
+const css = `${cssBase}\n${cssLayout}\n${cssVisual}\n${cssCloud}\n${cssIntensity}`;
 
-// The public page must boot the one canonical gameplay runtime plus the isolated cloud-account adapter, not stale gameplay generations.
+// The public page must boot the canonical local gameplay stack plus the isolated cloud-account adapter, not stale gameplay generations.
 const scriptSrcs = [...html.matchAll(/<script\s+[^>]*src=["']([^"']+)["']/gi)].map(m => m[1]);
-assert.deepEqual(scriptSrcs, ['fsa-v9.js','cloud-sync-v11.js'], `unexpected executable script set: ${scriptSrcs.join(', ')}`);
+assert.deepEqual(scriptSrcs, ['fsa-v9.js','arcade-intensity-v12.js','cloud-sync-v11.js','arcade-intensity-v12-bridge.js'], `unexpected executable script set: ${scriptSrcs.join(', ')}`);
 assert.ok(html.includes('gameplay-layout-v9.css'), 'current gameplay layout stylesheet missing');
 assert.ok(html.includes('fsa-v8.css'), 'base arcade stylesheet missing');
 assert.ok(html.includes('visual-fidelity-v10.css'), 'visual fidelity stylesheet missing');
 assert.ok(html.includes('cloud-sync-v11.css'), 'cloud account stylesheet missing');
+assert.ok(html.includes('arcade-intensity-v12.css'), 'arcade intensity stylesheet missing');
 assert.ok(html.includes('id="visualFidelityAdapter"'), 'visual-only DOM adapter missing');
 assert.ok(html.includes("document.documentElement.dataset.vf='v10'"), 'visual fidelity version marker missing');
 assert.ok(html.includes('id="guestStateRestore"'), 'guest state restore boundary missing');
 assert.ok(html.indexOf('guestStateRestore') < html.indexOf('src="fsa-v9.js"'), 'guest state restore must execute before gameplay runtime');
+assert.ok(html.indexOf('arcade-intensity-v12.js') > html.indexOf('fsa-v9.js'), 'intensity engine must layer after the canonical v9 shell');
+assert.ok(html.indexOf('arcade-intensity-v12-bridge.js') > html.indexOf('cloud-sync-v11.js'), 'intensity/cloud bridge must layer after the cloud adapter source');
 for (const legacy of ['app.js','advanced-engine-v6.js','gameplay-v7.js','fsa-v8.js']) {
   assert.ok(!scriptSrcs.includes(legacy), `legacy runtime accidentally reactivated: ${legacy}`);
 }
 
-// Every statically referenced gameplay-runtime ID must either exist in the live HTML shell or be explicitly created by the gameplay runtime itself.
+// Every statically referenced v9 gameplay-runtime ID must either exist in the live HTML shell or be explicitly created by that runtime itself.
 const runtimeIds = new Set();
 for (const match of runtime.matchAll(/\$\('#([A-Za-z][\w:-]*)'\)/g)) runtimeIds.add(match[1]);
 for (const match of runtime.matchAll(/getElementById\('([A-Za-z][\w:-]*)'\)/g)) runtimeIds.add(match[1]);
@@ -39,11 +43,13 @@ const providesId = id => {
 const missingIds = [...runtimeIds].filter(id => !providesId(id));
 assert.deepEqual(missingIds, [], `runtime DOM IDs are neither present nor runtime-created: ${missingIds.join(', ')}`);
 
-// Inline controls must resolve to current gameplay runtime functions/globals.
+// Inline controls must resolve to the canonical runtime surface. v12 intentionally overrides the fish-table functions after v9 loads.
 const inlineFns = new Set([...html.matchAll(/onclick=["']([A-Za-z_$][\w$]*)\s*\(/g)].map(m => m[1]));
 for (const fn of inlineFns) {
   const declared = new RegExp(`function\\s+${fn}\\s*\\(`).test(runtime) ||
-    new RegExp(`window\\.${fn}\\s*=`).test(runtime);
+    new RegExp(`window\\.${fn}\\s*=`).test(runtime) ||
+    new RegExp(`function\\s+${fn}\\s*\\(`).test(intensityRuntime) ||
+    new RegExp(`window\\.${fn}\\s*=`).test(intensityRuntime);
   assert.ok(declared, `inline control points to missing runtime function: ${fn}`);
 }
 
@@ -73,7 +79,8 @@ assert.ok(html.includes("navigator.serviceWorker.register('./sw.js')"), 'service
 
 // Offline/current-shell contract.
 for (const asset of [
-  './index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./fsa-v9.js','./cloud-sync-v11.js','./manifest.webmanifest',
+  './index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./arcade-intensity-v12.css',
+  './fsa-v9.js','./arcade-intensity-v12.js','./cloud-sync-v11.js','./arcade-intensity-v12-bridge.js','./manifest.webmanifest',
   './assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg'
 ]) {
   assert.ok(sw.includes(`'${asset}'`), `service-worker CORE missing ${asset}`);
@@ -87,9 +94,12 @@ assert.ok(/fetch\(event\.request\)/.test(sw), 'network path missing from service
 for (const url of scriptSrcs) assert.ok(!/^https?:\/\//i.test(url), `third-party runtime script forbidden: ${url}`);
 const stylesheetHrefs = [...html.matchAll(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["']/gi)].map(m => m[1]);
 for (const url of stylesheetHrefs) assert.ok(!/^https?:\/\//i.test(url), `third-party runtime stylesheet forbidden: ${url}`);
-for (const primitive of ['XMLHttpRequest','WebSocket(']) assert.ok(!runtime.includes(primitive), `unexpected network primitive in gameplay runtime: ${primitive}`);
-assert.ok(!/fetch\s*\(/.test(runtime), 'gameplay runtime must remain playable without a network fetch path');
+for (const localRuntime of [runtime,intensityRuntime,intensityBridge]) {
+  for (const primitive of ['XMLHttpRequest','WebSocket(']) assert.ok(!localRuntime.includes(primitive), `unexpected network primitive in gameplay runtime: ${primitive}`);
+  assert.ok(!/fetch\s*\(/.test(localRuntime), 'gameplay runtime must remain playable without a network fetch path');
+}
 assert.ok(!/https?:\/\//i.test(cssVisual), 'visual fidelity CSS must remain local-only');
+assert.ok(!/https?:\/\//i.test(cssIntensity), 'arcade intensity CSS must remain local-only');
 assert.ok(!/service[_-]?role/i.test(cloudRuntime), 'cloud browser adapter must not contain service-role credentials');
 
 for (const marker of [
@@ -101,6 +111,10 @@ for (const marker of [
   "disableAuto('Auto fire disabled after weapon change')",
   "disableAuto('Auto fire disabled after shot-value change')"
 ]) assert.ok(runtime.includes(marker), `runtime safety/lifecycle marker missing: ${marker}`);
+for (const marker of ['spawnFormation','spawnBoss','updateShots','coinBurst','bossPulse','navigator.vibrate','AUTO ARMED','LOCK ARMED']) {
+  assert.ok(intensityRuntime.includes(marker), `arcade intensity marker missing: ${marker}`);
+}
+assert.ok(intensityBridge.includes('__FSA_GAME_TEST__') && intensityBridge.includes('seedIntensityProfile'), 'v12 cloud compatibility bridge missing required authority hooks');
 
 assert.ok(/@media\(max-width:760px\)/.test(css), 'phone breakpoint missing');
 assert.ok(/@media\(max-height:520px\) and \(orientation:landscape\)/.test(css), 'short landscape breakpoint missing');
@@ -108,6 +122,6 @@ assert.ok(/prefers-reduced-motion:\s*reduce/.test(css), 'reduced-motion CSS gate
 assert.ok(/touch-action/i.test(css), 'touch interaction contract missing');
 
 assert.ok(html.includes('id="battleCanvas" width="1280" height="720"'), 'canvas coordinate contract changed');
-assert.ok(runtime.includes('*1280/r.width') && runtime.includes('*720/r.height'), 'pointer-to-canvas coordinate mapping changed');
+assert.ok((runtime.includes('*1280/r.width') && runtime.includes('*720/r.height')) || (intensityRuntime.includes('*1280/r.width') && intensityRuntime.includes('*720/r.height')), 'pointer-to-canvas coordinate mapping changed');
 
-console.log(`FSA_CURRENT_RUNTIME_CONTRACT=PASS ids=${runtimeIds.size} inline_controls=${inlineFns.size} scripts=${scriptSrcs.length} pwa=PASS offline=PASS mobile=PASS visual_v10=PASS cloud_v11=PASS safety_disclosure=PASS`);
+console.log(`FSA_CURRENT_RUNTIME_CONTRACT=PASS ids=${runtimeIds.size} inline_controls=${inlineFns.size} scripts=${scriptSrcs.length} pwa=PASS offline=PASS mobile=PASS visual_v12=PASS cloud_v11=PASS safety_disclosure=PASS`);
