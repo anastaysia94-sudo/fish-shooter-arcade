@@ -1,0 +1,25 @@
+name: Validate F.S.A. Hierarchy v2
+
+on:
+  pull_request:
+    paths:
+      - 'admin/**'
+      - 'backend/supabase/**'
+      - '.github/workflows/validate-hierarchy-v2.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'admin/**'
+      - 'backend/supabase/**'
+      - '.github/workflows/validate-hierarchy-v2.yml'
+
+jobs:
+  hierarchy-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate production hierarchy contract
+        run: node admin/hierarchy-v2-selftest.js
