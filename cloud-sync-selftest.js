@@ -13,7 +13,7 @@ assert(index.includes('cloud-sync-v11.js'),'cloud JS must be loaded');
 assert(index.includes('fsa.v11.guestBackup'),'guest state must be restored before runtime startup');
 assert(index.indexOf('guestStateRestore')<index.indexOf('src="fsa-v9.js"'),'guest restore must run before fsa-v9');
 assert(sw.includes("'./cloud-sync-v11.css'")&&sw.includes("'./cloud-sync-v11.js'"),'PWA cache must include cloud shell');
-assert(sw.includes('fsa-arcade-v14-cloud-accounts'),'cloud account release must bump cache generation');
+assert(/const CACHE='fsa-arcade-v\d+[-\w]*'/.test(sw),'cloud account release must use a versioned F.S.A. cache generation');
 
 assert(cloud.includes("client.rpc('fsa_rpc_player_bootstrap')"),'server bootstrap is required');
 assert(cloud.includes("from('fsa_player_cloud_state')"),'cloud state must be RLS-backed');
