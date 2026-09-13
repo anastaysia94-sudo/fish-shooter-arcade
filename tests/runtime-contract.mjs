@@ -4,18 +4,21 @@ import { resolve } from 'node:path';
 
 const root = resolve(process.cwd());
 const read = path => readFile(resolve(root, path), 'utf8');
-const [html, runtime, cssBase, cssLayout, sw, guide, manifestText] = await Promise.all([
-  read('index.html'), read('fsa-v9.js'), read('fsa-v8.css'), read('gameplay-layout-v9.css'),
+const [html, runtime, cssBase, cssLayout, cssVisual, sw, guide, manifestText] = await Promise.all([
+  read('index.html'), read('fsa-v9.js'), read('fsa-v8.css'), read('gameplay-layout-v9.css'), read('visual-fidelity-v10.css'),
   read('sw.js'), read('guide.html'), read('manifest.webmanifest')
 ]);
 const manifest = JSON.parse(manifestText);
-const css = `${cssBase}\n${cssLayout}`;
+const css = `${cssBase}\n${cssLayout}\n${cssVisual}`;
 
 // The public page must boot the one canonical gameplay runtime, not stale generations.
 const scriptSrcs = [...html.matchAll(/<script\s+[^>]*src=["']([^"']+)["']/gi)].map(m => m[1]);
 assert.deepEqual(scriptSrcs, ['fsa-v9.js'], `unexpected executable script set: ${scriptSrcs.join(', ')}`);
 assert.ok(html.includes('gameplay-layout-v9.css'), 'current gameplay layout stylesheet missing');
 assert.ok(html.includes('fsa-v8.css'), 'base arcade stylesheet missing');
+assert.ok(html.includes('visual-fidelity-v10.css'), 'visual fidelity stylesheet missing');
+assert.ok(html.includes('id="visualFidelityAdapter"'), 'visual-only DOM adapter missing');
+assert.ok(html.includes("document.documentElement.dataset.vf='v10'"), 'visual fidelity version marker missing');
 for (const legacy of ['app.js','advanced-engine-v6.js','gameplay-v7.js','fsa-v8.js']) {
   assert.ok(!scriptSrcs.includes(legacy), `legacy runtime accidentally reactivated: ${legacy}`);
 }
@@ -65,7 +68,10 @@ assert.ok(html.includes('rel="manifest" href="manifest.webmanifest"'), 'manifest
 assert.ok(html.includes("navigator.serviceWorker.register('./sw.js')"), 'service worker registration missing');
 
 // Offline/current-shell contract.
-for (const asset of ['./index.html','./fsa-v8.css','./gameplay-layout-v9.css','./fsa-v9.js','./manifest.webmanifest']) {
+for (const asset of [
+  './index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./fsa-v9.js','./manifest.webmanifest',
+  './assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg'
+]) {
   assert.ok(sw.includes(`'${asset}'`), `service-worker CORE missing ${asset}`);
 }
 assert.ok(sw.includes("const fallback=isAdmin?'./admin/index.html':'./index.html'"), 'root/admin navigation fallbacks must stay separated');
@@ -79,6 +85,7 @@ const stylesheetHrefs = [...html.matchAll(/<link\s+[^>]*rel=["']stylesheet["'][^
 for (const url of stylesheetHrefs) assert.ok(!/^https?:\/\//i.test(url), `third-party runtime stylesheet forbidden: ${url}`);
 for (const primitive of ['XMLHttpRequest','WebSocket(']) assert.ok(!runtime.includes(primitive), `unexpected network primitive in gameplay runtime: ${primitive}`);
 assert.ok(!/fetch\s*\(/.test(runtime), 'gameplay runtime must remain playable without a network fetch path');
+assert.ok(!/https?:\/\//i.test(cssVisual), 'visual fidelity CSS must remain local-only');
 
 // Persistence/lifecycle/automation contracts must remain wired in the shipped source.
 for (const marker of [
@@ -101,4 +108,4 @@ assert.ok(/touch-action/i.test(css), 'touch interaction contract missing');
 assert.ok(html.includes('id="battleCanvas" width="1280" height="720"'), 'canvas coordinate contract changed');
 assert.ok(runtime.includes('*1280/r.width') && runtime.includes('*720/r.height'), 'pointer-to-canvas coordinate mapping changed');
 
-console.log(`FSA_CURRENT_RUNTIME_CONTRACT=PASS ids=${runtimeIds.size} inline_controls=${inlineFns.size} scripts=${scriptSrcs.length} pwa=PASS offline=PASS mobile=PASS safety_disclosure=PASS`);
+console.log(`FSA_CURRENT_RUNTIME_CONTRACT=PASS ids=${runtimeIds.size} inline_controls=${inlineFns.size} scripts=${scriptSrcs.length} pwa=PASS offline=PASS mobile=PASS visual_v10=PASS safety_disclosure=PASS`);
