@@ -1,9 +1,9 @@
-// Cloud-sync cutover cache. The playable shell remains usable without account/network availability.
-const CACHE='fsa-arcade-v13-cloud-sync-20260913';
+// Cloud-account completion cache. The playable shell remains usable without account/network availability.
+const CACHE='fsa-arcade-v14-cloud-accounts-20260913';
 const CORE=[
   './','./index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./fsa-v9.js','./cloud-sync-v11.js','./manifest.webmanifest',
   './assets/fsa-mark.svg','./assets/fsa-boss-event.svg','./assets/fsa-gameplay.svg','./assets/fsa-lobby.svg','./assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg',
-  './admin/','./admin/index.html','./admin/styles.css','./admin/app.js','./admin/security-completion.js'
+  './admin/','./admin/index.html','./admin/styles.css','./admin/app.js','./admin/security-completion.js','./admin/cloud-player-admin.js'
 ];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
@@ -21,7 +21,7 @@ self.addEventListener('fetch',event=>{
     return;
   }
   // Security-sensitive Founder Console assets always prefer the network.
-  if(/\/admin\/(?:app\.js|styles\.css|index\.html)$/.test(url.pathname)||/\/admin\/security-completion\.js$/.test(url.pathname)){
+  if(/\/admin\/(?:app\.js|styles\.css|index\.html|security-completion\.js|cloud-player-admin\.js)$/.test(url.pathname)){
     event.respondWith(fetch(event.request).then(response=>{
       if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
       return response;
