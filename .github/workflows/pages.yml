@@ -20,6 +20,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Configure GitHub Pages
@@ -30,3 +31,32 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Install visual QA browser
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Wait for deployed site
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          for i in {1..30}; do
+            if curl -fsS "$PAGE_URL" >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - name: Capture live visual acceptance set
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: node tests/visual-acceptance-capture.mjs "$PAGE_URL"
+      - name: Upload live visual acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsa-live-visual-acceptance-${{ github.sha }}
+          path: artifacts/visual-acceptance/
+          if-no-files-found: error
+          retention-days: 30
