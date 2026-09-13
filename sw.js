@@ -1,7 +1,7 @@
-// Previous hierarchy cutover cache: fsa-arcade-v11-distributor-hierarchy-20260909; superseded by visual-fidelity v12.
-const CACHE='fsa-arcade-v12-visual-fidelity-20260913';
+// Cloud-sync cutover cache. The playable shell remains usable without account/network availability.
+const CACHE='fsa-arcade-v13-cloud-sync-20260913';
 const CORE=[
-  './','./index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./fsa-v9.js','./manifest.webmanifest',
+  './','./index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./fsa-v9.js','./cloud-sync-v11.js','./manifest.webmanifest',
   './assets/fsa-mark.svg','./assets/fsa-boss-event.svg','./assets/fsa-gameplay.svg','./assets/fsa-lobby.svg','./assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg',
   './admin/','./admin/index.html','./admin/styles.css','./admin/app.js','./admin/security-completion.js'
 ];
