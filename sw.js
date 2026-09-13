@@ -14,14 +14,21 @@ self.addEventListener('fetch',event=>{
   if(event.request.mode==='navigate'){
     const isAdmin=/\/admin(?:\/|$)/.test(url.pathname);
     const isActivation=/\/activate\.html$/.test(url.pathname);
-    const fallback=isAdmin?'./admin/index.html':isActivation?'./activate.html':'./index.html';
+    const fallback=isAdmin?'./admin/index.html':'./index.html';
+    if(isActivation){
+      event.respondWith(fetch(event.request).then(response=>{
+        if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put('./activate.html',copy));}
+        return response;
+      }).catch(()=>caches.match('./activate.html')));
+      return;
+    }
     event.respondWith(fetch(event.request).then(response=>{
       if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(fallback,copy));}
       return response;
     }).catch(()=>caches.match(fallback)));
     return;
   }
-  // Security-sensitive account assets always prefer the network.
+  // Security-sensitive Founder Console assets always prefer the network.
   if(/\/admin\/(?:app\.js|styles\.css|index\.html|security-completion\.js|cloud-player-admin\.js)$/.test(url.pathname)||/\/activate\.js$/.test(url.pathname)){
     event.respondWith(fetch(event.request).then(response=>{
       if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
