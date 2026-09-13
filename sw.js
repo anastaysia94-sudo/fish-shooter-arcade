@@ -1,3 +1,4 @@
+// Previous hierarchy cutover cache: fsa-arcade-v11-distributor-hierarchy-20260909; superseded by visual-fidelity v12.
 const CACHE='fsa-arcade-v12-visual-fidelity-20260913';
 const CORE=[
   './','./index.html','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./fsa-v9.js','./manifest.webmanifest',
