@@ -20,12 +20,18 @@ for (const legacy of ['app.js','advanced-engine-v6.js','gameplay-v7.js','fsa-v8.
   assert.ok(!scriptSrcs.includes(legacy), `legacy runtime accidentally reactivated: ${legacy}`);
 }
 
-// Every statically referenced runtime ID must still exist in the live HTML shell.
+// Every statically referenced runtime ID must either exist in the live HTML shell or be explicitly created by the runtime itself.
 const runtimeIds = new Set();
 for (const match of runtime.matchAll(/\$\('#([A-Za-z][\w:-]*)'\)/g)) runtimeIds.add(match[1]);
 for (const match of runtime.matchAll(/getElementById\('([A-Za-z][\w:-]*)'\)/g)) runtimeIds.add(match[1]);
-const missingIds = [...runtimeIds].filter(id => !new RegExp(`id=["']${id}["']`).test(html));
-assert.deepEqual(missingIds, [], `runtime DOM IDs missing from index.html: ${missingIds.join(', ')}`);
+const providesId = id => {
+  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`id=["']${escaped}["']`).test(html) ||
+    new RegExp(`\\.id\\s*=\\s*["']${escaped}["']`).test(runtime) ||
+    new RegExp(`setAttribute\\(\\s*["']id["']\\s*,\\s*["']${escaped}["']`).test(runtime);
+};
+const missingIds = [...runtimeIds].filter(id => !providesId(id));
+assert.deepEqual(missingIds, [], `runtime DOM IDs are neither present nor runtime-created: ${missingIds.join(', ')}`);
 
 // Inline controls must resolve to current runtime functions/globals.
 const inlineFns = new Set([...html.matchAll(/onclick=["']([A-Za-z_$][\w$]*)\s*\(/g)].map(m => m[1]));
