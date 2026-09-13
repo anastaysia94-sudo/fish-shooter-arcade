@@ -22,6 +22,9 @@ for(const feature of ['spawnFormation','spawnBoss','updateShots','coinBurst','sc
 for(const species of ['Chain Ray','Vortex Jelly','Chrome Shark','Bomb Crab','Arc Eel','Drill Marlin','Royal Leviathan']) assert(js.includes(species),`v12 species missing ${species}`);
 for(const gun of ['Pulse Cannon','Spread Blaster','Rail Harpoon']) assert(js.includes(gun),`v12 gun missing ${gun}`);
 for(const room of ['Bronze Reef','Silver Current','Gold Abyss']) assert(js.includes(room),`v12 room missing ${room}`);
+assert(js.includes('S.bossClock=S.game===14?8:12+Math.random()*10'),'normal tables must surface the first boss quickly enough to keep arcade pacing intense');
+assert(js.includes('if(s.trail.length>(LOW?5:10))s.trail.shift()'),'projectile trail cap must preserve a visible multi-frame trail');
+assert(js.includes("if($('#rightToggle'))$('#rightToggle').onclick=()=>$('#rightHud')?.classList.toggle('open')"),'right HUD toggle must stay interactive');
 assert(js.includes('const LOW='),'v12 must preserve low-data/constrained-device mode');
 assert(css.includes('prefers-reduced-motion'),'v12 CSS must preserve reduced-motion handling');
 assert(css.includes('data-intensity="v12"'),'v12 CSS must remain scoped');
