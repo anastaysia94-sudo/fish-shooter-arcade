@@ -1,0 +1,62 @@
+/* F.S.A. Arcade Intensity v12 — dense original fish-table presentation. */
+:root{--fsa-cyan:#46e9ff;--fsa-gold:#ffd35a;--fsa-coral:#ff5d67;--fsa-ink:#01070d;--fsa-glass:#031521d9}
+html[data-intensity="v12"] .v8-game{background:#01060b;overflow:hidden}
+html[data-intensity="v12"] .game-top{position:relative;z-index:40;background:linear-gradient(180deg,#041727f2,#020b13df);border-bottom:1px solid #7bdff13d;box-shadow:0 8px 32px #000b,inset 0 -1px #ffd35a35;backdrop-filter:blur(14px)}
+html[data-intensity="v12"] .game-logo strong{letter-spacing:.12em;color:#ffe69a;text-shadow:0 0 15px #ffbd4270}
+html[data-intensity="v12"] .boss-hud{width:min(48vw,620px);padding:4px 14px 7px;border:1px solid #ffbd4938;border-radius:13px;background:linear-gradient(180deg,#1a0711c9,#06101add);box-shadow:inset 0 0 22px #ff334516,0 0 22px #0008}
+html[data-intensity="v12"] .boss-hud .warn{font-size:8px;letter-spacing:.18em;color:#ffbd6d;animation:v12Warn 1.05s ease-in-out infinite alternate}
+html[data-intensity="v12"] .boss-hud h2{font-size:15px;letter-spacing:.12em;text-shadow:0 0 12px #ff4766aa}
+html[data-intensity="v12"] .bossbar{height:12px;border:1px solid #ffb26366;background:#16040a;box-shadow:inset 0 0 8px #000}
+html[data-intensity="v12"] .bossbar i{background:linear-gradient(90deg,#ff293d,#ff7450 55%,#ffd258);box-shadow:0 0 14px #ff3d4f}
+html[data-intensity="v12"] .game-main{position:relative;background:#01070c}
+html[data-intensity="v12"] .battle{position:relative;overflow:hidden;background:#01070c;isolation:isolate}
+html[data-intensity="v12"] .battle:before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(circle at 50% 42%,transparent 30%,#00000036 70%,#0000009d 100%),linear-gradient(115deg,transparent 18%,#7ef5ff0d 32%,transparent 47%),linear-gradient(65deg,transparent 55%,#ffd35a08 67%,transparent 80%);mix-blend-mode:screen}
+html[data-intensity="v12"] .battle:after{content:"";position:absolute;inset:-20%;z-index:4;pointer-events:none;background:repeating-radial-gradient(ellipse at 50% -5%,#8ff6ff12 0 1px,transparent 2px 42px);opacity:.24;transform:perspective(700px) rotateX(58deg);animation:v12Caustics 7s linear infinite}
+html[data-intensity="v12"] #battleCanvas{position:relative;z-index:2;width:100%;height:100%;filter:saturate(1.18) contrast(1.08);cursor:crosshair}
+html[data-intensity="v12"] .v12-scene-rail{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:12;display:flex;align-items:center;gap:8px;pointer-events:none}
+html[data-intensity="v12"] .v12-scene-chip{min-width:96px;padding:5px 10px;border:1px solid #5feeff5a;border-radius:999px;background:linear-gradient(180deg,#05283acc,#02111bdd);box-shadow:inset 0 0 13px #17dfff14,0 5px 18px #0009;color:#dffcff;text-align:center;font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(9px)}
+html[data-intensity="v12"] .v12-scene-chip b{display:block;color:#fff2aa;font-size:12px;letter-spacing:.03em;text-shadow:0 0 10px #ffc64b66}
+html[data-intensity="v12"] .v12-flash{position:absolute;inset:0;z-index:11;pointer-events:none;opacity:0;background:radial-gradient(circle at var(--x,50%) var(--y,50%),#fff 0,#42eaff55 7%,transparent 28%);mix-blend-mode:screen}
+html[data-intensity="v12"] .v12-flash.on{animation:v12Flash .24s ease-out}
+html[data-intensity="v12"] .v12-boss-pulse{position:absolute;inset:0;z-index:10;pointer-events:none;box-shadow:inset 0 0 0 2px #ff425b00;opacity:0}
+html[data-intensity="v12"] .v12-boss-pulse.on{animation:v12BossPulse 1.3s ease-out}
+html[data-intensity="v12"] .sidehud{z-index:20;width:172px!important;gap:7px!important;padding:7px!important;background:linear-gradient(90deg,#01070de5,#03101bd1 70%,transparent)!important;backdrop-filter:blur(7px)}
+html[data-intensity="v12"] .sidehud.right{background:linear-gradient(270deg,#01070de5,#03101bd1 70%,transparent)!important}
+html[data-intensity="v12"] .hudbox{border:1px solid #4ceaff2b!important;background:linear-gradient(180deg,#052237b5,#020d16c9)!important;border-radius:11px!important;box-shadow:inset 0 0 15px #3eeaff0b,0 9px 20px #0007!important}
+html[data-intensity="v12"] .hudbox h3{font-size:8px!important;letter-spacing:.16em;color:#aef8ff!important;border-bottom-color:#41dbff22!important}
+html[data-intensity="v12"] .gmission{font-size:8px!important}
+html[data-intensity="v12"] .radar{background:radial-gradient(circle,#062435 0,#020b12 67%),repeating-radial-gradient(circle,#44eaff16 0 1px,transparent 2px 19px)!important;box-shadow:inset 0 0 17px #16dfff18}
+html[data-intensity="v12"] .combo{font-size:42px!important;line-height:.9;color:#fff0a0!important;text-shadow:0 0 8px #ffb52e,0 0 22px #ff5d23!important}
+html[data-intensity="v12"] .feverbar{height:11px!important;background:#16071d!important;border:1px solid #d973ff33!important}
+html[data-intensity="v12"] .feverbar i{background:linear-gradient(90deg,#794cff,#ff45bc,#ffca55)!important;box-shadow:0 0 16px #ff4fdc88}
+html[data-intensity="v12"] .power-grid button{border:1px solid #6eefff3f!important;background:linear-gradient(180deg,#07304ae6,#02121ee8)!important;box-shadow:inset 0 0 12px #39dfff0c!important;transition:transform .12s ease,filter .12s ease,border-color .12s ease}
+html[data-intensity="v12"] .power-grid button:active{transform:scale(.93);filter:brightness(1.4);border-color:#ffe17c!important}
+html[data-intensity="v12"] .weapon-switch{display:flex!important;gap:5px!important;padding:5px!important;border:1px solid #6cecff32!important;border-radius:16px!important;background:#010912d9!important;box-shadow:0 8px 30px #000c,inset 0 0 20px #2de4ff0b!important;backdrop-filter:blur(11px)!important}
+html[data-intensity="v12"] .weapon-switch button{position:relative;overflow:hidden;border:1px solid #5ce9ff30!important;background:linear-gradient(180deg,#0a2738,#03111b)!important;color:#bceff8!important;border-radius:11px!important;font-size:8px!important;font-weight:950!important;letter-spacing:.06em!important;box-shadow:inset 0 0 0 1px #ffffff05!important}
+html[data-intensity="v12"] .weapon-switch button.on{border-color:#ffe2779a!important;background:linear-gradient(180deg,#43330c,#1b1103)!important;color:#fff0a4!important;box-shadow:0 0 18px #ffc44839,inset 0 0 16px #ffce551b!important}
+html[data-intensity="v12"] .weapon-switch button.on:after{content:"";position:absolute;left:12%;right:12%;bottom:2px;height:2px;background:#ffe276;box-shadow:0 0 8px #ffd04d}
+html[data-intensity="v12"] .seatgun{opacity:.37!important;filter:saturate(.8) brightness(.95)!important}
+html[data-intensity="v12"] .seatgun.you{opacity:1!important;filter:none!important}
+html[data-intensity="v12"] .gunart{border-radius:48% 48% 26% 26%!important;border:2px solid color-mix(in srgb,var(--seat) 75%,#e8ffff)!important;background:radial-gradient(circle at 50% 38%,#dffcff 0 4%,color-mix(in srgb,var(--seat) 70%,#09253a) 15%,#04111c 45%,#01060b 74%)!important;box-shadow:0 0 26px color-mix(in srgb,var(--seat) 55%,transparent),inset 0 0 24px #ffffff1b!important}
+html[data-intensity="v12"] .seatgun.you .gunart{box-shadow:0 0 15px #fff4,0 0 42px color-mix(in srgb,var(--seat) 70%,transparent),inset 0 0 24px #ffffff27!important}
+html[data-intensity="v12"] .seatgun.you .gunart:after{content:""!important;position:absolute!important;display:block!important;left:50%!important;top:8%!important;transform:translateX(-50%)!important;width:56%!important;height:16%!important;border-radius:999px!important;background:linear-gradient(90deg,transparent,#fff,transparent)!important;opacity:.45!important;filter:blur(1px)!important}
+html[data-intensity="v12"][data-weapon="pulse"] .seatgun.you .gunart{animation:v12Pulse 1.1s ease-in-out infinite alternate}
+html[data-intensity="v12"][data-weapon="spread"] .seatgun.you .gunart{animation:v12Heat .7s ease-in-out infinite alternate}
+html[data-intensity="v12"][data-weapon="rail"] .seatgun.you .gunart{animation:v12Rail 1.4s ease-in-out infinite alternate}
+html[data-intensity="v12"] .battle-message{z-index:30!important;padding:11px 20px!important;border:1px solid #ffe07570!important;border-radius:12px!important;background:linear-gradient(180deg,#1d1407eb,#090704e8)!important;color:#fff0a3!important;letter-spacing:.12em!important;box-shadow:0 0 25px #ffbd3e33,0 9px 28px #000c!important;text-shadow:0 0 9px #ffca4d55!important}
+html[data-intensity="v12"] .battle-message.on{animation:v12Banner .28s cubic-bezier(.2,.9,.3,1.3)}
+html[data-intensity="v12"] .live-row{border-bottom-color:#3fe9ff1e!important}
+html[data-intensity="v12"] .live-row em{color:#ffe073!important}
+@keyframes v12Warn{from{opacity:.55}to{opacity:1;text-shadow:0 0 9px #ff554f}}
+@keyframes v12Caustics{to{transform:perspective(700px) rotateX(58deg) translate3d(7%,3%,0)}}
+@keyframes v12Flash{0%{opacity:.85}100%{opacity:0}}
+@keyframes v12BossPulse{0%{opacity:1;box-shadow:inset 0 0 0 3px #ff425b, inset 0 0 70px #ff163b33}100%{opacity:0;box-shadow:inset 0 0 0 12px #ff425b00, inset 0 0 130px #ff163b00}}
+@keyframes v12Pulse{from{filter:brightness(.95)}to{filter:brightness(1.2) drop-shadow(0 0 8px #36e7ff)}}
+@keyframes v12Heat{from{filter:brightness(.98)}to{filter:brightness(1.18) drop-shadow(0 0 9px #ff6b3d)}}
+@keyframes v12Rail{from{filter:brightness(.96)}to{filter:brightness(1.17) drop-shadow(0 0 10px #ffe05a)}}
+@keyframes v12Banner{0%{transform:translate(-50%,-45%) scale(.72);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@media(min-width:1180px){html[data-intensity="v12"] .game-main{grid-template-columns:172px minmax(0,1fr) 172px!important}}
+@media(max-width:1100px){html[data-intensity="v12"] .sidehud{width:158px!important}.v12-scene-chip{min-width:82px;padding:4px 7px}}
+@media(max-width:760px){html[data-intensity="v12"] .sidehud{width:min(62vw,220px)!important}html[data-intensity="v12"] .v12-scene-rail{top:5px;gap:4px}.v12-scene-chip{min-width:auto;padding:3px 6px;font-size:6px}.v12-scene-chip b{font-size:9px}html[data-intensity="v12"] .weapon-switch{max-width:96vw!important}.boss-hud{width:min(53vw,360px)!important}}
+@media(max-height:520px) and (orientation:landscape){html[data-intensity="v12"] .v12-scene-rail{top:3px}.v12-scene-chip{padding:2px 5px}.v12-scene-chip b{font-size:8px}html[data-intensity="v12"] .sidehud{padding:4px!important;gap:4px!important}.hudbox{padding:5px!important}}
+@media(prefers-reduced-motion:reduce){html[data-intensity="v12"] .battle:after,html[data-intensity="v12"] .boss-hud .warn,html[data-intensity="v12"] .seatgun.you .gunart{animation:none!important}}
