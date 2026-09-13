@@ -1,0 +1,28 @@
+name: Validate F.S.A. Cloud Account Completion
+
+on:
+  push:
+    branches: [main, fsa-cloud-accounts-completion-v4]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cloud-account-completion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate player invitations, linking and cross-device boundary
+        run: |
+          set -euo pipefail
+          node --check admin/cloud-player-admin.js
+          node --check activate.js
+          node --check cloud-account-completion-selftest.js
+          node --check cloud-sync-v11.js
+          node cloud-account-completion-selftest.js
+          node cloud-sync-selftest.js

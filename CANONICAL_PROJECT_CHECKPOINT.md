@@ -10,14 +10,13 @@
 - Canonical release branch: `main`
 - Arcade: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/`
 - Founder Console: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/`
+- Account activation fallback: `https://anastaysia94-sudo.github.io/fish-shooter-arcade/activate.html`
 - Parent organization: **SmartPickShop Holdings**
 - Refresh `main` before editing. Never overwrite newer work with an older snapshot.
 
 ## 2. Product boundary
 
-**F.S.A. = Fish Shooter Arcade / Fish Shooter Alliance.**
-
-F.S.A. is the owned playable fish-shooter + slot-style virtual arcade and its operator control plane. **EGM4000 is separate.** A future telemetry bridge must be explicit/versioned and must never silently mutate F.S.A. rules.
+**F.S.A. = Fish Shooter Arcade / Fish Shooter Alliance.** F.S.A. is the owned playable fish-shooter + slot-style virtual arcade, cloud player account layer, and operator control plane. **EGM4000 is separate.** Any telemetry bridge must be explicit/versioned and must never silently mutate F.S.A. rules.
 
 F.S.A. remains **virtual/non-cash entertainment by default**. No cash deposits, withdrawals, redemption, or real-money wagering are enabled.
 
@@ -25,17 +24,7 @@ F.S.A. remains **virtual/non-cash entertainment by default**. No cash deposits, 
 
 The actual live runtime must look and operate like the approved F.S.A. / Fish Shooter Alliance references. Do not stop at concept art and do not cover a simple game with a pretty hero image.
 
-Canonical visual language:
-
-- cinematic neon Atlantis / underwater megacity
-- metallic gold F.S.A. trident identity
-- saturated cyan/electric-blue/violet/coral/molten-orange effects
-- adult, premium arcade tone
-- dense fish-table cabinet presentation with readable hierarchy
-- illustrated fish, sharks, dragons, rays, jellyfish, sea monsters, mechanical creatures, treasure, ruins, lightning, beams and boss effects
-- blue/gold glass-and-metal lobby/game cards
-- full-screen battlefield with missions, radar, boss HP, powers, combo/Fever and floating gun stations
-- Android/touch usability and a Lite/2G fallback must survive visual upgrades
+Canonical visual language: cinematic neon Atlantis / underwater megacity; metallic gold F.S.A. identity; saturated cyan/electric-blue/violet/coral/molten-orange effects; adult premium arcade tone; dense cabinet presentation; illustrated fish/sharks/dragons/rays/jellyfish/sea monsters/mechanical creatures/treasure/ruins/lightning/beams/boss effects; blue/gold glass-and-metal lobby cards; full-screen battlefield with missions/radar/boss HP/powers/combo/Fever/floating gun stations; Android/touch usability with Lite/2G fallback.
 
 Primary reference index: [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md).
 
@@ -57,29 +46,25 @@ Primary reference index: [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visua
 14. Treasure Trials
 15. Boss Rush
 
-All 15 must remain real playable tables with distinct identity/tuning, not title-only reskins.
+All 15 remain real playable tables with distinct identity/tuning. Shared systems include moving schools, target multipliers, common/fast/armored/special/elite/boss targets, boss phases, missions, Ocean Radar, combo, Ocean Fever, lock-on, guarded Auto Fire, hold-to-fire, powers, room tiers and owned-game telemetry hooks.
 
-Shared table systems include moving schools, target multipliers, common/fast/armored/special/elite/boss targets, boss phases, missions, Ocean Radar, combo, Ocean Fever, lock-on, guarded Auto Fire, hold-to-fire, powers, room tiers and exact owned-game telemetry hooks.
+**Only intentionally hard targets/elites/bosses get life bars. Ordinary fish do not.**
 
-Only intentionally hard targets/elites/bosses get life bars. Ordinary fish do not.
+## 5. Weapons and rooms
 
-## 5. Three-gun requirement
-
+Weapons:
 - **Pulse Cannon** — lowest cost, rapid precision fire.
 - **Spread Blaster** — medium cost, multi-projectile crowd control.
 - **Rail Harpoon** — highest cost, slow heavy/piercing boss/armor role.
 
-Gun switching must change weapon behavior and presentation, not merely the label. Current runtime keeps room-aware shot ladders and correct per-shot virtual-credit deductions.
-
-## 6. Room tiers
-
+Rooms:
 - Bronze Reef
 - Silver Current
 - Gold Abyss
 
-Room tiers control shot ranges/difficulty while preserving Pulse < Spread < Rail cost/destructive role.
+Gun switching changes behavior/presentation. Room tiers control shot ranges/difficulty while preserving Pulse < Spread < Rail cost/destructive role.
 
-## 7. Required slot games — exactly 20
+## 6. Required slot games — exactly 20
 
 1. Ocean Fortune
 2. Treasure Reels
@@ -102,189 +87,132 @@ Room tiers control shot ranges/difficulty while preserving Pulse < Spread < Rail
 19. Wild Pearls
 20. Treasure Temple
 
-Slots remain original virtual-credit mini games. Production art direction should ultimately give each title a distinct cabinet, background, symbols and feature identity.
+Slots remain original **virtual-credit** mini games. Production art direction should ultimately give each title a distinct cabinet, background, symbols and feature identity.
 
-## 8. Current gameplay/runtime state
+## 7. Current gameplay/runtime state
 
 Implemented and protected by CI:
-
 - 15 fish games + 20 slots
 - Pulse / Spread / Rail weapons
 - Bronze/Silver/Gold room tiers
-- room-specific shot values
-- correct shot deductions
+- correct room-specific shot values and deductions
 - hard-target and scalable boss durability
 - hard-target/boss-only life bars
-- four floating landscape gun stations; current player opaque, simulated rivals translucent
+- four floating landscape gun stations; current player opaque, rivals translucent
 - missions, radar, combo/Fever, powers
-- safer two-step Auto Fire/Lock On and Auto Fire spending guard
+- guarded Auto Fire/Lock On and Auto Fire spending cap
 - AI shooter balances/weapons
 - Data Saver/2G/constrained-device detection
 - PWA/offline shell
-- network-first security-sensitive Founder Console assets
+- cinematic visual-fidelity layer and visual acceptance tooling
 
-The remaining arcade priority is visual/content fidelity across all titles, not hierarchy/backend rework.
-
-## 9. Production Founder Console hierarchy — IMPLEMENTED
+## 8. Production Founder Console hierarchy — IMPLEMENTED
 
 Production authority is:
 
 **Founder → Distributor → Agent → User**
 
-This is no longer a browser-local prototype. The authority boundary is **Supabase Auth + PostgreSQL Row Level Security + MFA-gated audited RPCs + protected Auth-admin Edge Function**.
+Authority boundary: **Supabase Auth + PostgreSQL RLS + MFA-gated audited RPCs + protected Auth-admin Edge Functions**. Browser `localStorage` is not authoritative.
 
-### Founder
+Founder sees/manages the complete hierarchy after MFA. Distributors are isolated to their own Agents/users and delegated permissions. Agents are isolated to their own users. Cashier and moderator permissions remain separate. Every Agent belongs to exactly one Distributor and every User belongs to exactly one Agent.
 
-- sees complete hierarchy
-- invites/edits/suspends/reactivates Distributors
-- manages any Agent/user
-- reassigns Agents across Distributors when constraints pass
-- defines Distributor game access
-- normal credit/moderation powers after MFA
+## 9. Hierarchical credit and game invariants
 
-### Distributor
-
-- authenticated operator tied to exactly one Distributor record
-- sees only its Distributor, its Agents/users, its ledger/audit and inherited access
-- may manage Agents only when `can_manage_agents=true`
-- may manage users only when `can_manage_users=true`
-- cashier and moderator permissions are separate
-- cannot see/mutate sibling Distributors
-- cannot create Agent ceilings above its own ceiling
-- cannot grant games it does not own
-
-### Agent
-
-- authenticated operator tied to exactly one Agent
-- every Agent belongs to exactly one Distributor
-- sees parent Distributor, own Agent/users, own ledger/audit/access
-- may manage users only when `can_manage_users=true`
-- cashier and moderator permissions are separate
-- cannot see/mutate sibling Agents/users
-- cannot grant users games blocked at Agent level
-
-### User
-
-- belongs to exactly one Agent
-- virtual-credit balance is server-authoritative
-- user game access is a subset of Agent access
-- user/credit writes are performed through audited server RPCs
-
-## 10. Hierarchical credit invariants
-
-Every positive credit mutation checks **both** aggregate guards:
-
-1. Agent exposure after the mutation must not exceed `Agent.credit_ceiling`.
-2. Distributor exposure across all child Agents/users after the mutation must not exceed `Distributor.credit_ceiling`.
+Every positive credit mutation checks both aggregate guards:
+1. Agent exposure must stay `<= Agent.credit_ceiling`.
+2. Distributor exposure across child Agents/users must stay `<= Distributor.credit_ceiling`.
 
 Additional invariants:
-
 - no negative balances
 - Agent ceiling cannot exceed parent Distributor ceiling
-- Distributor ceiling cannot be lowered below existing exposure or below a child Agent ceiling
-- cross-Distributor user/Agent moves are restricted to authorized parent roles; Agent reassignment across Distributors is Founder-only
-- `fsa_credit_ledger` is append-only
-- corrections use compensating reversals
-- ledger rows record Distributor + Agent lineage
-- `fsa_audit_log` is immutable
+- append-only `fsa_credit_ledger`
+- compensating reversals instead of history rewrites
+- immutable `fsa_audit_log`
+- Distributor + Agent lineage retained on ledger rows
+- strict game inheritance: `active game → Distributor → Agent → User`
+- parent game removal cascades downward
+- child operators cannot self-grant a parent-blocked game
+- parent suspension blocks effective child authority
 
-## 11. Hierarchical game access
+## 10. Authentication / MFA / operator provisioning
 
-Strict inheritance:
-
-`active F.S.A. game → Distributor → Agent → User`
-
-- Founder controls Distributor access.
-- Founder/permitted Distributor controls Agent access inside the Distributor subset.
-- permitted hierarchy operators control User access inside the Agent subset.
-- removing a Distributor game cascades removal from Agents/users.
-- removing an Agent game cascades removal from users.
-- children cannot self-grant a parent-blocked game.
-
-## 12. Authentication / MFA / provisioning
-
-- Supabase Auth provides operator identity/password verification and recovery.
-- browser uses only the publishable key under RLS.
+- Supabase Auth provides operator identity/password/recovery.
+- browser uses only a publishable key under RLS.
 - service-role credentials never appear in GitHub Pages/browser code.
-- TOTP MFA is supported.
-- administrative mutations require database-verified `aal2`.
-- `fsa-founder-admin` Edge Function has JWT verification enabled.
-- `invite_distributor` is Founder-only.
-- `invite_agent` is Founder or permitted Distributor; Distributor scope is forced server-side to the caller's own Distributor.
-- invited operators receive real Auth accounts and role mappings.
+- TOTP MFA is supported and Founder MFA has been production-verified.
+- administrative writes require `aal2`.
+- Founder sensitive reads are AAL2-gated by database RLS.
+- `fsa-founder-admin` provisions Distributor/Agent Auth identities under server checks.
+- account recovery has a direct one-time-link fallback if project redirects are stale.
+- compromised passwords are screened using HIBP k-anonymity because the shared Supabase organization is on the Free plan.
 
-## 13. Server mutation API
+## 11. Production cloud player accounts — IMPLEMENTED
 
-Authenticated hierarchy writes use:
+Cross-device player accounts are a production F.S.A. subsystem and **must not be reverted to local-only identity**.
 
-- `fsa_rpc_create_player`
-- `fsa_rpc_adjust_credits`
-- `fsa_rpc_reverse_credit`
-- `fsa_rpc_update_player`
-- `fsa_rpc_update_distributor`
-- `fsa_rpc_update_agent`
-- `fsa_rpc_reassign_agent`
-- `fsa_rpc_set_distributor_games`
-- `fsa_rpc_set_agent_games`
-- `fsa_rpc_set_player_games`
+Authority and behavior:
+- normal player Auth identity maps one-to-one to `fsa_players.auth_user_id` with a partial unique index;
+- `fsa_private.session_player_id()` resolves only an active player under an active Agent and Distributor;
+- `fsa_rpc_player_bootstrap()` returns the signed-in player's server identity/wallet without depending on multiplayer tables;
+- `fsa_player_cloud_state` stores level/xp/gems/pearls plus preferences, last game/room, revision and update timestamp;
+- player browser writes are restricted to safe preference/session fields; progression fields are server-only;
+- `fsa_player_game_access` remains authoritative for available titles;
+- signed-in arcade UI displays server wallet and blocks games not granted by the hierarchy;
+- cross-device preference writes use optimistic revision matching; stale writes reload the newest cloud state instead of silently winning;
+- offline cache may display the last synced account/access snapshot, but cannot become server authority;
+- guest/local demo state remains explicitly separate from a cloud wallet;
+- public self-registration remains disabled.
 
-Each function re-checks role, active parent state, scope, delegated permission and MFA as applicable.
+Provisioning:
+- protected `fsa-player-admin` Edge Function has JWT verification enabled and requires operator AAL2;
+- `invite_player` creates/invites the Auth identity then calls service-only `fsa_service_create_network_player`;
+- `link_player` attaches an Auth identity to an existing unlinked server user through service-only `fsa_service_link_network_player`;
+- Founder/Distributor/Agent scopes and `can_manage_users` are checked server-side;
+- non-zero opening balance additionally requires cashier authority for non-Founder operators;
+- Agent/Distributor aggregate credit ceilings and Agent game inheritance remain enforced;
+- account creation/linking writes audit events;
+- Auth provisioning is rolled back when a newly invited account cannot be linked.
 
-## 14. Live hierarchy verification completed
+Activation/recovery resilience:
+- invitation emails target the production arcade URL;
+- `/activate.html` accepts only links from this F.S.A. Supabase project, verifies invite/recovery OTPs directly, screens the new password through HIBP k-anonymity, and returns the player to the arcade;
+- this fallback avoids making account activation depend on an unverifiable project-level redirect allowlist.
 
-Disposable transactions were rolled back after verification. The live production database has passed:
+## 12. Cloud-account migrations / runtime files
 
-- `aal1` Founder mutation → rejected with `FSA_MFA_REQUIRED`
-- `aal2` Founder create user → +credit → reversal → exact opening balance restored
-- append-only 3-row opening/adjustment/reversal ledger sequence
-- Distributor game removal cascades to Agent and User
-- Agent ceiling overage → `FSA_AGENT_CREDIT_CEILING_EXCEEDED`
-- Distributor ceiling overage → `FSA_DISTRIBUTOR_CREDIT_CEILING_EXCEEDED`
-- in a two-Distributor RLS fixture, Distributor sees exactly 1 Distributor / 1 Agent / 1 User
-- cross-Distributor Agent update → `FSA_SCOPE_DENIED`
-- smoke test fixtures leave no live Distributor/Agent/User/ledger/audit rows after rollback
+Tracked cloud account pieces include:
+- `backend/supabase/migrations/20260913_fsa_player_cloud_state_v4.sql`
+- `backend/supabase/migrations/20260913_fsa_player_cloud_write_v4.sql`
+- `backend/supabase/migrations/20260913_fsa_player_cloud_account_linking_v4.sql`
+- `backend/supabase/migrations/20260913_fsa_player_cloud_authority_completion_v4.sql`
+- `backend/supabase/functions/fsa-player-admin/index.ts`
+- `cloud-sync-v11.js`
+- `cloud-sync-v11.css`
+- `admin/cloud-player-admin.js`
+- `activate.html`
+- `activate.js`
+- `cloud-sync-selftest.js`
+- `cloud-account-completion-selftest.js`
 
-## 15. Supabase schema/version
+## 13. Live verification requirements
 
-Hierarchy v2 sets `fsa_backend_meta.schema_version=2`.
+A release is not complete merely because files exist. Relevant GitHub CI must pass, migrations/functions must be present in the live Supabase project, changes must be merged to `main`, Pages must deploy the exact `main` commit, and live database state must be inspected where connector tooling permits.
 
-Tracked migrations include:
+Previous hierarchy verification includes AAL1 rejection, AAL2 credit/reversal correctness, append-only ledger behavior, credit ceiling enforcement, RLS isolation and cross-Distributor scope denial. Cloud-account completion additionally verifies database function/ACL structure, one-to-one Auth linkage constraints, Edge Function deployment/JWT verification, browser boundary tests, optimistic sync invariants and PWA delivery.
 
-- `20260908_fsa_founder_console_backend_v1.sql`
-- `20260908_fsa_harden_trigger_search_paths.sql`
-- `20260908_fsa_least_privilege_execute_v1.sql`
-- `20260908_fsa_performance_hardening_v1.sql`
-- `20260909_fsa_distributor_hierarchy_schema_v2.sql`
-- `20260909_fsa_distributor_hierarchy_authority_v2.sql`
+## 14. Low-data / Android rule
 
-Backend details: [`backend/README.md`](backend/README.md).
+Preserve a Lite path for `saveData`, 2G/slow-2G, reduced-motion and constrained devices. Heavy art/audio remains optional/lazy. HD enhances play but must not be required to reach a usable table. Keep the service-worker shell, compressed assets, scaled effects and touch-friendly layouts.
 
-## 16. Low-data / Android rule
+## 15. Separate workstreams not implied by cloud accounts
 
-Preserve a Lite path for `saveData`, 2G/slow-2G, reduced-motion and constrained devices. Heavy art/audio must remain optional/lazy. HD enhances play but must not be required to reach a usable table. Keep the service-worker shell, compressed assets, scaled effects and touch-friendly layouts.
-
-## 17. Account-level settings outside repository code
-
-The available connector cannot change these Supabase Auth project settings:
-
-- **Leaked Password Protection** is currently reported disabled and should be enabled where available.
-- `https://anastaysia94-sudo.github.io/fish-shooter-arcade/admin/` must be present in the Auth redirect allowlist for invitation/recovery links.
-
-Each human Founder/Distributor/Agent must enroll/verify their own TOTP factor. The app cannot scan an operator's authenticator on their behalf.
-
-## 18. Separate future work — NOT implied by hierarchy v2
-
-The hierarchy release does not start or complete:
-
-- cross-device/cloud player-account synchronization outside the operator backend
-- real network multiplayer/shared human tables
+Do not silently claim these complete merely because hierarchy/cloud accounts exist:
+- real network multiplayer/shared human tables unless its own live verification proves completion
 - production F.S.A. → EGM4000 telemetry API
 - final bespoke production art/audio for every title
 - full physical Android/store QA
 - real-money functionality
 
-Do not silently fold these into the hierarchy release or claim they are complete.
+## 16. Working rule
 
-## 19. Working rule
-
-Do not claim completion from code generation alone. A release is complete only after the relevant logic tests/CI pass, the target changes are merged into `main`, GitHub Pages deploys successfully, and the live runtime/backend state is verified where tooling permits.
+Do not substitute generated pictures for implementation. Do not claim completion from code generation alone. Build the actual runtime/backend, test it, fix failures, merge the tested head, deploy Pages, and verify the live result.

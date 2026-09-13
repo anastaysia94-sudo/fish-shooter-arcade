@@ -1,6 +1,6 @@
 # F.S.A. — Fish Shooter Arcade
 
-**SmartPickShop Holdings · cinematic v9 arcade + production Founder hierarchy**
+**SmartPickShop Holdings · cinematic arcade + production hierarchy + cloud player accounts**
 
 > **Continuation rule:** read [`CANONICAL_PROJECT_CHECKPOINT.md`](CANONICAL_PROJECT_CHECKPOINT.md), [`docs/visual-reference/REFERENCE_INDEX.md`](docs/visual-reference/REFERENCE_INDEX.md), and [`backend/README.md`](backend/README.md) before changing this project.
 
@@ -27,34 +27,30 @@ The control plane is server-authoritative:
 
 **Founder → Distributor → Agent → User**
 
-Implemented production behavior:
+Implemented production behavior includes Supabase Auth, TOTP MFA/AAL2, PostgreSQL Row Level Security, Distributor/Agent credit ceilings, scoped user administration, cashier/moderator separation, inherited game access, append-only virtual-credit ledger, immutable audit history, compensating reversals, and protected Edge Functions. Browser `localStorage` is not authority for hierarchy, balances, permissions, ledger, or audit.
 
-- Supabase Auth operator accounts and password recovery
-- TOTP MFA; administrative mutations require database-verified `aal2`
-- PostgreSQL Row Level Security for Founder / Distributor / Agent scopes
-- Founder creates and manages Distributors
-- permitted Distributors create/manage only their own Agents
-- permitted Founder/Distributor/Agent operators manage users within inherited scope
-- every Agent belongs to exactly one Distributor
-- Distributor aggregate virtual-credit ceilings
-- Agent aggregate virtual-credit ceilings inside the parent Distributor ceiling
-- cashier and moderator authority remain separate
-- Distributor → Agent → User game-access inheritance
-- parent game removals cascade downward
-- parent suspension blocks effective child authority
-- Founder-only cross-Distributor Agent reassignment
-- append-only virtual-credit ledger with Distributor + Agent lineage
-- immutable audit history
-- compensating reversals instead of rewriting ledger rows
-- protected JWT-verified Edge Function for authenticated Distributor/Agent provisioning
-- no service-role credential in browser code
-- no browser `localStorage` authority for hierarchy, balances, permissions, ledger, or audit
+## Production cloud player accounts
+
+Invited F.S.A. players can now use the same server-backed account on multiple devices.
+
+- Auth identity is linked one-to-one to an F.S.A. player record.
+- Founder/Distributor/Agent operators invite new cloud players through an MFA-gated Edge Function.
+- Existing server users can be linked to an Auth identity without recreating their wallet or player record.
+- Player identity resolves through `fsa_private.session_player_id()` and the authenticated bootstrap RPC.
+- Virtual-credit wallet and game permissions remain server-authoritative.
+- Cloud state stores level/xp/gems/pearls plus user preferences and last game/room.
+- Browser writes are limited to safe preference/session fields; progression fields are server-only.
+- Sync uses monotonic optimistic revisions so a stale device cannot silently overwrite newer cloud settings.
+- Offline mode can show the last synced account/access cache, while server authority resumes when connectivity returns.
+- Guest/local demo state remains separate and does not become a server wallet.
+- Public player self-registration remains disabled; accounts originate from authorized hierarchy operators.
+- Service-role credentials remain inside JWT-protected Edge Functions and never ship to the arcade browser.
 
 F.S.A. remains **virtual/non-cash entertainment**. No deposits, withdrawals, cash redemption, or real-money wagering are enabled.
 
 ## Product boundary
 
-F.S.A. remains separate from EGM4000. Any future F.S.A. → EGM4000 connection must use an explicit versioned telemetry boundary. Real multiplayer, cloud player-account sync, production EGM4000 telemetry, and real-money systems are separate workstreams, not implied by this hierarchy release.
+F.S.A. remains separate from EGM4000. Any F.S.A. → EGM4000 connection must use an explicit versioned telemetry boundary. Real network multiplayer, production EGM4000 telemetry, final per-title art/audio completion, physical Android/store QA, and any real-money system remain separate workstreams unless their own release evidence says otherwise.
 
 ## Working rule
 
