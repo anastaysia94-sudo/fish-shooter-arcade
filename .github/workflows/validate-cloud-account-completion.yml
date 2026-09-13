@@ -21,6 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check admin/cloud-player-admin.js
+          node --check activate.js
           node --check cloud-account-completion-selftest.js
           node --check cloud-sync-v11.js
           node cloud-account-completion-selftest.js
