@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html fsa-v8.css gameplay-layout-v9.css fsa-v9.js gameplay-selftest.js manifest.webmanifest sw.js admin/index.html admin/styles.css admin/app.js admin/logic-selftest.js backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql backend/supabase/migrations/20260909_fsa_distributor_hierarchy_schema_v2.sql backend/supabase/migrations/20260909_fsa_distributor_hierarchy_authority_v2.sql backend/supabase/functions/fsa-founder-admin/index.ts; do test -f "$f"; done
+          for f in index.html fsa-v8.css gameplay-layout-v9.css fsa-v9.js gameplay-selftest.js tests/low-data-budget.mjs tests/low-data-behavior.mjs manifest.webmanifest sw.js admin/index.html admin/styles.css admin/app.js admin/logic-selftest.js backend/supabase/migrations/20260908_fsa_founder_console_backend_v1.sql backend/supabase/migrations/20260909_fsa_distributor_hierarchy_schema_v2.sql backend/supabase/migrations/20260909_fsa_distributor_hierarchy_authority_v2.sql backend/supabase/functions/fsa-founder-admin/index.ts; do test -f "$f"; done
           python3 - <<'PY'
           import json,pathlib
           r=pathlib.Path('.')
@@ -49,9 +49,13 @@ jobs:
           PY
           node --check fsa-v9.js
           node --check gameplay-selftest.js
+          node --check tests/low-data-budget.mjs
+          node --check tests/low-data-behavior.mjs
           node --input-type=module --check < admin/app.js
           node --check admin/logic-selftest.js
           node --check sw.js
           node gameplay-selftest.js
+          node tests/low-data-budget.mjs
+          node tests/low-data-behavior.mjs
           node admin/logic-selftest.js
           echo 'FSA_RELEASE_HIERARCHY_V2=PASS'
