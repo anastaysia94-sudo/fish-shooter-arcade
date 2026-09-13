@@ -22,5 +22,5 @@ assert(authority.includes('to service_role'),'service player creation must remai
 assert(activationHtml.includes('activate.js')&&activation.includes("url.origin!==SUPABASE_URL")||activation.includes("u.origin!==SUPABASE_URL"),'activation fallback must reject foreign project links');
 assert(activation.includes("['invite','recovery','magiclink','email']"),'activation fallback must accept invite/recovery link types only');
 assert(activation.includes('api.pwnedpasswords.com/range/'),'activation password must be breach-screened');
-assert(sw.includes('fsa-arcade-v14-cloud-accounts')&&sw.includes("'./admin/cloud-player-admin.js'")&&sw.includes("'./activate.html'")&&sw.includes("'./activate.js'"),'PWA cutover must deliver cloud account and activation assets');
+assert(/const CACHE='fsa-arcade-v\d+[-\w]*'/.test(sw)&&sw.includes("'./admin/cloud-player-admin.js'")&&sw.includes("'./activate.html'")&&sw.includes("'./activate.js'")&&sw.includes("'./cloud-sync-v11.js'"),'PWA cutover must deliver cloud account and activation assets');
 console.log('FSA_CLOUD_ACCOUNT_COMPLETION=PASS invite=1 link_existing=1 unique_auth=1 aal2=1 standalone_bootstrap=1 activation_fallback=1 server_wallet=1');
