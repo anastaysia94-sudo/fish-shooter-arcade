@@ -1,0 +1,71 @@
+name: F.S.A. Current Runtime Regression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "index.html"
+      - "fsa-v8.css"
+      - "gameplay-layout-v9.css"
+      - "fsa-v9.js"
+      - "gameplay-selftest.js"
+      - "guide.html"
+      - "manifest.webmanifest"
+      - "sw.js"
+      - "tests/runtime-behavior.mjs"
+      - "tests/runtime-contract.mjs"
+      - "tests/low-data-behavior.mjs"
+      - "tests/low-data-budget.mjs"
+      - ".github/workflows/current-runtime-regression.yml"
+      - ".github/workflows/validate-v9.yml"
+      - ".github/workflows/validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "fsa-v8.css"
+      - "gameplay-layout-v9.css"
+      - "fsa-v9.js"
+      - "gameplay-selftest.js"
+      - "guide.html"
+      - "manifest.webmanifest"
+      - "sw.js"
+      - "tests/runtime-behavior.mjs"
+      - "tests/runtime-contract.mjs"
+      - "tests/low-data-behavior.mjs"
+      - "tests/low-data-budget.mjs"
+      - ".github/workflows/current-runtime-regression.yml"
+      - ".github/workflows/validate-v9.yml"
+      - ".github/workflows/validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  current-runtime-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Syntax gates
+        run: |
+          node --check fsa-v9.js
+          node --check gameplay-selftest.js
+          node --check sw.js
+          node --check tests/runtime-behavior.mjs
+          node --check tests/runtime-contract.mjs
+      - name: Current gameplay contract
+        run: node gameplay-selftest.js
+      - name: Executable current runtime behavior
+        run: node tests/runtime-behavior.mjs
+      - name: DOM PWA mobile and safety contract
+        run: node tests/runtime-contract.mjs
+      - name: Low-data and 2G behavior
+        run: |
+          node tests/low-data-budget.mjs
+          node tests/low-data-behavior.mjs
+      - name: Completion marker
+        run: echo 'FSA_CURRENT_RUNTIME_REGRESSION=PASS'
