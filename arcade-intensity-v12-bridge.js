@@ -1,0 +1,16 @@
+(()=>{'use strict';
+const legacy=window.__FSA_GAME_TEST__||null;
+if(!legacy)return;
+const KEY='fsa.v9.profile';
+const shadow={game:Number(legacy.getState?.()?.game)||0,room:Number(legacy.getState?.()?.room)||1};
+const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch{return {}}};
+const write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch{}};
+const seedIntensityProfile=()=>{const p=legacy.getProfile?.();if(p)write({...read(),credits:Number(p.credits)||0,gems:Number(p.gems)||0,pearls:Number(p.pearls)||0,level:Number(p.level)||1,xp:Number(p.xp)||0})};
+const intensityOpen=window.openGame;
+const intensityRoom=window.chooseRoom;
+if(typeof intensityOpen==='function')window.openGame=function(i){shadow.game=Math.max(0,Math.min(14,Number(i)||0));seedIntensityProfile();return intensityOpen.apply(this,arguments)};
+if(typeof intensityRoom==='function')window.chooseRoom=function(i){shadow.room=Math.max(0,Math.min(2,Number(i)||0));return intensityRoom.apply(this,arguments)};
+const legacyState=legacy.getState?.bind(legacy);
+window.__FSA_GAME_TEST__={...legacy,getProfile:()=>legacy.getProfile?.(),getState:()=>{const base=legacyState?.()||{};const fishOpen=document.getElementById('game')?.classList.contains('on');const slotOpen=document.getElementById('slotModal')?.classList.contains('on');if(slotOpen)return base;if(fishOpen)return {...base,game:shadow.game,room:shadow.room};return {...base,game:shadow.game,room:shadow.room}}};
+window.__FSA_INTENSITY_BRIDGE__={version:'v12',getShadowState:()=>({...shadow}),seedProfile:seedIntensityProfile};
+})();
