@@ -1,0 +1,56 @@
+name: F.S.A. Visual Fidelity v10
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "index.html"
+      - "visual-fidelity-v10.css"
+      - "assets/fsa-title-atlas-v10.svg"
+      - "assets/fsa-slot-atlas-v10.svg"
+      - "sw.js"
+      - "tests/visual-fidelity-contract.mjs"
+      - "tests/runtime-contract.mjs"
+      - "tests/low-data-budget.mjs"
+      - ".github/workflows/visual-fidelity.yml"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "visual-fidelity-v10.css"
+      - "assets/fsa-title-atlas-v10.svg"
+      - "assets/fsa-slot-atlas-v10.svg"
+      - "sw.js"
+      - "tests/visual-fidelity-contract.mjs"
+      - "tests/runtime-contract.mjs"
+      - "tests/low-data-budget.mjs"
+      - ".github/workflows/visual-fidelity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  visual-fidelity-v10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Syntax and asset presence
+        run: |
+          test -f visual-fidelity-v10.css
+          test -f assets/fsa-title-atlas-v10.svg
+          test -f assets/fsa-slot-atlas-v10.svg
+          node --check tests/visual-fidelity-contract.mjs
+          node --check tests/runtime-contract.mjs
+          node --check tests/low-data-budget.mjs
+      - name: Visual catalog contract
+        run: node tests/visual-fidelity-contract.mjs
+      - name: Runtime and offline compatibility
+        run: |
+          node tests/runtime-contract.mjs
+          node tests/low-data-budget.mjs
+      - name: Completion marker
+        run: echo 'FSA_VISUAL_FIDELITY_V10=PASS'

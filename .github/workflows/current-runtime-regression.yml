@@ -7,13 +7,17 @@ on:
       - "index.html"
       - "fsa-v8.css"
       - "gameplay-layout-v9.css"
+      - "visual-fidelity-v10.css"
       - "fsa-v9.js"
+      - "assets/fsa-title-atlas-v10.svg"
+      - "assets/fsa-slot-atlas-v10.svg"
       - "gameplay-selftest.js"
       - "guide.html"
       - "manifest.webmanifest"
       - "sw.js"
       - "tests/runtime-behavior.mjs"
       - "tests/runtime-contract.mjs"
+      - "tests/visual-fidelity-contract.mjs"
       - "tests/low-data-behavior.mjs"
       - "tests/low-data-budget.mjs"
       - ".github/workflows/current-runtime-regression.yml"
@@ -25,13 +29,17 @@ on:
       - "index.html"
       - "fsa-v8.css"
       - "gameplay-layout-v9.css"
+      - "visual-fidelity-v10.css"
       - "fsa-v9.js"
+      - "assets/fsa-title-atlas-v10.svg"
+      - "assets/fsa-slot-atlas-v10.svg"
       - "gameplay-selftest.js"
       - "guide.html"
       - "manifest.webmanifest"
       - "sw.js"
       - "tests/runtime-behavior.mjs"
       - "tests/runtime-contract.mjs"
+      - "tests/visual-fidelity-contract.mjs"
       - "tests/low-data-behavior.mjs"
       - "tests/low-data-budget.mjs"
       - ".github/workflows/current-runtime-regression.yml"
@@ -57,12 +65,15 @@ jobs:
           node --check sw.js
           node --check tests/runtime-behavior.mjs
           node --check tests/runtime-contract.mjs
+          node --check tests/visual-fidelity-contract.mjs
       - name: Current gameplay contract
         run: node gameplay-selftest.js
       - name: Executable current runtime behavior
         run: node tests/runtime-behavior.mjs
       - name: DOM PWA mobile and safety contract
         run: node tests/runtime-contract.mjs
+      - name: Visual fidelity v10 contract
+        run: node tests/visual-fidelity-contract.mjs
       - name: Low-data and 2G behavior
         run: |
           node tests/low-data-budget.mjs

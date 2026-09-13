@@ -23,9 +23,13 @@ jobs:
           set -euo pipefail
           test -f fsa-v9.js
           test -f gameplay-layout-v9.css
+          test -f visual-fidelity-v10.css
+          test -f assets/fsa-title-atlas-v10.svg
+          test -f assets/fsa-slot-atlas-v10.svg
           test -f gameplay-selftest.js
           test -f tests/runtime-behavior.mjs
           test -f tests/runtime-contract.mjs
+          test -f tests/visual-fidelity-contract.mjs
           test -f tests/low-data-budget.mjs
           test -f tests/low-data-behavior.mjs
           test -f admin/logic-selftest.js
@@ -34,11 +38,13 @@ jobs:
           test -f backend/supabase/functions/fsa-founder-admin/index.ts
           grep -q 'fsa-v9.js' index.html
           grep -q 'gameplay-layout-v9.css' index.html
+          grep -q 'visual-fidelity-v10.css' index.html
           grep -q 'Founder → Distributor → Agent → User' admin/index.html
           node --check fsa-v9.js
           node --check gameplay-selftest.js
           node --check tests/runtime-behavior.mjs
           node --check tests/runtime-contract.mjs
+          node --check tests/visual-fidelity-contract.mjs
           node --check tests/low-data-budget.mjs
           node --check tests/low-data-behavior.mjs
           node --input-type=module --check < admin/app.js
@@ -47,6 +53,7 @@ jobs:
           node gameplay-selftest.js
           node tests/runtime-behavior.mjs
           node tests/runtime-contract.mjs
+          node tests/visual-fidelity-contract.mjs
           node tests/low-data-budget.mjs
           node tests/low-data-behavior.mjs
           node admin/logic-selftest.js
