@@ -21,7 +21,7 @@
 .weapon-switch{bottom:94px!important;z-index:18!important}
 .weapon-switch button{backdrop-filter:blur(8px)}
 .battle{padding-bottom:0!important}
-.battle canvas{z-index:2}
+.battle canvas{z-index:2;touch-action:none}
 @media(max-width:1100px){
   .v8-game{grid-template-rows:66px minmax(0,1fr)!important}
   .game-bottom{inset:66px 0 0!important}
