@@ -1,7 +1,7 @@
 // Cloud-account completion + arcade-intensity cache. The playable shell remains usable without account/network availability.
-const CACHE='fsa-arcade-v15-intensity-20260913';
+const CACHE='fsa-arcade-v16-intensity-bridge-20260913';
 const CORE=[
-  './','./index.html','./activate.html','./activate.js','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./arcade-intensity-v12.css','./fsa-v9.js','./arcade-intensity-v12.js','./cloud-sync-v11.js','./manifest.webmanifest',
+  './','./index.html','./activate.html','./activate.js','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./arcade-intensity-v12.css','./fsa-v9.js','./arcade-intensity-v12.js','./cloud-sync-v11.js','./arcade-intensity-v12-bridge.js','./manifest.webmanifest',
   './assets/fsa-mark.svg','./assets/fsa-boss-event.svg','./assets/fsa-gameplay.svg','./assets/fsa-lobby.svg','./assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg',
   './admin/','./admin/index.html','./admin/styles.css','./admin/app.js','./admin/security-completion.js','./admin/cloud-player-admin.js'
 ];
