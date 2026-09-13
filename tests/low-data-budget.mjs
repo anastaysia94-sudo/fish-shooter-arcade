@@ -6,6 +6,7 @@ const criticalBudgets = new Map([
   ['index.html', 96 * 1024],
   ['fsa-v8.css', 128 * 1024],
   ['gameplay-layout-v9.css', 64 * 1024],
+  ['visual-fidelity-v10.css', 48 * 1024],
   ['fsa-v9.js', 128 * 1024],
   ['sw.js', 32 * 1024],
 ]);
