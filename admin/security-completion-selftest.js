@@ -1,0 +1,17 @@
+'use strict';
+const fs=require('fs');
+const assert=require('assert');
+const html=fs.readFileSync('admin/index.html','utf8');
+const js=fs.readFileSync('admin/security-completion.js','utf8');
+const sw=fs.readFileSync('sw.js','utf8');
+const sql=fs.readFileSync('backend/supabase/migrations/20260912_fsa_founder_mfa_sensitive_reads_v1.sql','utf8');
+assert(js.includes('api.pwnedpasswords.com/range/'));
+assert(js.includes('SHA-1'));
+assert(js.includes('verifyOtp'));
+assert(js.includes('30*60*1000'));
+assert(html.includes('recoveryLinkInput'));
+assert(html.includes('Compromised-password screening'));
+assert(html.includes('security-completion.js'));
+assert(sw.includes('security-completion.js'));
+for(const table of ['fsa_distributors','fsa_agents','fsa_players','fsa_credit_ledger','fsa_audit_log'])assert(sql.includes(table));
+console.log('FSA_BACKEND_V1_COMPLETION=PASS');

@@ -1,0 +1,31 @@
+name: Validate F.S.A. Founder Backend Completion
+
+on:
+  push:
+    branches: [main, fsa-backend-v1-100-completion]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  founder-backend-completion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate recovery, password screening and MFA read gate
+        run: |
+          set -euo pipefail
+          test -f admin/security-completion.js
+          test -f admin/security-completion-selftest.js
+          test -f backend/supabase/migrations/20260912_fsa_founder_mfa_sensitive_reads_v1.sql
+          node --input-type=module --check < admin/security-completion.js
+          node --check admin/security-completion-selftest.js
+          node admin/security-completion-selftest.js
+          grep -q "security-completion.js" admin/index.html
+          grep -q "security-completion.js" sw.js
+          echo 'FSA_FOUNDER_BACKEND_COMPLETION=PASS'
