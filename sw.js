@@ -29,7 +29,10 @@ self.addEventListener('fetch',event=>{
     return;
   }
   // Security-sensitive Founder Console assets always prefer the network.
-  if(/\/admin\/(?:app\.js|styles\.css|index\.html|security-completion\.js|cloud-player-admin\.js)$/.test(url.pathname)||/\/activate\.js$/.test(url.pathname)){
+  const founderCore=/\/admin\/(?:app\.js|styles\.css|index\.html)$/.test(url.pathname);
+  const founderSecurity=/\/admin\/(?:security-completion\.js|cloud-player-admin\.js)$/.test(url.pathname);
+  const accountActivation=/\/activate\.js$/.test(url.pathname);
+  if(founderCore||founderSecurity||accountActivation){
     event.respondWith(fetch(event.request).then(response=>{
       if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
       return response;
