@@ -18,8 +18,10 @@ on:
       - "tests/runtime-behavior.mjs"
       - "tests/runtime-contract.mjs"
       - "tests/visual-fidelity-contract.mjs"
+      - "tests/visual-acceptance-capture.mjs"
       - "tests/low-data-behavior.mjs"
       - "tests/low-data-budget.mjs"
+      - ".github/workflows/pages.yml"
       - ".github/workflows/current-runtime-regression.yml"
       - ".github/workflows/validate-v9.yml"
       - ".github/workflows/validate.yml"
@@ -40,8 +42,10 @@ on:
       - "tests/runtime-behavior.mjs"
       - "tests/runtime-contract.mjs"
       - "tests/visual-fidelity-contract.mjs"
+      - "tests/visual-acceptance-capture.mjs"
       - "tests/low-data-behavior.mjs"
       - "tests/low-data-budget.mjs"
+      - ".github/workflows/pages.yml"
       - ".github/workflows/current-runtime-regression.yml"
       - ".github/workflows/validate-v9.yml"
       - ".github/workflows/validate.yml"
@@ -66,6 +70,7 @@ jobs:
           node --check tests/runtime-behavior.mjs
           node --check tests/runtime-contract.mjs
           node --check tests/visual-fidelity-contract.mjs
+          node --check tests/visual-acceptance-capture.mjs
       - name: Current gameplay contract
         run: node gameplay-selftest.js
       - name: Executable current runtime behavior
