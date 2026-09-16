@@ -31,6 +31,19 @@ assert(css.includes('data-intensity="v12"'),'v12 CSS must remain scoped');
 assert(bridge.includes('__FSA_GAME_TEST__'),'bridge must preserve cloud runtime hooks');
 assert(bridge.includes('seedIntensityProfile'),'bridge must seed v12 from cloud/legacy profile authority before fish play');
 assert(bridge.includes('shadow.game')&&bridge.includes('shadow.room'),'bridge must report current v12 game/room to cloud sync');
+
+// Cinematic v13 is a local UI/gameplay-control enhancement layered inside the existing bridge.
+for(const marker of ["cinematic:'v13'",'__FSA_CINEMATIC_UI__','v13ActionTower','v13Reticle','v13TeamStrip','v13ComboCallout','v13BossMeta','data-cinematic-lite']){
+  assert(bridge.includes(marker),`cinematic v13 marker missing ${marker}`);
+}
+for(const marker of ["k==='q'","k==='e'","window.switchGun?.(Number(k)-1)","window.betStep?.(-1)","window.betStep?.(1)","z:'nuke'","x:'lightning'","c:'freeze'","v:'bomb'"]){
+  assert(bridge.includes(marker),`cinematic v13 control binding missing ${marker}`);
+}
+assert(bridge.includes("$('#lockBtn')?.click()")&&bridge.includes("$('#autoBtn')?.click()"),'cinematic controls must reuse canonical lock/auto authority and confirmation semantics');
+assert(bridge.includes('@media(max-width:760px)'),'cinematic v13 must preserve a phone layout');
+assert(bridge.includes('@media(max-height:520px) and (orientation:landscape)'),'cinematic v13 must preserve short landscape play');
+assert(bridge.includes('@media(prefers-reduced-motion:reduce)'),'cinematic v13 must preserve reduced-motion behavior');
+assert(!/fetch\s*\(/.test(bridge),'cinematic v13 bridge must remain local-first without fetch');
 assert(!js.includes('Fire Kirin'),'runtime must remain original and not embed competitor branding');
 
-console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS');
+console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS cinematic_v13=PASS');
