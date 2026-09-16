@@ -6,6 +6,10 @@ const index=read('index.html');
 const js=read('arcade-intensity-v12.js');
 const css=read('arcade-intensity-v12.css');
 const bridge=read('arcade-intensity-v12-bridge.js');
+const spectacle=read('boss-spectacle-v13.js');
+const dense=read('dense-mode-v14.js');
+const denseCss=read('dense-mode-v14.css');
+const denseOverlay=read('dense-mode-v14-overlay.css');
 const sw=read('sw.js');
 
 for(const asset of ['arcade-intensity-v12.css','arcade-intensity-v12.js','arcade-intensity-v12-bridge.js']){
@@ -46,4 +50,24 @@ assert(bridge.includes('@media(prefers-reduced-motion:reduce)'),'cinematic v13 m
 assert(!/fetch\s*\(/.test(bridge),'cinematic v13 bridge must remain local-first without fetch');
 assert(!js.includes('Fire Kirin'),'runtime must remain original and not embed competitor branding');
 
-console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS cinematic_v13=PASS');
+// Dense v14 layers high-density arcade presentation over the current v13 spectacle without replacing engine/cloud authority.
+for(const asset of ['dense-mode-v14.css','dense-mode-v14-overlay.css','dense-mode-v14.js']){
+  assert(spectacle.includes(asset),`v13 spectacle must load ${asset}`);
+  assert(sw.includes(`./${asset}`),`service worker must cache ${asset}`);
+  assert(sw.includes(asset.replaceAll('.','\\.'))||sw.includes(asset),`service worker fresh-runtime policy must include ${asset}`);
+}
+for(const marker of ['__FSA_DENSE_UI__','v14CombatRail','v14Targeting','v14TargetInspector','v14FeverCore','v14LootStack','v14DensityCtl','v14Atmos','seedAtmosphere','drawAtmos','setTargetPolicy','setMode']){
+  assert(dense.includes(marker),`dense v14 runtime marker missing ${marker}`);
+}
+for(const marker of ['data-dense-ui="v14"','v14-combat-rail','v14-fever-core','v14-target-card','data-density-mode="extreme"','prefers-reduced-motion']){
+  assert(denseCss.includes(marker),`dense v14 CSS marker missing ${marker}`);
+}
+assert(denseOverlay.includes('#v14Atmos'),'dense v14 overlay must style the atmosphere canvas');
+assert(denseOverlay.includes('pointer-events:none'),'dense atmosphere must never block canonical gameplay input');
+assert(dense.includes("LOW?'standard':'dense'"),'Dense must be the normal default while constrained/reduced-motion mode falls back to Standard');
+assert(dense.includes("local.mode==='extreme'?44:local.mode==='dense'?34:28"),'desktop density modes must expose explicit visual target budgets');
+assert(dense.includes("local.mode==='extreme'?38:local.mode==='dense'?28:16"),'dense mode must scale multi-depth ambient schools');
+assert(!/fetch\s*\(/.test(dense),'dense v14 runtime must remain local-first without fetch');
+assert(!dense.includes('Fire Kirin'),'dense runtime must remain original and not embed competitor branding');
+
+console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS cinematic_v13=PASS dense_v14=PASS');
