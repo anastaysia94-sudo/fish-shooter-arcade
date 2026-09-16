@@ -25,7 +25,7 @@ async function waitForVisibleBoss(p){
     const boss=dots.find(d=>getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)');
     if(!boss)return false;
     const left=parseFloat(boss.style.left),top=parseFloat(boss.style.top);
-    if(!Number.isFinite(left)||!Number.isFinite(top)||left<=16||left>=84||top<=14||top>=86)return false;
+    if(!Number.isFinite(left)||!Number.isFinite(top)||left<=20||left>=72||top<=14||top>=86)return false;
     const x=(left-8)/84*(canvas.width||1280),y=(top-8)/84*(canvas.height||720);
     const ctx=canvas.getContext('2d',{willReadFrequently:true});
     if(!ctx)return false;
@@ -35,11 +35,11 @@ async function waitForVisibleBoss(p){
     let bright=0;
     for(let py=0;py<h;py+=4)for(let px=0;px<w;px+=4){const i=(py*w+px)*4,R=data[i],G=data[i+1],B=data[i+2],A=data[i+3],hi=Math.max(R,G,B),lo=Math.min(R,G,B);if(A>200&&hi>175&&hi-lo>45)bright++}
     return bright>=180;
-  },null,{timeout:40000});
-  await p.waitForTimeout(180);
+  },null,{timeout:50000});
   return p.evaluate(()=>{const boss=[...document.querySelectorAll('#radar .dot')].find(d=>getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)');return boss?{radarLeft:parseFloat(boss.style.left),radarTop:parseFloat(boss.style.top)}:null});
 }
 async function waitForTargetDensity(p,minVisible=18){
+  const trigger=minVisible+4;
   await p.waitForFunction(min=>{
     const visible=[...document.querySelectorAll('#radar .dot')].filter(d=>{
       if(getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)')return false;
@@ -47,8 +47,7 @@ async function waitForTargetDensity(p,minVisible=18){
       return Number.isFinite(left)&&Number.isFinite(top)&&left>10&&left<90&&top>10&&top<90;
     });
     return visible.length>=min;
-  },minVisible,{timeout:35000});
-  await p.waitForTimeout(180);
+  },trigger,{timeout:50000});
   return p.evaluate(()=>[...document.querySelectorAll('#radar .dot')].filter(d=>{
     if(getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)')return false;
     const left=parseFloat(d.style.left),top=parseFloat(d.style.top);
