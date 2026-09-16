@@ -44,6 +44,10 @@ function loadDenseVisualStack(){
     const script=document.createElement('script');script.src=src;script.async=false;document.body.appendChild(script);
   }
 }
-mount();updateCombo();updateFever();parseBoss();loadDenseVisualStack();
-window.__FSA_SPECTACLE_V13__={version:'v13',denseGraphics:'v15',state:()=>({...V,armed:[...V.armed]}),callout,coinBurst};
+function loadTelemetryV1(){
+  if(document.querySelector('script[src="telemetry-v1.js"]'))return;
+  const script=document.createElement('script');script.src='telemetry-v1.js';script.async=false;script.dataset.optional='analytics';document.body.appendChild(script);
+}
+mount();updateCombo();updateFever();parseBoss();loadDenseVisualStack();loadTelemetryV1();
+window.__FSA_SPECTACLE_V13__={version:'v13',denseGraphics:'v15',telemetry:'v1',state:()=>({...V,armed:[...V.armed]}),callout,coinBurst};
 })();
