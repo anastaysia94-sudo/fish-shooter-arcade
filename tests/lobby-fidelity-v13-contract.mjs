@@ -44,7 +44,8 @@ need(lite.includes("url('assets/fsa-lobby.svg')"),'Lite Fever card must retain l
 
 need(sw.includes("'./lobby-fidelity-v13.css'"),'Offline CORE shell must cache lobby-fidelity-v13.css.');
 need(sw.includes('lobby-fidelity-v13\\.css'),'Lobby fidelity stylesheet must be network-first/fresh in installed PWAs.');
-need(sw.includes('fsa-arcade-v19-lobby-fidelity-20260916'),'Service-worker cache version must advance for the lobby release.');
+const cacheVersion=Number(sw.match(/const CACHE='fsa-arcade-v(\d+)-/)?.[1]||0);
+need(cacheVersion>=19,'Service-worker cache version must remain at or beyond the lobby-fidelity release.');
 
 for(let i=1;i<=12;i++) need(capture.includes(`,${i}`)||capture.includes(`item:${i}`)||capture.includes(`item: ${i}`),`Visual acceptance harness lost item ${i}.`);
 need(capture.includes('02-android-portrait-lobby'),'Portrait lobby capture is required.');
