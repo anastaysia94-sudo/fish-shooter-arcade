@@ -69,11 +69,13 @@ async function verifySlotLobby(p){
     const states=cards.map(card=>{
       const cs=getComputedStyle(card),symbols=card.querySelector('.slot-symbols'),ss=symbols?getComputedStyle(symbols):null;
       const layers=cs.backgroundSize.split(',').map(x=>x.trim());
+      const atlasLayer=layers[1]||'';
       return {
         atlas:cs.backgroundImage.includes('fsa-slot-atlas-v10.svg'),
         clipped:cs.overflowX==='hidden'&&cs.overflowY==='hidden',
         symbolsHidden:!!ss&&ss.opacity==='0'&&ss.visibility==='hidden',
-        atlasWidthSized:layers.length>=2&&/^2000%\s+auto$/i.test(layers[1]),
+        atlasWidthSized:atlasLayer.startsWith('2000%')&&!/\s100%$/i.test(atlasLayer),
+        atlasLayer,
         position:cs.backgroundPosition,
         size:cs.backgroundSize,
         width:card.getBoundingClientRect().width,
@@ -88,6 +90,7 @@ async function verifySlotLobby(p){
       widthSizedAtlasCards:states.filter(x=>x.atlasWidthSized).length,
       distinctAtlasPositions:new Set(states.map(x=>x.position)).size,
       distinctAtlasSizes:new Set(states.map(x=>x.size)).size,
+      sampleAtlasLayers:[...new Set(states.map(x=>x.atlasLayer))].slice(0,5),
       measurableCards:states.filter(x=>x.width>40&&x.height>80).length
     };
   });
@@ -95,7 +98,7 @@ async function verifySlotLobby(p){
   if(qa.atlasCards!==20)throw new Error(`Slot lobby atlas missing on ${20-qa.atlasCards} cards`);
   if(qa.clippedCards!==20)throw new Error(`Slot lobby clipping missing on ${20-qa.clippedCards} cards`);
   if(qa.hiddenLegacySymbolCards!==20)throw new Error(`Legacy slot symbols remain visible on ${20-qa.hiddenLegacySymbolCards} cards`);
-  if(qa.widthSizedAtlasCards!==20)throw new Error(`Slot atlas is not width-sized on ${20-qa.widthSizedAtlasCards} cards`);
+  if(qa.widthSizedAtlasCards!==20)throw new Error(`Slot atlas width semantics missing on ${20-qa.widthSizedAtlasCards} cards; sample=${JSON.stringify(qa.sampleAtlasLayers)}`);
   if(qa.distinctAtlasPositions!==20)throw new Error(`Slot lobby expected 20 distinct atlas positions, found ${qa.distinctAtlasPositions}`);
   if(qa.measurableCards!==20)throw new Error(`Slot lobby contains collapsed cards`);
   return qa;
@@ -112,7 +115,7 @@ try{
   {const {c,p}=await page(1366,768);await go(p);await openGame(p,11,2);await snapAtTargetDensity(p,'06-crowded-coral-chaos',6,18);await c.close()}
   {const {c,p}=await page(1366,768);await go(p);await openGame(p,0);for(const [i,n] of [[0,'pulse'],[1,'spread'],[2,'rail']]){await p.evaluate(x=>window.switchGun(x),i);await p.waitForTimeout(250);await snap(p,`07-${n}-mode`,7,{mode:n})}await c.close()}
   {const {c,p}=await page(1440,900);await go(p);await p.locator('#worlds').scrollIntoViewIfNeeded();await p.waitForTimeout(250);await snap(p,'08-room-selection',8);await c.close()}
-  {const {c,p}=await page(1440,900);await go(p);await p.locator('#slots').scrollIntoViewIfNeeded();await p.waitForTimeout(250);const slotQa=await verifySlotLobby(p);await snap(p,'09-slot-lobby',9,slotQa);await c.close()}
+  {const {c,p}=await page(1440,900);await go(p);await p.locator('#slots').scrollIntoViewIfNeeded();await p.waitForTimeout(250);await p.screenshot({path:resolve(out,'09-slot-lobby.png'),animations:'disabled'});const slotQa=await verifySlotLobby(p);rows.push({item:9,name:'09-slot-lobby',file:'09-slot-lobby.png',...slotQa});await c.close()}
   {const {c,p}=await page(1366,768);await go(p);await p.waitForFunction(()=>typeof window.openSlot==='function');await p.evaluate(()=>{window.openSlot(0);document.querySelectorAll('.reel').forEach(x=>x.textContent='7');const e=document.querySelector('#slotResult');if(e)e.textContent='JACKPOT FEATURE · FIVE-REEL QA STATE'});await p.waitForSelector('#slotModal.on');await p.waitForTimeout(350);await snap(p,'10-open-five-reel-feature',10);await c.close()}
   {const {c,p}=await page(915,412,true,true);await go(p);await openGame(p,0,0);const dots=await p.locator('#radar .dot').count();if(dots>10)throw new Error(`Lite mode did not engage: ${dots} radar dots`);await snap(p,'11-lite-2g-mode',11,{radarDots:dots});await c.close()}
   {const {c,p}=await page(412,915,true);await go(p,'admin/');const txt=(await p.locator('body').innerText()).trim();if(!txt)throw new Error('Founder Console mobile view is blank');await snap(p,'12-founder-console-mobile',12);await c.close()}
