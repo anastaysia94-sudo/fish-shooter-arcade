@@ -92,12 +92,79 @@ jobs:
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
-          if node tests/visual-acceptance-capture.mjs "$PAGE_URL"; then
-            exit 0
+          export FSA_LIVE_SOURCE_URL="${PAGE_URL%/}/"
+          python3 - <<'PY' >/tmp/fsa-live-proxy.log 2>&1 &
+          import os
+          import urllib.request
+          from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+          target = os.environ["FSA_LIVE_SOURCE_URL"].rstrip("/") + "/"
+
+          class Handler(BaseHTTPRequestHandler):
+              def do_GET(self):
+                  url = target + self.path.lstrip("/")
+                  req = urllib.request.Request(
+                      url,
+                      headers={
+                          "User-Agent": "FSA-Visual-QA-Proxy/1.0",
+                          "Cache-Control": "no-cache",
+                      },
+                  )
+                  try:
+                      with urllib.request.urlopen(req, timeout=30) as response:
+                          body = response.read()
+                          self.send_response(response.status)
+                          for key, value in response.headers.items():
+                              if key.lower() not in {"content-length", "transfer-encoding", "connection", "content-encoding"}:
+                                  self.send_header(key, value)
+                          self.send_header("Content-Length", str(len(body)))
+                          self.end_headers()
+                          self.wfile.write(body)
+                  except Exception as exc:
+                      body = f"upstream fetch failed: {exc}".encode()
+                      self.send_response(502)
+                      self.send_header("Content-Type", "text/plain; charset=utf-8")
+                      self.send_header("Content-Length", str(len(body)))
+                      self.end_headers()
+                      self.wfile.write(body)
+
+              def log_message(self, fmt, *args):
+                  print("FSA_LIVE_PROXY", fmt % args, flush=True)
+
+          ThreadingHTTPServer(("127.0.0.1", 4173), Handler).serve_forever()
+          PY
+          PROXY_PID=$!
+          trap 'kill "$PROXY_PID" 2>/dev/null || true' EXIT
+
+          for i in {1..30}; do
+            if curl -fsS --max-time 15 http://127.0.0.1:4173/ >/dev/null; then
+              echo "FSA_LIVE_PROXY=PASS source=$FSA_LIVE_SOURCE_URL"
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS --max-time 15 http://127.0.0.1:4173/ >/dev/null
+
+          if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+            echo "First proxied live capture attempt failed; retrying once."
+            sleep 5
+            node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"
           fi
-          echo "First live visual capture attempt failed; retrying once after a longer Pages/browser settle window."
-          sleep 12
-          node tests/visual-acceptance-capture.mjs "$PAGE_URL"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("artifacts/visual-acceptance/manifest.json")
+          data = json.loads(path.read_text())
+          data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
+          data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
+          data["sourceCommit"] = os.environ.get("GITHUB_SHA")
+          data["captureTransport"] = "same-origin reverse proxy streaming deployed GitHub Pages bytes"
+          path.write_text(json.dumps(data, indent=2) + "\n")
+          print("FSA_VISUAL_MANIFEST_SOURCE=PASS", data["sourceUrl"], data["sourceCommit"])
+          PY
       - name: Upload live visual acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
