@@ -24,6 +24,7 @@ class GameActivity : ComponentActivity() {
 
     private val gameUrl = "https://anastaysia94-sudo.github.io/fish-shooter-arcade/"
     private val allowedHost = "anastaysia94-sudo.github.io"
+    private val allowedPath = "/fish-shooter-arcade"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +32,7 @@ class GameActivity : ComponentActivity() {
 
         window.statusBarColor = Color.rgb(2, 8, 14)
         window.navigationBarColor = Color.rgb(2, 8, 14)
+        WebView.setWebContentsDebuggingEnabled(false)
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -45,7 +47,7 @@ class GameActivity : ComponentActivity() {
         }
 
         val brand = TextView(this).apply {
-            text = "F.S.A.  •  TABLE ENGINE v5"
+            text = "F.S.A.  •  TABLE ENGINE v12"
             setTextColor(Color.rgb(67, 230, 255))
             textSize = 12f
             setTypeface(typeface, android.graphics.Typeface.BOLD)
@@ -94,29 +96,32 @@ class GameActivity : ComponentActivity() {
                 setSupportZoom(false)
                 allowFileAccess = false
                 allowContentAccess = false
+                javaScriptCanOpenWindowsAutomatically = false
+                setGeolocationEnabled(false)
+                saveFormData = false
+                safeBrowsingEnabled = true
                 mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-                userAgentString = "$userAgentString FSA-Android-v11"
+                userAgentString = "$userAgentString FSA-Android-v12"
             }
             webChromeClient = WebChromeClient()
             webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                    val uri = request?.url ?: return false
-                    if (uri.scheme == "https" && uri.host == allowedHost) return false
-                    return runCatching {
-                        startActivity(Intent(Intent.ACTION_VIEW, uri))
-                        true
-                    }.getOrDefault(true)
+                    val uri = request?.url ?: return true
+                    if (isTrustedFsaUri(uri)) return false
+                    return openExternally(uri)
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
+                    val uri = runCatching { Uri.parse(url) }.getOrNull()
+                    if (uri == null || !isTrustedFsaUri(uri)) return
                     // Mark the trusted F.S.A. page as running inside the Android cabinet.
                     view?.evaluateJavascript(
                         """
                         (()=>{
                           document.documentElement.classList.add('fsa-android-cabinet');
-                          document.body && document.body.setAttribute('data-fsa-android','v11');
-                          try { localStorage.setItem('fsa.android.cabinet','v11'); } catch(e) {}
+                          document.body && document.body.setAttribute('data-fsa-android','v12');
+                          try { localStorage.setItem('fsa.android.cabinet','v12'); } catch(e) {}
                         })();
                         """.trimIndent(),
                         null
@@ -173,6 +178,23 @@ class GameActivity : ComponentActivity() {
         webView.webChromeClient = null
         webView.destroy()
         super.onDestroy()
+    }
+
+    private fun isTrustedFsaUri(uri: Uri): Boolean {
+        val path = uri.path.orEmpty()
+        return uri.scheme.equals("https", ignoreCase = true) &&
+            uri.host.equals(allowedHost, ignoreCase = true) &&
+            (path == allowedPath || path.startsWith("$allowedPath/"))
+    }
+
+    private fun openExternally(uri: Uri): Boolean {
+        return when (uri.scheme?.lowercase()) {
+            "https", "http", "mailto" -> runCatching {
+                startActivity(Intent(Intent.ACTION_VIEW, uri))
+                true
+            }.getOrDefault(true)
+            else -> true
+        }
     }
 
     private fun enterImmersive() {
