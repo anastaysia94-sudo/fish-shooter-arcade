@@ -12,6 +12,22 @@
   "icons": [
     {"src":"assets/fsa-mark.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}
   ],
+  "shortcuts": [
+    {
+      "name": "Visual QA War Room",
+      "short_name": "Visual QA",
+      "description": "Open the 12/12 certified F.S.A. visual acceptance experience.",
+      "url": "qa/",
+      "icons": [{"src":"assets/fsa-mark.svg","sizes":"any","type":"image/svg+xml"}]
+    },
+    {
+      "name": "Founder Console",
+      "short_name": "Founder",
+      "description": "Open the secure F.S.A. operator console.",
+      "url": "admin/",
+      "icons": [{"src":"assets/fsa-mark.svg","sizes":"any","type":"image/svg+xml"}]
+    }
+  ],
   "categories": ["games","entertainment"],
   "prefer_related_applications": false
 }
