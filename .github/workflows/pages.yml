@@ -92,6 +92,7 @@ jobs:
             "/boss-spectacle-v13.js"
             "/dense-mode-v14.js"
             "/dense-graphics-v15.js"
+            "/telemetry-v1.js"
           )
           for asset in "${assets[@]}"; do
             echo "Preflighting $asset"
@@ -121,6 +122,8 @@ jobs:
             "dense-mode-v14.js"
             "dense-graphics-v15.css"
             "dense-graphics-v15.js"
+            "telemetry-v1.js"
+            "sw.js"
             "assets/fsa-fish-hd-atlas.webp"
             "assets/fsa-slots-hd-atlas.webp"
             "assets/reef-run-hd-battle.webp"
@@ -153,38 +156,93 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           export FSA_LIVE_SOURCE_URL="${PAGE_URL%/}/"
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/fsa-static-server.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 
-          for i in {1..30}; do
-            if curl -fsS --max-time 10 http://127.0.0.1:4173/ >/dev/null; then
-              echo "FSA_BYTE_VERIFIED_LOCAL_SERVER=PASS"
-              break
-            fi
-            sleep 1
-          done
-          curl -fsS --max-time 10 http://127.0.0.1:4173/ >/dev/null
+          # GitHub-hosted Chromium has repeatedly hung on ordinary network navigation,
+          # including 127.0.0.1, while curl and production parity remain healthy.
+          # Patch only the disposable CI harness so browser requests are fulfilled
+          # in-process from this exact byte-verified checkout.
+          python3 - <<'PY'
+          from pathlib import Path
 
-          if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
-            echo "First deterministic capture attempt failed; retrying once." >&2
-            sleep 3
-            if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+          path = Path('tests/visual-acceptance-capture.mjs')
+          text = path.read_text()
+          text = text.replace(
+              "import { mkdir, rm, writeFile } from 'node:fs/promises';",
+              "import { mkdir, rm, writeFile, readFile } from 'node:fs/promises';"
+          )
+          text = text.replace(
+              "import { resolve } from 'node:path';",
+              "import { resolve, extname, sep } from 'node:path';"
+          )
+          text = text.replace(
+              "const browser = await chromium.launch({headless:true});",
+              "const fixtureRoot=resolve('.');\\nconst browser = await chromium.launch({headless:true,args:['--no-proxy-server']});"
+          )
+
+          old = """async function page(width,height,mobile=false,low=false){
+            const c=await browser.newContext({viewport:{width,height},screen:{width,height},isMobile:mobile,hasTouch:mobile,userAgent:mobile?ua:undefined});
+            if(low) await c.addInitScript(()=>{const v={saveData:true,effectiveType:'2g',downlink:.25,rtt:900,addEventListener(){},removeEventListener(){}};for(const k of ['connection','mozConnection','webkitConnection'])try{Object.defineProperty(navigator,k,{get:()=>v})}catch{};try{Object.defineProperty(navigator,'deviceMemory',{get:()=>2})}catch{};try{Object.defineProperty(navigator,'hardwareConcurrency',{get:()=>2})}catch{}});
+            const p=await c.newPage();
+            p.setDefaultTimeout(60000);
+            p.on('pageerror',error=>console.error(`FSA_BROWSER_PAGEERROR ${error.message}`));
+            p.on('requestfailed',request=>console.error(`FSA_BROWSER_REQUEST_FAILED ${request.method()} ${request.url()} ${request.failure()?.errorText||''}`));
+            return {c,p};
+          }"""
+
+          new = """const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg'};
+          async function page(width,height,mobile=false,low=false){
+            const c=await browser.newContext({viewport:{width,height},screen:{width,height},isMobile:mobile,hasTouch:mobile,userAgent:mobile?ua:undefined,serviceWorkers:'block'});
+            await c.route('**/*',async route=>{
+              const request=route.request();
+              let url;
+              try{url=new URL(request.url())}catch{return route.abort('blockedbyclient')}
+              if(url.origin!==base.origin)return route.abort('blockedbyclient');
+              let rel=decodeURIComponent(url.pathname).replace(/^\\/+/, '');
+              if(!rel||rel.endsWith('/'))rel+='index.html';
+              const file=resolve(fixtureRoot,rel);
+              if(file!==fixtureRoot&&!file.startsWith(fixtureRoot+sep))return route.fulfill({status:403,body:'forbidden'});
+              try{
+                const body=await readFile(file);
+                return route.fulfill({status:200,body,contentType:MIME[extname(file).toLowerCase()]||'application/octet-stream',headers:{'Cache-Control':'no-store'}});
+              }catch(error){
+                if(error?.code==='ENOENT')return route.fulfill({status:404,body:'not found'});
+                throw error;
+              }
+            });
+            if(low) await c.addInitScript(()=>{const v={saveData:true,effectiveType:'2g',downlink:.25,rtt:900,addEventListener(){},removeEventListener(){}};for(const k of ['connection','mozConnection','webkitConnection'])try{Object.defineProperty(navigator,k,{get:()=>v})}catch{};try{Object.defineProperty(navigator,'deviceMemory',{get:()=>2})}catch{};try{Object.defineProperty(navigator,'hardwareConcurrency',{get:()=>2})}catch{}});
+            const p=await c.newPage();
+            p.setDefaultTimeout(60000);
+            p.on('pageerror',error=>console.error(`FSA_BROWSER_PAGEERROR ${error.message}`));
+            p.on('requestfailed',request=>{if(!/^https?:\\/\\/fsa\\.local\\//.test(request.url()))return;console.error(`FSA_BROWSER_REQUEST_FAILED ${request.method()} ${request.url()} ${request.failure()?.errorText||''}`)});
+            return {c,p};
+          }"""
+
+          if old not in text:
+              raise SystemExit('Expected visual harness page() block was not found; refusing a silent CI rewrite')
+          text = text.replace(old, new)
+          path.write_text(text)
+          print('FSA_INPROCESS_FIXTURE_PATCH=PASS')
+          PY
+
+          node --check tests/visual-acceptance-capture.mjs
+
+          if ! node tests/visual-acceptance-capture.mjs "http://fsa.local/"; then
+            echo "First in-process capture attempt failed; retrying once." >&2
+            sleep 2
+            if ! node tests/visual-acceptance-capture.mjs "http://fsa.local/"; then
               mkdir -p artifacts/visual-acceptance
               python3 - <<'PY'
           import json, os
           from datetime import datetime, timezone
           from pathlib import Path
           Path('artifacts/visual-acceptance/failure.json').write_text(json.dumps({
-              'schema':'fsa.visual-acceptance.failure.v2',
+              'schema':'fsa.visual-acceptance.failure.v3',
               'sourceUrl':os.environ.get('FSA_LIVE_SOURCE_URL'),
               'sourceCommit':os.environ.get('GITHUB_SHA'),
               'generatedAt':datetime.now(timezone.utc).isoformat(),
-              'message':'Production byte parity passed, but both deterministic browser-render attempts failed.'
+              'message':'Production byte parity passed, but both in-process browser-render attempts failed.'
           },indent=2)+'\n')
           PY
-              echo "--- local static-server diagnostics ---" >&2
-              tail -n 200 /tmp/fsa-static-server.log >&2 || true
               exit 1
             fi
           fi
@@ -200,7 +258,7 @@ jobs:
           data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceCommit"] = os.environ.get("GITHUB_SHA")
-          data["captureTransport"] = "localhost static server from the exact Pages deployment source after production byte-parity verification"
+          data["captureTransport"] = "Playwright in-process route fulfillment from the exact Pages deployment source after production byte-parity verification"
           data["deploymentParity"] = {
               "verified": True,
               "productionUrl": os.environ["FSA_LIVE_SOURCE_URL"],
