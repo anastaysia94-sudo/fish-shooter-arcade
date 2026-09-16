@@ -24,83 +24,64 @@ using (false)
 with check (false);
 
 -- Replace the simple key allowlist with key + type + range validation.
+-- This is intentionally SQL rather than procedural PL/pgSQL so the validator is
+-- small, deterministic and easy to audit.
 create or replace function fsa_private.telemetry_payload_allowed(p_payload jsonb)
 returns boolean
-language plpgsql
+language sql
 immutable
 security definer
 set search_path = pg_catalog, public
 as $$
-declare
-  k text;
-  n numeric;
-  s text;
-begin
-  if p_payload is null or jsonb_typeof(p_payload) <> 'object' or pg_column_size(p_payload) > 4096 then
-    return false;
-  end if;
-
-  for k in select jsonb_object_keys(p_payload)
-  loop
-    if k not in (
-      'client','build','low_data','source','reason','shots','hits','kills','score',
-      'combo','fever','gun','power','slot_id','result_class','duration_ms',
-      'target_count','wave','boss_ratio'
-    ) then
-      return false;
-    end if;
-  end loop;
-
-  -- Short string fields only. These are labels, never free-form identity/account text.
-  foreach k in array array['client','build','source','reason','power','slot_id','result_class']
-  loop
-    if p_payload ? k then
-      if jsonb_typeof(p_payload -> k) <> 'string' then return false; end if;
-      s := p_payload ->> k;
-      if char_length(s) < 1 or char_length(s) > case when k='build' then 80 else 64 end then return false; end if;
-    end if;
-  end loop;
-
-  if p_payload ? 'low_data' and jsonb_typeof(p_payload -> 'low_data') <> 'boolean' then
-    return false;
-  end if;
-
-  -- Integer-like counters/ranges. JSON numeric is accepted only inside bounded ranges.
-  foreach k in array array['shots','hits','kills','score','combo','fever','gun','duration_ms','target_count','wave']
-  loop
-    if p_payload ? k then
-      if jsonb_typeof(p_payload -> k) <> 'number' then return false; end if;
-      begin
-        n := (p_payload ->> k)::numeric;
-      exception when others then
-        return false;
-      end;
-      if trunc(n) <> n then return false; end if;
-      if n < 0 then return false; end if;
-      if k in ('shots','hits') and n > 10000000 then return false; end if;
-      if k='kills' and n > 1000000 then return false; end if;
-      if k='score' and n > 2000000000 then return false; end if;
-      if k='combo' and n > 100000 then return false; end if;
-      if k='fever' and n > 100 then return false; end if;
-      if k='gun' and n > 2 then return false; end if;
-      if k='duration_ms' and n > 86400000 then return false; end if;
-      if k='target_count' and n > 1000 then return false; end if;
-      if k='wave' and n > 10000 then return false; end if;
-    end if;
-  end loop;
-
-  if p_payload ? 'boss_ratio' then
-    if jsonb_typeof(p_payload -> 'boss_ratio') <> 'number' then return false; end if;
-    begin
-      n := (p_payload ->> 'boss_ratio')::numeric;
-    exception when others then
-      return false;
-    end;
-    if n < 0 or n > 1 then return false; end if;
-  end if;
-
-  return true;
-end;
+  select coalesce(
+    p_payload is not null
+    and jsonb_typeof(p_payload) = 'object'
+    and pg_column_size(p_payload) <= 4096
+    and not exists (
+      select 1
+      from jsonb_object_keys(p_payload) as keys(key)
+      where keys.key not in (
+        'client','build','low_data','source','reason','shots','hits','kills','score',
+        'combo','fever','gun','power','slot_id','result_class','duration_ms',
+        'target_count','wave','boss_ratio'
+      )
+    )
+    and not exists (
+      select 1
+      from jsonb_each(p_payload) as item(key,value)
+      where case
+        when item.key in ('client','build','source','reason','power','slot_id','result_class') then
+          jsonb_typeof(item.value) <> 'string'
+          or char_length(item.value #>> '{}') < 1
+          or char_length(item.value #>> '{}') > case when item.key='build' then 80 else 64 end
+        when item.key = 'low_data' then
+          jsonb_typeof(item.value) <> 'boolean'
+        when item.key in ('shots','hits','kills','score','combo','fever','gun','duration_ms','target_count','wave') then
+          case
+            when jsonb_typeof(item.value) <> 'number' then true
+            else
+              ((item.value #>> '{}')::numeric < 0)
+              or mod((item.value #>> '{}')::numeric,1) <> 0
+              or (item.key in ('shots','hits') and (item.value #>> '{}')::numeric > 10000000)
+              or (item.key='kills' and (item.value #>> '{}')::numeric > 1000000)
+              or (item.key='score' and (item.value #>> '{}')::numeric > 2000000000)
+              or (item.key='combo' and (item.value #>> '{}')::numeric > 100000)
+              or (item.key='fever' and (item.value #>> '{}')::numeric > 100)
+              or (item.key='gun' and (item.value #>> '{}')::numeric > 2)
+              or (item.key='duration_ms' and (item.value #>> '{}')::numeric > 86400000)
+              or (item.key='target_count' and (item.value #>> '{}')::numeric > 1000)
+              or (item.key='wave' and (item.value #>> '{}')::numeric > 10000)
+          end
+        when item.key = 'boss_ratio' then
+          case
+            when jsonb_typeof(item.value) <> 'number' then true
+            else (item.value #>> '{}')::numeric < 0 or (item.value #>> '{}')::numeric > 1
+          end
+        else false
+      end
+    ),
+    false
+  );
 $$;
 
 revoke all on function fsa_private.telemetry_payload_allowed(jsonb) from public, anon, authenticated;
