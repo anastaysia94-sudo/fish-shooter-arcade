@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="visual-fidelity-v10.css">
   <link rel="stylesheet" href="cloud-sync-v11.css">
   <link rel="stylesheet" href="arcade-intensity-v12.css">
+  <link rel="stylesheet" href="boss-spectacle-v13.css">
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -57,6 +58,7 @@
 <script src="fsa-v9.js"></script>
 <script id="visualFidelityAdapter">(()=>{'use strict';document.documentElement.dataset.vf='v10';const gunKey=t=>/spread/i.test(t)?'spread':/rail/i.test(t)?'rail':'pulse';const syncGuns=()=>document.querySelectorAll('.seatgun').forEach(seat=>{const art=seat.querySelector('.gunart'),name=seat.querySelector('.gname');if(art&&name)art.dataset.gun=gunKey(name.textContent)});const symbolKey=t=>/[💎🔷]/u.test(t)?'gem':/[🪙⭐]/u.test(t)?'gold':/[🐚🐬🐠🦈🦪🪸🌊]/u.test(t)?'sea':/[👑🔱]/u.test(t)?'crown':/[🧜🌙🌀🍀]/u.test(t)?'wild':t.trim()==='7'?'seven':/[⚓]/u.test(t)?'anchor':'treasure';const syncReels=()=>document.querySelectorAll('.reel').forEach(reel=>reel.dataset.symbol=symbolKey(reel.textContent));syncGuns();syncReels();const gunName=document.getElementById('youGun'),reels=document.querySelector('.reels');if(gunName)new MutationObserver(syncGuns).observe(gunName,{subtree:true,childList:true,characterData:true});if(reels)new MutationObserver(syncReels).observe(reels,{subtree:true,childList:true,characterData:true});})();</script>
 <script src="arcade-intensity-v12.js"></script>
+<script src="boss-spectacle-v13.js"></script>
 <script src="cloud-sync-v11.js" defer></script>
 <script src="arcade-intensity-v12-bridge.js" defer></script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
