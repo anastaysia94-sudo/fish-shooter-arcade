@@ -120,7 +120,7 @@ function installCinematicChrome(){
     battle.appendChild(tower);
     tower.addEventListener('click',e=>{const b=e.target.closest('[data-v13-action]');if(b)runAction(b.dataset.v13Action)});
   }
-  if(!$('#v13Hotkeys')){const h=document.createElement('div');h.id='v13Hotkeys';h.className='v13-hotkeys';h.textContent='1–3 CANNON  ·  Q LOCK  ·  E AUTO  ·  [ ] POWER  ·  Z/X/C/V SURGE';battle.appendChild(h)}
+  if(!$('#v13Hotkeys')){const h=document.createElement('div');h.id='v13Hotkeys';h.className='v13-hotkeys';h.textContent='1–3 CANNON  ·  Q LOCK  ·  E AUTO  ·  [ ] BET  ·  Z/X/C/V SURGE';battle.appendChild(h)}
 }
 
 function runAction(action){
