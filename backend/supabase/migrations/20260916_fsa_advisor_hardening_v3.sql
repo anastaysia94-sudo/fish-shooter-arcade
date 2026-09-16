@@ -7,9 +7,13 @@
 -- Remove the duplicate partial unique index. Keep fsa_players_auth_user_unique_idx.
 drop index if exists public.fsa_players_auth_user_uidx;
 
--- Cover the remaining F.S.A. foreign key reported by the database advisor.
+-- Cover F.S.A. foreign keys reported by the database advisor.
 create index if not exists fsa_player_cloud_state_last_game_id_idx
   on public.fsa_player_cloud_state(last_game_id);
+create index if not exists fsa_telemetry_events_game_id_idx
+  on public.fsa_telemetry_events(game_id);
+create index if not exists fsa_telemetry_sessions_last_game_id_idx
+  on public.fsa_telemetry_sessions(last_game_id);
 
 -- Telemetry tables are intentionally RPC-only for clients. Explicit deny-all policies
 -- preserve the previous implicit RLS deny behavior while documenting the boundary.
