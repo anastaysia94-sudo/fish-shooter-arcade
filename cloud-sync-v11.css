@@ -1,3 +1,5 @@
+@import url('lobby-fidelity-v13.css');
+
 .cloud-dialog {
   width: min(760px, calc(100vw - 24px));
   max-height: 86vh;
