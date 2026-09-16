@@ -12,29 +12,38 @@ const ua='Mozilla/5.0 (Linux; Android 16; Pixel 8 Pro) AppleWebKit/537.36 (KHTML
 async function page(width,height,mobile=false,low=false){
   const c=await browser.newContext({viewport:{width,height},screen:{width,height},isMobile:mobile,hasTouch:mobile,userAgent:mobile?ua:undefined});
   if(low) await c.addInitScript(()=>{const v={saveData:true,effectiveType:'2g',downlink:.25,rtt:900,addEventListener(){},removeEventListener(){}};for(const k of ['connection','mozConnection','webkitConnection'])try{Object.defineProperty(navigator,k,{get:()=>v})}catch{};try{Object.defineProperty(navigator,'deviceMemory',{get:()=>2})}catch{};try{Object.defineProperty(navigator,'hardwareConcurrency',{get:()=>2})}catch{}});
-  return {c,p:await c.newPage()};
+  const p=await c.newPage();
+  p.setDefaultTimeout(60000);
+  p.on('pageerror',error=>console.error(`FSA_BROWSER_PAGEERROR ${error.message}`));
+  p.on('requestfailed',request=>console.error(`FSA_BROWSER_REQUEST_FAILED ${request.method()} ${request.url()} ${request.failure()?.errorText||''}`));
+  return {c,p};
 }
 async function go(p,path=''){
   const url=new URL(path,base).toString();
   let lastError;
   for(let attempt=1;attempt<=3;attempt++){
     try{
-      await p.goto(url,{waitUntil:'commit',timeout:30000});
-      await p.waitForSelector('body',{state:'attached',timeout:30000});
+      await p.goto(url,{waitUntil:'commit',timeout:60000});
+      await p.waitForSelector('body',{state:'attached',timeout:60000});
       await p.waitForTimeout(700);
       return;
     }catch(error){
       lastError=error;
+      console.error(`FSA_BROWSER_NAV_RETRY attempt=${attempt} url=${url} error=${error.message}`);
       if(attempt<3){
         try{await p.goto('about:blank',{waitUntil:'commit',timeout:5000})}catch{}
-        await p.waitForTimeout(1500*attempt);
+        await p.waitForTimeout(2000*attempt);
       }
     }
   }
   throw lastError;
 }
+async function waitForLobbyReady(p){
+  await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.openSlot==='function'&&document.querySelectorAll('#fishGrid .lib-card').length===15&&document.querySelectorAll('#slotGrid .slot-card').length===20,null,{timeout:120000});
+  return p.evaluate(()=>({fishCards:document.querySelectorAll('#fishGrid .lib-card').length,slotCards:document.querySelectorAll('#slotGrid .slot-card').length,openGame:typeof window.openGame,openSlot:typeof window.openSlot,readyState:document.readyState}));
+}
 async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});rows.push({item,name,file:`${name}.png`,...meta})}
-async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function');await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on');await p.waitForTimeout(700)}
+async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.chooseRoom==='function',null,{timeout:120000});await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on',{timeout:60000});await p.waitForTimeout(700)}
 async function waitForVisibleBoss(p){
   await p.waitForFunction(()=>{
     const canvas=document.querySelector('#battleCanvas');
@@ -123,8 +132,8 @@ async function verifySlotLobby(p){
 }
 
 try{
-  {const {c,p}=await page(1600,1000);await go(p);await p.waitForSelector('#fishGrid .lib-card');await snap(p,'01-desktop-main-lobby',1);await c.close()}
-  {const {c,p}=await page(412,915,true);await go(p);await snap(p,'02-android-portrait-lobby',2);await c.close()}
+  {const {c,p}=await page(1600,1000);await go(p);const ready=await waitForLobbyReady(p);await snap(p,'01-desktop-main-lobby',1,{runtimeReady:ready});await c.close()}
+  {const {c,p}=await page(412,915,true);await go(p);const ready=await waitForLobbyReady(p);await snap(p,'02-android-portrait-lobby',2,{runtimeReady:ready});await c.close()}
   {const {c,p}=await page(915,412,true);await go(p);await openGame(p,0);await snap(p,'03-android-landscape-reef-run',3);await c.close()}
   {
     const a=await page(1366,768);await go(a.p);await a.p.evaluate(()=>{Math.random=()=>0});await openGame(a.p,0);const reefBoss=await waitForVisibleBoss(a.p);await snap(a.p,'04-reef-run-boss-phase',4,{bossVisible:true,...reefBoss});await a.c.close();
@@ -133,8 +142,8 @@ try{
   {const {c,p}=await page(1366,768);await go(p);await openGame(p,11,2);await snapAtTargetDensity(p,'06-crowded-coral-chaos',6,18);await c.close()}
   {const {c,p}=await page(1366,768);await go(p);await openGame(p,0);for(const [i,n] of [[0,'pulse'],[1,'spread'],[2,'rail']]){await p.evaluate(x=>window.switchGun(x),i);await p.waitForTimeout(250);await snap(p,`07-${n}-mode`,7,{mode:n})}await c.close()}
   {const {c,p}=await page(1440,900);await go(p);await p.locator('#worlds').scrollIntoViewIfNeeded();await p.waitForTimeout(250);await snap(p,'08-room-selection',8);await c.close()}
-  {const {c,p}=await page(1440,900);await go(p);await p.locator('#slots').scrollIntoViewIfNeeded();await p.waitForTimeout(250);await p.screenshot({path:resolve(out,'09-slot-lobby.png'),animations:'disabled'});const slotQa=await verifySlotLobby(p);rows.push({item:9,name:'09-slot-lobby',file:'09-slot-lobby.png',...slotQa});await c.close()}
-  {const {c,p}=await page(1366,768);await go(p);await p.waitForFunction(()=>typeof window.openSlot==='function'&&typeof window.spin==='function');const feature=await p.evaluate(()=>{window.openSlot(0);const n=e=>Number((e?.textContent||'0').replace(/[^0-9.-]/g,''))||0;const before=n(document.querySelector('#slotCoins')),bet=n(document.querySelector('#slotBet')),realRandom=Math.random;try{Math.random=()=>0.65;window.spin()}finally{Math.random=realRandom}const reels=[...document.querySelectorAll('.reel')].map(x=>x.textContent.trim());const after=n(document.querySelector('#slotCoins'));return {engineResolved:true,slotTitle:document.querySelector('#slotTitle')?.textContent?.trim()||'',reelCount:reels.length,reelValues:reels,result:document.querySelector('#slotResult')?.textContent?.trim()||'',bet,beforeCredits:before,afterCredits:after,creditDelta:after-before}});if(feature.reelCount!==5||!feature.reelValues.every(v=>v==='7'))throw new Error(`Real slot feature did not resolve five 7s: ${JSON.stringify(feature.reelValues)}`);if(!/^JACKPOT WIN \+1,500$/.test(feature.result))throw new Error(`Real slot feature result mismatch: ${feature.result}`);if(feature.bet!==100||feature.creditDelta!==1400)throw new Error(`Real slot payout mismatch: bet=${feature.bet} delta=${feature.creditDelta}`);await p.waitForSelector('#slotModal.on');await p.waitForTimeout(250);await snap(p,'10-open-five-reel-feature',10,feature);await c.close()}
+  {const {c,p}=await page(1440,900);await go(p);await waitForLobbyReady(p);await p.locator('#slots').scrollIntoViewIfNeeded();await p.waitForTimeout(250);await p.screenshot({path:resolve(out,'09-slot-lobby.png'),animations:'disabled'});const slotQa=await verifySlotLobby(p);rows.push({item:9,name:'09-slot-lobby',file:'09-slot-lobby.png',...slotQa});await c.close()}
+  {const {c,p}=await page(1366,768);await go(p);await p.waitForFunction(()=>typeof window.openSlot==='function'&&typeof window.spin==='function',null,{timeout:120000});const feature=await p.evaluate(()=>{window.openSlot(0);const n=e=>Number((e?.textContent||'0').replace(/[^0-9.-]/g,''))||0;const before=n(document.querySelector('#slotCoins')),bet=n(document.querySelector('#slotBet')),realRandom=Math.random;try{Math.random=()=>0.65;window.spin()}finally{Math.random=realRandom}const reels=[...document.querySelectorAll('.reel')].map(x=>x.textContent.trim());const after=n(document.querySelector('#slotCoins'));return {engineResolved:true,slotTitle:document.querySelector('#slotTitle')?.textContent?.trim()||'',reelCount:reels.length,reelValues:reels,result:document.querySelector('#slotResult')?.textContent?.trim()||'',bet,beforeCredits:before,afterCredits:after,creditDelta:after-before}});if(feature.reelCount!==5||!feature.reelValues.every(v=>v==='7'))throw new Error(`Real slot feature did not resolve five 7s: ${JSON.stringify(feature.reelValues)}`);if(!/^JACKPOT WIN \+1,500$/.test(feature.result))throw new Error(`Real slot feature result mismatch: ${feature.result}`);if(feature.bet!==100||feature.creditDelta!==1400)throw new Error(`Real slot payout mismatch: bet=${feature.bet} delta=${feature.creditDelta}`);await p.waitForSelector('#slotModal.on');await p.waitForTimeout(250);await snap(p,'10-open-five-reel-feature',10,feature);await c.close()}
   {const {c,p}=await page(915,412,true,true);await go(p);await openGame(p,0,0);const dots=await p.locator('#radar .dot').count();if(dots>10)throw new Error(`Lite mode did not engage: ${dots} radar dots`);await snap(p,'11-lite-2g-mode',11,{radarDots:dots});await c.close()}
   {const {c,p}=await page(412,915,true);await go(p,'admin/');const txt=(await p.locator('body').innerText()).trim();if(!txt)throw new Error('Founder Console mobile view is blank');await snap(p,'12-founder-console-mobile',12);await c.close()}
   for(let i=1;i<=12;i++)if(!rows.some(r=>r.item===i))throw new Error(`Missing acceptance item ${i}`);
