@@ -7,8 +7,15 @@ on:
       - "lobby-fidelity-v13.css"
       - "cloud-sync-v11.css"
       - "arcade-intensity-v12-bridge.js"
+      - "boss-spectacle-v13.js"
+      - "dense-mode-v14.js"
+      - "dense-mode-v14.css"
+      - "dense-mode-v14-overlay.css"
+      - "dense-graphics-v15.js"
+      - "dense-graphics-v15.css"
       - "sw.js"
       - "tests/lobby-fidelity-v13-contract.mjs"
+      - "tests/dense-graphics-v15-contract.mjs"
       - "tests/visual-acceptance-capture.mjs"
       - ".github/workflows/lobby-fidelity-v13.yml"
   push:
@@ -17,8 +24,15 @@ on:
       - "lobby-fidelity-v13.css"
       - "cloud-sync-v11.css"
       - "arcade-intensity-v12-bridge.js"
+      - "boss-spectacle-v13.js"
+      - "dense-mode-v14.js"
+      - "dense-mode-v14.css"
+      - "dense-mode-v14-overlay.css"
+      - "dense-graphics-v15.js"
+      - "dense-graphics-v15.css"
       - "sw.js"
       - "tests/lobby-fidelity-v13-contract.mjs"
+      - "tests/dense-graphics-v15-contract.mjs"
       - "tests/visual-acceptance-capture.mjs"
       - ".github/workflows/lobby-fidelity-v13.yml"
 
@@ -36,10 +50,14 @@ jobs:
           node-version: '22'
       - name: Syntax check visual contracts
         run: |
+          node --check dense-graphics-v15.js
           node --check tests/lobby-fidelity-v13-contract.mjs
+          node --check tests/dense-graphics-v15-contract.mjs
           node --check tests/visual-acceptance-capture.mjs
       - name: Premium lobby and Lite/2G contract
         run: node tests/lobby-fidelity-v13-contract.mjs
+      - name: Dense Graphics V15 contract
+        run: node tests/dense-graphics-v15-contract.mjs
       - name: Preserve current runtime contracts
         run: |
           node tests/runtime-contract.mjs
@@ -50,4 +68,4 @@ jobs:
           node tests/low-data-budget.mjs
           node tests/low-data-behavior.mjs
       - name: Completion marker
-        run: echo 'FSA_LOBBY_FIDELITY_V13_GATE=PASS'
+        run: echo 'FSA_LOBBY_FIDELITY_V13_GATE=PASS dense_graphics_v15=PASS'
