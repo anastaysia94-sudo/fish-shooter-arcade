@@ -24,23 +24,33 @@ env:
 
 jobs:
   android-v12-release-candidate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
-
-      - name: Install Android 36 SDK
+      - name: Configure preinstalled Android SDK 36
         shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -x "$SDKMANAGER" ]]; then
+            SDKMANAGER="$(command -v sdkmanager)"
+          fi
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/build-tools/36.0.0" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          test -x "$SDK_ROOT/build-tools/36.0.0/aapt"
+          test -x "$SDK_ROOT/build-tools/36.0.0/apksigner"
 
       - uses: gradle/actions/setup-gradle@v4
         with:
@@ -112,7 +122,7 @@ jobs:
           debug_apk=installable test build
           release_outputs=store candidates; Play distribution requires the repository-secrets signing mode
           EOF
-          (cd dist/android-v12 && sha256sum * > SHA256SUMS.txt)
+          (cd dist/android-v12 && sha256sum FSA-v12-* BUILD-STATUS.txt > SHA256SUMS.txt)
 
       - uses: actions/upload-artifact@v4
         with:
