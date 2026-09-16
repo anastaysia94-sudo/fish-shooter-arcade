@@ -5,6 +5,8 @@ import { resolve, extname, relative } from 'node:path';
 const HOST = process.env.FSA_QA_HOST || '127.0.0.1';
 const PORT = Number(process.env.FSA_QA_PORT || 4173);
 const ROOT = resolve(process.env.FSA_QA_ROOT || '.');
+const BOOTSTRAP_PATH = '/__fsa_qa_bootstrap__';
+const BOOTSTRAP = Buffer.from('<!doctype html><html><head><meta charset="utf-8"><title>FSA QA Bootstrap</title></head><body data-fsa-qa-bootstrap="1"></body></html>');
 
 const MIME = new Map([
   ['.html','text/html; charset=utf-8'],
@@ -47,6 +49,13 @@ const server = http.createServer(async (req,res)=>{
   if(req.method !== 'GET' && req.method !== 'HEAD'){
     res.writeHead(405, {'Content-Length':'0','Connection':'close'}); res.end(); return;
   }
+  const pathname = decodeURIComponent(new URL(req.url || '/', 'http://qa.local').pathname);
+  if(pathname === BOOTSTRAP_PATH){
+    res.writeHead(200, {...headers('.html', BOOTSTRAP.length), 'X-FSA-QA-Bootstrap':'1'});
+    if(req.method === 'HEAD') res.end(); else res.end(BOOTSTRAP);
+    process.stdout.write(`FSA_QA_HTTP 200 ${BOOTSTRAP_PATH} bootstrap=1\n`);
+    return;
+  }
   try{
     const file = safePath(req.url);
     if(!file){res.writeHead(403,{'Content-Length':'0','Connection':'close'});res.end();return;}
@@ -69,7 +78,7 @@ server.headersTimeout = 5000;
 server.requestTimeout = 10000;
 
 server.listen(PORT, HOST, ()=>{
-  console.log(`FSA_VISUAL_ACCEPTANCE_SERVER=READY http://${HOST}:${PORT}/ root=${ROOT}`);
+  console.log(`FSA_VISUAL_ACCEPTANCE_SERVER=READY http://${HOST}:${PORT}/ root=${ROOT} bootstrap=${BOOTSTRAP_PATH}`);
 });
 
 function shutdown(signal){
