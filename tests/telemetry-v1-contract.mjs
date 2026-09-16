@@ -41,10 +41,10 @@ has(hardening, /s\.id=p_session_id and s\.player_id=pid and s\.ended_at is null/
 has(hardening, /join public\.fsa_player_game_access a on a\.game_id=g\.id and a\.player_id=pid/i, 'telemetry game ids must respect game entitlement');
 has(hardening, /FSA_TELEMETRY_SESSION_LIMIT/, 'per-session abuse cap missing');
 has(hardening, /open_count >= 5/, 'open-session abuse cap missing');
-has(hardening, /pg_column_size\(p_payload\) > 4096/i, 'payload size guard missing');
-has(hardening, /jsonb_typeof\(p_payload -> 'low_data'\) <> 'boolean'/, 'typed boolean validation missing');
-has(hardening, /if trunc\(n\) <> n then return false/, 'integer-like telemetry validation missing');
-has(hardening, /boss_ratio.*n < 0 or n > 1/is, 'boss-ratio range validation missing');
+has(hardening, /pg_column_size\(p_payload\) <= 4096/i, 'payload size guard missing');
+has(hardening, /item\.key = 'low_data'[\s\S]*?jsonb_typeof\(item\.value\) <> 'boolean'/i, 'typed boolean validation missing');
+has(hardening, /mod\(\(item\.value #>> '\{\}'\)::numeric,1\) <> 0/i, 'integer-like telemetry validation missing');
+has(hardening, /item\.key = 'boss_ratio'[\s\S]*?::numeric < 0[\s\S]*?::numeric > 1/i, 'boss-ratio range validation missing');
 
 // The EGM4000 export is sanitized, pseudonymous and founder MFA-only.
 has(hardening, /fsa_rpc_egm4000_telemetry_feed/, 'EGM4000 feed RPC missing');
