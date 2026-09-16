@@ -14,7 +14,25 @@ async function page(width,height,mobile=false,low=false){
   if(low) await c.addInitScript(()=>{const v={saveData:true,effectiveType:'2g',downlink:.25,rtt:900,addEventListener(){},removeEventListener(){}};for(const k of ['connection','mozConnection','webkitConnection'])try{Object.defineProperty(navigator,k,{get:()=>v})}catch{};try{Object.defineProperty(navigator,'deviceMemory',{get:()=>2})}catch{};try{Object.defineProperty(navigator,'hardwareConcurrency',{get:()=>2})}catch{}});
   return {c,p:await c.newPage()};
 }
-async function go(p,path=''){await p.goto(new URL(path,base).toString(),{waitUntil:'domcontentloaded',timeout:45000});await p.waitForTimeout(700)}
+async function go(p,path=''){
+  const url=new URL(path,base).toString();
+  let lastError;
+  for(let attempt=1;attempt<=3;attempt++){
+    try{
+      await p.goto(url,{waitUntil:'commit',timeout:30000});
+      await p.waitForSelector('body',{state:'attached',timeout:30000});
+      await p.waitForTimeout(700);
+      return;
+    }catch(error){
+      lastError=error;
+      if(attempt<3){
+        try{await p.goto('about:blank',{waitUntil:'commit',timeout:5000})}catch{}
+        await p.waitForTimeout(1500*attempt);
+      }
+    }
+  }
+  throw lastError;
+}
 async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});rows.push({item,name,file:`${name}.png`,...meta})}
 async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function');await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on');await p.waitForTimeout(700)}
 async function waitForVisibleBoss(p){
