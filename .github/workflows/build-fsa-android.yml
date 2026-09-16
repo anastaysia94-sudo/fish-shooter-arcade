@@ -1,4 +1,4 @@
-name: Build F.S.A. Android v12 Release Candidate
+name: Build F.S.A. Android Release v12
 
 on:
   workflow_dispatch:
@@ -6,134 +6,66 @@ on:
     branches: [main]
     paths:
       - "android-fsa/**"
+      - "tests/android-release-contract.mjs"
       - ".github/workflows/build-fsa-android.yml"
   pull_request:
     branches: [main]
     paths:
       - "android-fsa/**"
+      - "tests/android-release-contract.mjs"
       - ".github/workflows/build-fsa-android.yml"
 
 permissions:
   contents: read
 
-env:
-  FSA_ANDROID_KEYSTORE_B64: ${{ secrets.FSA_ANDROID_KEYSTORE_B64 }}
-  FSA_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.FSA_ANDROID_KEYSTORE_PASSWORD }}
-  FSA_ANDROID_KEY_ALIAS: ${{ secrets.FSA_ANDROID_KEY_ALIAS }}
-  FSA_ANDROID_KEY_PASSWORD: ${{ secrets.FSA_ANDROID_KEY_PASSWORD }}
-
 jobs:
-  android-v12-release-candidate:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 25
+  android-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
-
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Android v12 source and security contract
+        run: node tests/android-release-contract.mjs
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Configure preinstalled Android SDK 36
+      - name: Install Android 36 SDK
         shell: bash
         run: |
           set -euo pipefail
-          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-          if [[ ! -x "$SDKMANAGER" ]]; then
-            SDKMANAGER="$(command -v sdkmanager)"
-          fi
-          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
-          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
-          echo "$SDK_ROOT/build-tools/36.0.0" >> "$GITHUB_PATH"
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
-          test -x "$SDK_ROOT/build-tools/36.0.0/aapt"
-          test -x "$SDK_ROOT/build-tools/36.0.0/apksigner"
-
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-
-      - name: Android v12 release contract
-        run: python3 android-fsa/release-selftest.py
-
-      - name: Prepare optional production signing material
-        if: ${{ env.FSA_ANDROID_KEYSTORE_B64 != '' && env.FSA_ANDROID_KEYSTORE_PASSWORD != '' && env.FSA_ANDROID_KEY_ALIAS != '' && env.FSA_ANDROID_KEY_PASSWORD != '' }}
-        shell: bash
-        run: |
-          printf '%s' "$FSA_ANDROID_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/fsa-upload.jks"
-          echo "FSA_ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/fsa-upload.jks" >> "$GITHUB_ENV"
-          echo "FSA_ANDROID_SIGNING_MODE=repository-secrets" >> "$GITHUB_ENV"
-
-      - name: Set unsigned release mode when signing secrets are absent
-        if: ${{ env.FSA_ANDROID_KEYSTORE_B64 == '' || env.FSA_ANDROID_KEYSTORE_PASSWORD == '' || env.FSA_ANDROID_KEY_ALIAS == '' || env.FSA_ANDROID_KEY_PASSWORD == '' }}
-        run: echo "FSA_ANDROID_SIGNING_MODE=unsigned-release-candidate" >> "$GITHUB_ENV"
-
-      - name: Build debug APK, release APK and release AAB
+      - name: Lint, test, build APK and release bundle
         working-directory: android-fsa
-        run: gradle :app:assembleDebug :app:assembleRelease :app:bundleRelease --stacktrace
-
-      - name: Verify package metadata and signatures
+        run: gradle :app:lintRelease :app:testDebugUnitTest :app:assembleDebug :app:bundleRelease --stacktrace
+      - name: Verify Android artifacts
         shell: bash
         run: |
-          set -euo pipefail
-          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
-          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
-          DEBUG_APK="android-fsa/app/build/outputs/apk/debug/app-debug.apk"
-          RELEASE_APK="$(find android-fsa/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n1)"
-          AAB="android-fsa/app/build/outputs/bundle/release/app-release.aab"
-          test -f "$DEBUG_APK"
-          test -n "$RELEASE_APK" && test -f "$RELEASE_APK"
-          test -f "$AAB"
-          "$AAPT" dump badging "$DEBUG_APK" | tee /tmp/fsa-debug-badging.txt
-          "$AAPT" dump badging "$RELEASE_APK" | tee /tmp/fsa-release-badging.txt
-          grep -q "package: name='com.smartpickshop.fsa' versionCode='12' versionName='0.12.0-android-rc1'" /tmp/fsa-debug-badging.txt
-          grep -q "package: name='com.smartpickshop.fsa' versionCode='12' versionName='0.12.0-android-rc1'" /tmp/fsa-release-badging.txt
-          "$APKSIGNER" verify --verbose "$DEBUG_APK"
-          unzip -t "$AAB" >/dev/null
-          if [[ "$FSA_ANDROID_SIGNING_MODE" == "repository-secrets" ]]; then
-            "$APKSIGNER" verify --verbose "$RELEASE_APK"
-            jarsigner -verify "$AAB" >/dev/null
-          fi
-
-      - name: Stage deterministic Android artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dist/android-v12
-          cp android-fsa/app/build/outputs/apk/debug/app-debug.apk dist/android-v12/FSA-v12-debug.apk
-          RELEASE_APK="$(find android-fsa/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n1)"
-          AAB="android-fsa/app/build/outputs/bundle/release/app-release.aab"
-          if [[ "$FSA_ANDROID_SIGNING_MODE" == "repository-secrets" ]]; then
-            cp "$RELEASE_APK" dist/android-v12/FSA-v12-signed-release.apk
-            cp "$AAB" dist/android-v12/FSA-v12-signed-release.aab
-          else
-            cp "$RELEASE_APK" dist/android-v12/FSA-v12-unsigned-release.apk
-            cp "$AAB" dist/android-v12/FSA-v12-unsigned-release.aab
-          fi
-          cat > dist/android-v12/BUILD-STATUS.txt <<EOF
-          F.S.A. Android v12 release candidate
-          package=com.smartpickshop.fsa
-          versionCode=12
-          versionName=0.12.0-android-rc1
-          signing=$FSA_ANDROID_SIGNING_MODE
-          debug_apk=installable test build
-          release_outputs=store candidates; Play distribution requires the repository-secrets signing mode
-          EOF
-          (cd dist/android-v12 && sha256sum FSA-v12-* BUILD-STATUS.txt > SHA256SUMS.txt)
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: FSA-Android-v12-debug-installable
-          path: dist/android-v12/FSA-v12-debug.apk
-          if-no-files-found: error
-          retention-days: 30
-
+          test -f android-fsa/app/build/outputs/apk/debug/app-debug.apk
+          test -f android-fsa/app/build/outputs/bundle/release/app-release.aab
+          sha256sum \
+            android-fsa/app/build/outputs/apk/debug/app-debug.apk \
+            android-fsa/app/build/outputs/bundle/release/app-release.aab \
+            > android-fsa/SHA256SUMS.txt
+          cat android-fsa/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: FSA-Android-v12-release-candidate
-          path: dist/android-v12/
+          path: |
+            android-fsa/app/build/outputs/apk/debug/app-debug.apk
+            android-fsa/app/build/outputs/bundle/release/app-release.aab
+            android-fsa/SHA256SUMS.txt
+            android-fsa/app/build/reports/lint-results-release.html
           if-no-files-found: error
           retention-days: 30
