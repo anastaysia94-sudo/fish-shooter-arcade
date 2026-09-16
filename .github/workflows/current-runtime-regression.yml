@@ -9,8 +9,10 @@ on:
       - "gameplay-layout-v9.css"
       - "visual-fidelity-v10.css"
       - "arcade-intensity-v12.css"
+      - "boss-spectacle-v13.css"
       - "fsa-v9.js"
       - "arcade-intensity-v12.js"
+      - "boss-spectacle-v13.js"
       - "arcade-intensity-v12-bridge.js"
       - "assets/fsa-title-atlas-v10.svg"
       - "assets/fsa-slot-atlas-v10.svg"
@@ -23,6 +25,7 @@ on:
       - "tests/visual-fidelity-contract.mjs"
       - "tests/visual-acceptance-capture.mjs"
       - "tests/arcade-intensity-v12-contract.mjs"
+      - "tests/boss-spectacle-v13-contract.mjs"
       - "tests/low-data-behavior.mjs"
       - "tests/low-data-budget.mjs"
       - ".github/workflows/pages.yml"
@@ -37,8 +40,10 @@ on:
       - "gameplay-layout-v9.css"
       - "visual-fidelity-v10.css"
       - "arcade-intensity-v12.css"
+      - "boss-spectacle-v13.css"
       - "fsa-v9.js"
       - "arcade-intensity-v12.js"
+      - "boss-spectacle-v13.js"
       - "arcade-intensity-v12-bridge.js"
       - "assets/fsa-title-atlas-v10.svg"
       - "assets/fsa-slot-atlas-v10.svg"
@@ -51,6 +56,7 @@ on:
       - "tests/visual-fidelity-contract.mjs"
       - "tests/visual-acceptance-capture.mjs"
       - "tests/arcade-intensity-v12-contract.mjs"
+      - "tests/boss-spectacle-v13-contract.mjs"
       - "tests/low-data-behavior.mjs"
       - "tests/low-data-budget.mjs"
       - ".github/workflows/pages.yml"
@@ -74,6 +80,7 @@ jobs:
         run: |
           node --check fsa-v9.js
           node --check arcade-intensity-v12.js
+          node --check boss-spectacle-v13.js
           node --check arcade-intensity-v12-bridge.js
           node --check gameplay-selftest.js
           node --check sw.js
@@ -82,6 +89,7 @@ jobs:
           node --check tests/visual-fidelity-contract.mjs
           node --check tests/visual-acceptance-capture.mjs
           node --check tests/arcade-intensity-v12-contract.mjs
+          node --check tests/boss-spectacle-v13-contract.mjs
       - name: Current gameplay contract
         run: node gameplay-selftest.js
       - name: Executable current runtime behavior
@@ -92,6 +100,8 @@ jobs:
         run: node tests/visual-fidelity-contract.mjs
       - name: Arcade intensity v12 contract
         run: node tests/arcade-intensity-v12-contract.mjs
+      - name: Boss spectacle v13 contract
+        run: node tests/boss-spectacle-v13-contract.mjs
       - name: Low-data and 2G behavior
         run: |
           node tests/low-data-budget.mjs
