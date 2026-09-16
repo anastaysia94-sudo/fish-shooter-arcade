@@ -2,6 +2,7 @@ package com.smartpickshop.fsa
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -27,6 +28,7 @@ class GameActivity : ComponentActivity() {
     private val gameUrl = "https://anastaysia94-sudo.github.io/fish-shooter-arcade/"
     private val allowedHost = "anastaysia94-sudo.github.io"
     private val allowedPath = "/fish-shooter-arcade"
+    private val maxMainFrameRetries = 4
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +83,9 @@ class GameActivity : ComponentActivity() {
 
         root.addView(topBar, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(52)))
 
+        var mainFrameLoadFailed = false
+        var mainFrameRetryCount = 0
+
         webView = WebView(this).apply {
             setBackgroundColor(Color.BLACK)
             isFocusable = true
@@ -113,17 +118,35 @@ class GameActivity : ComponentActivity() {
                     return openExternally(uri)
                 }
 
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    val uri = url?.let { value -> runCatching { Uri.parse(value) }.getOrNull() }
+                    if (uri != null && isTrustedFsaUri(uri)) mainFrameLoadFailed = false
+                }
+
                 override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                     super.onReceivedError(view, request, error)
-                    if (request?.isForMainFrame == true) {
-                        Log.e("FSAAndroid", "MAIN_FRAME_ERROR code=${error?.errorCode} description=${error?.description}")
+                    if (request?.isForMainFrame != true) return
+                    mainFrameLoadFailed = true
+                    val uri = request.url
+                    val code = error?.errorCode
+                    val description = error?.description
+                    if (isTrustedFsaUri(uri) && mainFrameRetryCount < maxMainFrameRetries) {
+                        mainFrameRetryCount += 1
+                        val delayMs = 1_500L * mainFrameRetryCount
+                        Log.w("FSAAndroid", "MAIN_FRAME_RETRY attempt=$mainFrameRetryCount code=$code description=$description delayMs=$delayMs")
+                        view?.postDelayed({
+                            if (!isFinishing && !isDestroyed) view.loadUrl(gameUrl)
+                        }, delayMs)
+                    } else {
+                        Log.e("FSAAndroid", "MAIN_FRAME_ERROR_FINAL code=$code description=$description")
                     }
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     val uri = url?.let { value -> runCatching { Uri.parse(value) }.getOrNull() }
-                    if (uri == null || !isTrustedFsaUri(uri)) return
+                    if (uri == null || !isTrustedFsaUri(uri) || mainFrameLoadFailed) return
                     // Mark the trusted F.S.A. page as running inside the Android cabinet.
                     view?.evaluateJavascript(
                         """
@@ -135,6 +158,7 @@ class GameActivity : ComponentActivity() {
                         })();
                         """.trimIndent()
                     ) { result ->
+                        mainFrameRetryCount = 0
                         Log.i("FSAAndroid", "TRUSTED_PAGE_FINISHED host=${uri.host} path=${uri.path} cabinet=$result")
                     }
                 }
