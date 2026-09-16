@@ -31,9 +31,9 @@ android {
         if (hasReleaseSigning) {
             create("release") {
                 storeFile = file(releaseStoreFile!!)
-                storePassword = releaseStorePassword
-                keyAlias = releaseKeyAlias
-                keyPassword = releaseKeyPassword
+                storePassword = releaseStorePassword!!
+                keyAlias = releaseKeyAlias!!
+                keyPassword = releaseKeyPassword!!
                 enableV1Signing = true
                 enableV2Signing = true
                 enableV3Signing = true
