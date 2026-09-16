@@ -34,3 +34,32 @@
 #cloudAccountButton::after { content:''; position:absolute; right:8px; top:7px; width:7px; height:7px; border-radius:50%; background:#4fe7ff; }
 @media(max-width:760px){ .cloud-account-grid,.cloud-prefs{grid-template-columns:repeat(2,minmax(0,1fr))}.cloud-shell{padding:15px} }
 @media(max-width:430px){ .cloud-account-grid,.cloud-prefs{grid-template-columns:1fr}.cloud-dialog{width:calc(100vw - 12px)}.cloud-actions .btn{flex:1 1 auto} }
+
+/* Visual-fidelity compatibility: v13 cinematic styling must not erase the
+   canonical v10 per-title slot cabinet atlas. Keep the cinematic frame while
+   restoring one clipped, illustrated cabinet per slot card. */
+html[data-vf="v10"][data-cinematic="v13"] #slotGrid.slots-grid .slot-card {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  min-height: 164px !important;
+  background-image:
+    linear-gradient(180deg,rgba(0,10,18,.02) 0%,rgba(0,8,14,.08) 45%,rgba(2,7,13,.88) 100%),
+    url('assets/fsa-slot-atlas-v10.svg') !important;
+  background-size: 100% 100%, 2000% 100% !important;
+  background-position: center, var(--vf-slot-pos,0%) center !important;
+  background-repeat: no-repeat !important;
+  border-color: #d3ac45 !important;
+  box-shadow: inset 0 0 0 1px #ffe9a922,0 16px 32px #0009 !important;
+}
+html[data-vf="v10"][data-cinematic="v13"] #slotGrid .slot-card > b,
+html[data-vf="v10"][data-cinematic="v13"] #slotGrid .slot-card > small {
+  position: relative !important;
+  z-index: 4 !important;
+  text-shadow: 0 2px 8px #000,0 0 10px #000 !important;
+}
+html[data-vf="v10"][data-cinematic="v13"] #slotGrid .slot-symbols {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
