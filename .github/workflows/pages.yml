@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -34,6 +34,11 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+      - name: Validate visual runtime before browser QA
+        run: |
+          node --check dense-graphics-v15.js
+          node --check tests/dense-graphics-v15-contract.mjs
+          node tests/dense-graphics-v15-contract.mjs
       - name: Install visual QA browser
         run: |
           npm init -y >/dev/null 2>&1
@@ -80,8 +85,13 @@ jobs:
             "/visual-fidelity-v10.css"
             "/arcade-intensity-v12.css"
             "/boss-spectacle-v13.css"
+            "/dense-mode-v14.css"
+            "/dense-mode-v14-overlay.css"
+            "/dense-graphics-v15.css"
             "/arcade-intensity-v12.js"
             "/boss-spectacle-v13.js"
+            "/dense-mode-v14.js"
+            "/dense-graphics-v15.js"
           )
           for asset in "${assets[@]}"; do
             echo "Preflighting $asset"
@@ -106,7 +116,7 @@ jobs:
                   req = urllib.request.Request(
                       url,
                       headers={
-                          "User-Agent": "FSA-Visual-QA-Proxy/1.0",
+                          "User-Agent": "FSA-Visual-QA-Proxy/1.1",
                           "Cache-Control": "no-cache",
                       },
                   )
@@ -117,6 +127,7 @@ jobs:
                           for key, value in response.headers.items():
                               if key.lower() not in {"content-length", "transfer-encoding", "connection", "content-encoding"}:
                                   self.send_header(key, value)
+                          self.send_header("Cache-Control", "no-store, max-age=0")
                           self.send_header("Content-Length", str(len(body)))
                           self.end_headers()
                           self.wfile.write(body)
@@ -148,7 +159,24 @@ jobs:
           if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
             echo "First proxied live capture attempt failed; retrying once."
             sleep 5
-            node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"
+            if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+              mkdir -p artifacts/visual-acceptance
+              python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          Path('artifacts/visual-acceptance/failure.json').write_text(json.dumps({
+              'schema':'fsa.visual-acceptance.failure.v1',
+              'sourceUrl':os.environ.get('FSA_LIVE_SOURCE_URL'),
+              'sourceCommit':os.environ.get('GITHUB_SHA'),
+              'generatedAt':datetime.now(timezone.utc).isoformat(),
+              'message':'Both canonical proxied visual-acceptance capture attempts failed. See workflow log and proxy log.'
+          },indent=2)+'\n')
+          PY
+              echo "--- live proxy diagnostics ---" >&2
+              tail -n 200 /tmp/fsa-live-proxy.log >&2 || true
+              exit 1
+            fi
           fi
 
           python3 - <<'PY'
