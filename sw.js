@@ -1,5 +1,5 @@
 // Cloud-account completion + cinematic gameplay cache. The playable shell remains usable without account/network availability.
-const CACHE='fsa-arcade-v17-cinematic-20260916';
+const CACHE='fsa-arcade-v18-cinematic-20260916';
 const CORE=[
   './','./index.html','./activate.html','./activate.js','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./arcade-intensity-v12.css','./fsa-v9.js','./arcade-intensity-v12.js','./cloud-sync-v11.js','./arcade-intensity-v12-bridge.js','./manifest.webmanifest',
   './assets/fsa-mark.svg','./assets/fsa-boss-event.svg','./assets/fsa-gameplay.svg','./assets/fsa-lobby.svg','./assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg',
@@ -12,8 +12,6 @@ self.addEventListener('activate',event=>{event.waitUntil(
   caches.keys()
     .then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key))))
     .then(()=>self.clients.claim())
-    .then(()=>self.clients.matchAll({type:'window'}))
-    .then(clients=>Promise.all(clients.map(client=>client.navigate(client.url).catch(()=>null))))
 );});
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
@@ -30,7 +28,7 @@ self.addEventListener('fetch',event=>{
     event.respondWith(fetch(event.request).then(response=>cacheResponse(fallback,response)).catch(()=>caches.match(fallback)));
     return;
   }
-  // Gameplay/UI runtime files are network-first so a deployed visual/gameplay upgrade cannot be hidden indefinitely by an older installed PWA cache.
+  // Gameplay/UI runtime files are network-first so deployed visual/gameplay upgrades replace older installed-PWA assets on the next normal load.
   if(FRESH_RUNTIME.test(url.pathname)){
     event.respondWith(fetch(event.request).then(response=>cacheResponse(event.request,response)).catch(()=>caches.match(event.request)));
     return;
