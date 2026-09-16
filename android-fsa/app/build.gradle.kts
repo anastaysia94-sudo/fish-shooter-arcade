@@ -4,6 +4,17 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val releaseStoreFile = System.getenv("FSA_ANDROID_KEYSTORE_PATH")
+val releaseStorePassword = System.getenv("FSA_ANDROID_KEYSTORE_PASSWORD")
+val releaseKeyAlias = System.getenv("FSA_ANDROID_KEY_ALIAS")
+val releaseKeyPassword = System.getenv("FSA_ANDROID_KEY_PASSWORD")
+val hasReleaseSigning = listOf(
+    releaseStoreFile,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { !it.isNullOrBlank() }
+
 android {
     namespace = "com.smartpickshop.fsa"
     compileSdk = 36
@@ -12,8 +23,35 @@ android {
         applicationId = "com.smartpickshop.fsa"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
-        versionName = "0.11.0-premium-table-v5"
+        versionCode = 12
+        versionName = "0.12.0-android-rc1"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword!!
+                keyAlias = releaseKeyAlias!!
+                keyPassword = releaseKeyPassword!!
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
     }
 
     compileOptions {
