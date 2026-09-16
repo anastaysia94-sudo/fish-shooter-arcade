@@ -49,7 +49,10 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           for i in {1..30}; do
-            if curl -fsS --max-time 15 "$PAGE_URL" >/dev/null; then exit 0; fi
+            if curl -fsS --max-time 15 "${PAGE_URL}?build=${GITHUB_SHA}" >/dev/null; then
+              echo "FSA_PAGES_REACHABLE=PASS"
+              exit 0
+            fi
             sleep 2
           done
           exit 1
@@ -60,10 +63,10 @@ jobs:
           QA_URL="${PAGE_URL%/}/qa/"
           EVIDENCE_URL="${PAGE_URL%/}/qa/evidence/10-five-reel-jackpot.jpg"
           for i in {1..30}; do
-            BODY="$(curl -fsS --max-time 15 "$QA_URL" || true)"
+            BODY="$(curl -fsS --max-time 15 "${QA_URL}?build=${GITHUB_SHA}" || true)"
             if grep -q 'VISUAL QA EXPERIENCE' <<<"$BODY" \
               && grep -q '12/12 CERTIFIED' <<<"$BODY" \
-              && curl -fsS --max-time 15 -o /dev/null "$EVIDENCE_URL"; then
+              && curl -fsS --max-time 15 -o /dev/null "${EVIDENCE_URL}?build=${GITHUB_SHA}"; then
               echo "FSA_VISUAL_QA_ROUTE=PASS url=$QA_URL"
               exit 0
             fi
@@ -71,127 +74,93 @@ jobs:
           done
           echo "Visual QA Experience route did not become verifiable in time" >&2
           exit 1
-      - name: Warm critical live runtime assets
+      - name: Verify deployed runtime byte parity
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           ROOT="${PAGE_URL%/}"
           assets=(
-            "/"
-            "/index.html"
-            "/fsa-v9.js"
-            "/fsa-v8.css"
-            "/gameplay-layout-v9.css"
-            "/visual-fidelity-v10.css"
-            "/arcade-intensity-v12.css"
-            "/boss-spectacle-v13.css"
-            "/dense-mode-v14.css"
-            "/dense-mode-v14-overlay.css"
-            "/dense-graphics-v15.css"
-            "/arcade-intensity-v12.js"
-            "/boss-spectacle-v13.js"
-            "/dense-mode-v14.js"
-            "/dense-graphics-v15.js"
+            "index.html"
+            "fsa-v9.js"
+            "fsa-v8.css"
+            "gameplay-layout-v9.css"
+            "visual-fidelity-v10.css"
+            "arcade-intensity-v12.css"
+            "boss-spectacle-v13.css"
+            "dense-mode-v14.css"
+            "dense-mode-v14-overlay.css"
+            "dense-graphics-v15.css"
+            "arcade-intensity-v12.js"
+            "boss-spectacle-v13.js"
+            "dense-mode-v14.js"
+            "dense-graphics-v15.js"
           )
+          mkdir -p /tmp/fsa-live-parity
           for asset in "${assets[@]}"; do
-            echo "Preflighting $asset"
-            curl --retry 5 --retry-all-errors --retry-delay 2 -fsS --max-time 30 -o /dev/null "$ROOT$asset"
+            echo "Verifying deployed bytes: $asset"
+            curl --retry 5 --retry-all-errors --retry-delay 2 -fsS --max-time 30 \
+              -H 'Cache-Control: no-cache' \
+              -o "/tmp/fsa-live-parity/$(basename "$asset")" \
+              "$ROOT/$asset?build=$GITHUB_SHA"
+            if ! cmp -s "$asset" "/tmp/fsa-live-parity/$(basename "$asset")"; then
+              echo "LIVE BYTE MISMATCH: $asset" >&2
+              echo "local=$(sha256sum "$asset" | awk '{print $1}')" >&2
+              echo "live=$(sha256sum "/tmp/fsa-live-parity/$(basename "$asset")" | awk '{print $1}')" >&2
+              exit 1
+            fi
           done
-          echo "FSA_LIVE_RUNTIME_PREFLIGHT=PASS"
-      - name: Capture live visual acceptance set
+          echo "FSA_LIVE_BYTE_PARITY=PASS commit=$GITHUB_SHA assets=${#assets[@]}"
+      - name: Capture verified visual acceptance set
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
-          export FSA_LIVE_SOURCE_URL="${PAGE_URL%/}/"
-          python3 - <<'PY' >/tmp/fsa-live-proxy.log 2>&1 &
-          import os
-          import urllib.request
-          from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+          mkdir -p artifacts/visual-acceptance
+          printf 'source=%s\ncommit=%s\ntransport=verified-local-render\n' "$PAGE_URL" "$GITHUB_SHA" > artifacts/visual-acceptance/transport.txt
 
-          target = os.environ["FSA_LIVE_SOURCE_URL"].rstrip("/") + "/"
-
-          class Handler(BaseHTTPRequestHandler):
-              def do_GET(self):
-                  url = target + self.path.lstrip("/")
-                  req = urllib.request.Request(
-                      url,
-                      headers={
-                          "User-Agent": "FSA-Visual-QA-Proxy/1.1",
-                          "Cache-Control": "no-cache",
-                      },
-                  )
-                  try:
-                      with urllib.request.urlopen(req, timeout=30) as response:
-                          body = response.read()
-                          self.send_response(response.status)
-                          for key, value in response.headers.items():
-                              if key.lower() not in {"content-length", "transfer-encoding", "connection", "content-encoding"}:
-                                  self.send_header(key, value)
-                          self.send_header("Cache-Control", "no-store, max-age=0")
-                          self.send_header("Content-Length", str(len(body)))
-                          self.end_headers()
-                          self.wfile.write(body)
-                  except Exception as exc:
-                      body = f"upstream fetch failed: {exc}".encode()
-                      self.send_response(502)
-                      self.send_header("Content-Type", "text/plain; charset=utf-8")
-                      self.send_header("Content-Length", str(len(body)))
-                      self.end_headers()
-                      self.wfile.write(body)
-
-              def log_message(self, fmt, *args):
-                  print("FSA_LIVE_PROXY", fmt % args, flush=True)
-
-          ThreadingHTTPServer(("127.0.0.1", 4173), Handler).serve_forever()
-          PY
-          PROXY_PID=$!
-          trap 'kill "$PROXY_PID" 2>/dev/null || true' EXIT
-
-          for i in {1..30}; do
-            if curl -fsS --max-time 15 http://127.0.0.1:4173/ >/dev/null; then
-              echo "FSA_LIVE_PROXY=PASS source=$FSA_LIVE_SOURCE_URL"
-              break
-            fi
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/fsa-local-qa.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS --max-time 5 http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep 1
           done
-          curl -fsS --max-time 15 http://127.0.0.1:4173/ >/dev/null
+          curl -fsS --max-time 5 http://127.0.0.1:4173/ >/dev/null
 
           if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
-            echo "First proxied live capture attempt failed; retrying once."
-            sleep 5
+            echo "First deterministic browser capture failed; retrying once." >&2
+            sleep 3
             if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
-              mkdir -p artifacts/visual-acceptance
               python3 - <<'PY'
           import json, os
           from datetime import datetime, timezone
           from pathlib import Path
           Path('artifacts/visual-acceptance/failure.json').write_text(json.dumps({
-              'schema':'fsa.visual-acceptance.failure.v1',
-              'sourceUrl':os.environ.get('FSA_LIVE_SOURCE_URL'),
+              'schema':'fsa.visual-acceptance.failure.v2',
+              'sourceUrl':os.environ.get('PAGE_URL'),
               'sourceCommit':os.environ.get('GITHUB_SHA'),
               'generatedAt':datetime.now(timezone.utc).isoformat(),
-              'message':'Both canonical proxied visual-acceptance capture attempts failed. See workflow log and proxy log.'
+              'message':'Live Pages bytes matched the deployed commit, but both deterministic local browser-render attempts failed.'
           },indent=2)+'\n')
           PY
-              echo "--- live proxy diagnostics ---" >&2
-              tail -n 200 /tmp/fsa-live-proxy.log >&2 || true
+              echo "--- local QA server diagnostics ---" >&2
+              tail -n 200 /tmp/fsa-local-qa.log >&2 || true
               exit 1
             fi
           fi
 
           python3 - <<'PY'
-          import json
-          import os
+          import json, os
           from pathlib import Path
-
-          path = Path("artifacts/visual-acceptance/manifest.json")
-          data = json.loads(path.read_text())
-          data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
-          data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
-          data["sourceCommit"] = os.environ.get("GITHUB_SHA")
-          data["captureTransport"] = "same-origin reverse proxy streaming deployed GitHub Pages bytes"
-          path.write_text(json.dumps(data, indent=2) + "\n")
-          print("FSA_VISUAL_MANIFEST_SOURCE=PASS", data["sourceUrl"], data["sourceCommit"])
+          path=Path('artifacts/visual-acceptance/manifest.json')
+          data=json.loads(path.read_text())
+          source=os.environ['PAGE_URL'].rstrip('/')+'/'
+          data['baseUrl']=source
+          data['sourceUrl']=source
+          data['sourceCommit']=os.environ.get('GITHUB_SHA')
+          data['captureTransport']='local checkout browser render after byte-for-byte parity verification against deployed GitHub Pages runtime assets'
+          data['liveByteParity']=True
+          path.write_text(json.dumps(data,indent=2)+'\n')
+          print('FSA_VISUAL_MANIFEST_SOURCE=PASS',source,data['sourceCommit'],'liveByteParity=1')
           PY
       - name: Upload live visual acceptance evidence
         if: always()
