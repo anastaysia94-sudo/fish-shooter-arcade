@@ -54,3 +54,10 @@ jobs:
           grep -q 'player_key text' "$HARD"
           grep -q 'FSA_TELEMETRY_SESSION_LIMIT' "$HARD"
           ! grep -Eiq 'update[[:space:]]+public\.fsa_(players|player_cloud_state)' "$BASE" "$HARD"
+          HARD="$HARD" python - <<'PY'
+          import os, re
+          text = open(os.environ['HARD'], encoding='utf-8').read()
+          bodies = re.findall(r'\bas\s+\$\$(.*?)\$\$;', text, flags=re.I | re.S)
+          assert len(bodies) >= 4, f'expected at least 4 PL/pgSQL bodies, found {len(bodies)}'
+          assert all(body.strip().lower().endswith('end;') for body in bodies), 'PL/pgSQL function body missing final END; terminator'
+          PY
