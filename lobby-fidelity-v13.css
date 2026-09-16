@@ -1,0 +1,38 @@
+/* F.S.A. Lobby Fidelity v13 — premium Atlantis lobby treatment layered over the canonical runtime. */
+:root{--l13-cyan:#51ecff;--l13-gold:#ffd86b;--l13-coral:#ff6a5d;--l13-glass:#031521e8;--l13-line:#3cdffc44}
+html[data-lobby="v13"] .v8-app{background-image:linear-gradient(180deg,#00101a99,#020913eb 62%,#01070cf6),radial-gradient(circle at 52% 7%,#17d8ff26,transparent 24%),url('assets/fsa-lobby.svg');background-size:cover,auto,cover;background-position:center,center,center top;background-attachment:fixed}
+html[data-lobby="v13"] .v8-topart{height:150px;background:linear-gradient(90deg,#00101de8,#063c64a8 48%,#00101de8),url('assets/fsa-lobby.svg') center 30%/cover;border-bottom:1px solid #ffd86b55;box-shadow:0 8px 36px #000c,inset 0 -1px #5ceaff55}
+html[data-lobby="v13"] .v8-topart:before{background:radial-gradient(circle at 50% 38%,#5ef2ff1e,transparent 20%),linear-gradient(180deg,transparent 18%,#03121eb8 88%);opacity:1;filter:none}
+html[data-lobby="v13"] .v8-topart:after{background:linear-gradient(90deg,#00101ee8 0,transparent 22%,transparent 78%,#00101ee8 100%)}
+html[data-lobby="v13"] .v8-brand strong{font-size:58px;letter-spacing:.12em;color:transparent;background:linear-gradient(#fff6b5 0,#ffd76c 32%,#d88b19 68%,#fff0a0 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 12px #ffbf4366) drop-shadow(0 8px 12px #000)}
+html[data-lobby="v13"] .v8-brand strong:before{content:'♆';display:inline-block;margin-right:14px;color:#ffd86b;-webkit-text-fill-color:#ffd86b;font-size:.86em;transform:translateY(-1px);text-shadow:0 0 14px #ffbd3f}
+html[data-lobby="v13"] .v8-brand span{color:#fff1b2;text-shadow:0 2px 9px #000;letter-spacing:.28em}
+html[data-lobby="v13"] .v8-brand small{color:#7ff4ff;text-shadow:0 2px 8px #000}
+html[data-lobby="v13"] .v8-account{background:linear-gradient(180deg,#031827f2,#020d16ef);border-bottom:1px solid #46e8ff38;box-shadow:0 8px 26px #0008;backdrop-filter:blur(14px)}
+html[data-lobby="v13"] .profile,html[data-lobby="v13"] .currency,html[data-lobby="v13"] .quick-actions{border-color:#39dcff3e;background:linear-gradient(145deg,#0a2940e8,#03101bdd);box-shadow:inset 0 0 18px #45eaff0a}
+html[data-lobby="v13"] .v8-nav{background:#020d16e8;border-bottom-color:#ffd86b2c;box-shadow:0 8px 24px #0009;backdrop-filter:blur(12px)}
+html[data-lobby="v13"] .v8-nav button,html[data-lobby="v13"] .v8-nav a{border-color:#39dfff38;background:linear-gradient(180deg,#07304a,#03121d);box-shadow:inset 0 0 14px #39dfff0a}
+html[data-lobby="v13"] .v8-nav .active{border-color:#ffe17e9c;background:linear-gradient(180deg,#4a350b,#1b1204);color:#fff2ab;box-shadow:0 0 16px #ffc54d25,inset 0 0 14px #ffce5520}
+html[data-lobby="v13"] .v8-content{padding-top:14px}
+html[data-lobby="v13"] .v8-hero-grid{grid-template-columns:minmax(0,2.2fr) minmax(230px,.72fr) minmax(230px,.72fr) minmax(270px,.9fr);gap:10px}
+html[data-lobby="v13"] .hero-card{min-height:370px;border-color:#54eaff55;background-image:linear-gradient(90deg,#00111df2 0,#00111dbd 38%,#00111d35 66%),radial-gradient(circle at 74% 37%,#ff6a4434,transparent 24%),url('assets/reef-run-hd-battle.webp'),url('assets/fsa-gameplay.svg');background-size:auto,auto,cover,cover;background-position:center,center,68% center,center;box-shadow:0 18px 42px #000b,inset 0 0 0 1px #ffffff10}
+html[data-lobby="v13"] .hero-card:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,#00101ce8 100%),radial-gradient(circle at 70% 30%,#4be8ff20,transparent 30%)}
+html[data-lobby="v13"] .hero-copy{z-index:2;left:28px;bottom:28px;max-width:52%}
+html[data-lobby="v13"] .hero-copy h1{font-size:48px;line-height:.92;color:#fff0a5;text-shadow:0 0 16px #ffb82f44,0 5px 16px #000}
+html[data-lobby="v13"] .hero-copy p{font-size:12px;line-height:1.55;color:#def9ff}
+html[data-lobby="v13"] .promo-card{min-height:370px;border-color:#53e9ff45;box-shadow:0 16px 34px #0009,inset 0 0 0 1px #ffffff0b}
+html[data-lobby="v13"] .promo-card.jackpot{background-image:linear-gradient(180deg,#071d2a55,#050812e8),radial-gradient(circle at 55% 26%,#ffc64f55,transparent 28%),url('assets/fsa-slots-hd-atlas.webp'),url('assets/fsa-boss-event.svg');background-size:auto,auto,cover,cover;background-position:center,center,center,center}
+html[data-lobby="v13"] .promo-card.fever{background-image:linear-gradient(180deg,#10113b5c,#080516e8),radial-gradient(circle at 50% 22%,#b34cff77,transparent 34%),url('assets/fsa-fish-hd-atlas.webp'),url('assets/fsa-lobby.svg');background-size:auto,auto,cover,cover;background-position:center,center,center,center}
+html[data-lobby="v13"] .promo-card:before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 34%,#020912e8 74%);pointer-events:none}
+html[data-lobby="v13"] .promo-card>*{position:relative;z-index:2}
+html[data-lobby="v13"] .promo-card h2{font-size:27px;text-shadow:0 2px 10px #000}
+html[data-lobby="v13"] .promo-card .big{font-size:29px;text-shadow:0 0 15px #ffbd3f66,0 2px 8px #000}
+html[data-lobby="v13"] .mission-card{min-height:370px;border-color:#53e9ff3f;background:linear-gradient(180deg,#082437ef,#03101bed);box-shadow:0 16px 34px #0009,inset 0 0 20px #2de3ff0d}
+html[data-lobby="v13"] .lib-card{border-color:#39dfff45;box-shadow:0 12px 28px #0008,inset 0 0 0 1px #ffffff08}
+html[data-lobby="v13"] .world-card{border-color:#4ce8ff45;box-shadow:0 12px 28px #0008,inset 0 0 18px #4de8ff09}
+html[data-lobby="v13"] .boss-card{border-color:#ff735540;box-shadow:0 12px 24px #0008,inset 0 0 18px #ff435510}
+html[data-lobby="v13"] .slot-card{border-color:#d8a83d66;box-shadow:0 12px 28px #0008,inset 0 0 0 1px #ffe7a514}
+html[data-lobby="v13"] .section-title h2,html[data-lobby="v13"] .v8-library-head h2{letter-spacing:.01em}
+@media(max-width:900px){html[data-lobby="v13"] .v8-topart{height:118px}html[data-lobby="v13"] .v8-brand strong{font-size:40px}html[data-lobby="v13"] .v8-hero-grid{grid-template-columns:1fr 1fr}html[data-lobby="v13"] .hero-card{grid-column:1/-1;min-height:340px}html[data-lobby="v13"] .hero-copy{max-width:60%}.mission-card{min-height:300px!important}}
+@media(max-width:560px){html[data-lobby="v13"] .v8-topart{height:96px}html[data-lobby="v13"] .v8-brand strong{font-size:30px}html[data-lobby="v13"] .v8-brand span{font-size:9px;letter-spacing:.2em}html[data-lobby="v13"] .v8-brand small{font-size:8px}html[data-lobby="v13"] .v8-hero-grid{grid-template-columns:1fr}html[data-lobby="v13"] .hero-card,html[data-lobby="v13"] .promo-card,html[data-lobby="v13"] .mission-card{grid-column:1;min-height:315px}html[data-lobby="v13"] .hero-card{background-position:center,center,64% center,center}html[data-lobby="v13"] .hero-copy{left:18px;right:18px;bottom:18px;max-width:76%}html[data-lobby="v13"] .hero-copy h1{font-size:36px}html[data-lobby="v13"] .promo-card{min-height:260px}html[data-lobby="v13"] .mission-card{min-height:300px}}
+@media(prefers-reduced-motion:reduce){html[data-lobby="v13"] .hero-card,html[data-lobby="v13"] .promo-card{background-attachment:initial}}
