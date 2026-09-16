@@ -1,0 +1,56 @@
+/* F.S.A. Boss Spectacle v13 — translates the high-energy boss-battle concept into the live table. */
+html[data-spectacle="v13"] .battle{--v13-p1:#ff5a37;--v13-p2:#38a9ff;--v13-p3:#53f27a;--v13-p4:#bc58ff}
+html[data-spectacle="v13"] .game-top{background:linear-gradient(180deg,#061b2bf5,#02111bef 70%,#02080cdd);box-shadow:0 10px 34px #000c,inset 0 -1px #54eaff55}
+html[data-spectacle="v13"] .game-logo strong{font-size:22px;letter-spacing:.08em;background:linear-gradient(180deg,#fff6b8,#ffc54c 46%,#a4620b 55%,#ffe27b);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 8px #45dfff88)}
+html[data-spectacle="v13"] .boss-hud{width:min(54vw,760px);padding:5px 16px 8px;border-color:#ffba5980;background:linear-gradient(180deg,#250b12f0,#080f17ef);box-shadow:0 0 28px #ff4a5744,inset 0 0 25px #ffbd3d12}
+html[data-spectacle="v13"] .boss-hud h2{font-size:17px;color:#ff8368;text-shadow:0 0 12px #ff3d48cc}
+html[data-spectacle="v13"] .bossbar{height:16px;border:2px solid #ddbd7e80;box-shadow:inset 0 0 9px #000,0 0 14px #ff604638}
+html[data-spectacle="v13"] .bossbar i{background:linear-gradient(90deg,#ff2d3e,#ff6b32 55%,#ffd64e 88%,#fff1a0)}
+html[data-spectacle="v13"] .battle:before{background:radial-gradient(circle at 50% 43%,transparent 20%,#00172322 45%,#00091466 78%,#000 100%),linear-gradient(115deg,transparent 10%,#a7f5ff12 25%,transparent 42%),linear-gradient(65deg,transparent 48%,#ffe05c0d 66%,transparent 84%)}
+html[data-spectacle="v13"] .battle:after{opacity:.34;filter:saturate(1.35)}
+html[data-spectacle="v13"] #battleCanvas{filter:saturate(1.34) contrast(1.13) brightness(1.03)}
+html[data-spectacle="v13"] .sidehud{width:184px!important;padding:8px!important;gap:8px!important;background:linear-gradient(90deg,#01070df5,#031521e8 74%,transparent)!important}
+html[data-spectacle="v13"] .sidehud.right{background:linear-gradient(270deg,#01070df5,#031521e8 74%,transparent)!important}
+html[data-spectacle="v13"] .hudbox{border:1px solid #56e7ff52!important;background:linear-gradient(180deg,#06263cd8,#020d16e8)!important;box-shadow:inset 0 0 18px #32dcff11,0 8px 24px #0009!important}
+html[data-spectacle="v13"] .hudbox h3{font-size:9px!important;color:#7feeff!important;text-shadow:0 0 8px #1adfff77}
+html[data-spectacle="v13"] .radar{border:1px solid #6deeff55!important;background:radial-gradient(circle,#08334a 0,#021019 64%),repeating-radial-gradient(circle,#69efff1c 0 1px,transparent 2px 18px)!important;box-shadow:inset 0 0 22px #17ddff20,0 0 14px #1fdfff15}
+html[data-spectacle="v13"] .combo{font-size:48px!important;background:linear-gradient(180deg,#fff4a0,#ffbc21 55%,#ff6028);-webkit-background-clip:text;background-clip:text;color:transparent!important;filter:drop-shadow(0 0 8px #ff9c21);transform-origin:center}
+html[data-spectacle="v13"] .combo.v13-pop{animation:v13ComboPop .28s cubic-bezier(.2,1.2,.35,1)}
+html[data-spectacle="v13"] .feverbar{height:13px!important}
+html[data-spectacle="v13"] .feverbar i{background:linear-gradient(90deg,#12bfff,#785cff,#ff49ba,#ffcf4d)!important}
+html[data-spectacle="v13"] .weapon-switch{bottom:14px!important;border:1px solid #64ecff55!important;background:linear-gradient(180deg,#061724ed,#02070ded)!important;box-shadow:0 12px 34px #000d,inset 0 0 24px #3de7ff0d!important}
+html[data-spectacle="v13"] .weapon-switch button{min-width:74px!important;padding:8px 11px!important;font-size:9px!important}
+html[data-spectacle="v13"] .weapon-switch button.on{transform:translateY(-2px);border-color:#ffe278!important;box-shadow:0 0 20px #ffc54c44,inset 0 0 16px #ffd9551c!important}
+html[data-spectacle="v13"] .game-bottom{background:linear-gradient(180deg,#040a10f2,#010407 88%);box-shadow:0 -10px 34px #000c,inset 0 1px #73eaff2f}
+html[data-spectacle="v13"] .seatgun{position:relative;overflow:visible;border-top:2px solid color-mix(in srgb,var(--seat) 78%,#fff);box-shadow:inset 0 8px 20px color-mix(in srgb,var(--seat) 12%,transparent);transition:filter .18s ease,transform .18s ease}
+html[data-spectacle="v13"] .seatgun:before{content:"";position:absolute;left:4%;right:4%;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--seat),#fff,var(--seat),transparent);opacity:.78;filter:blur(.3px)}
+html[data-spectacle="v13"] .seatgun:nth-child(1){--seat:#ff5a37!important}html[data-spectacle="v13"] .seatgun:nth-child(2){--seat:#38a9ff!important}html[data-spectacle="v13"] .seatgun:nth-child(3){--seat:#53f27a!important}html[data-spectacle="v13"] .seatgun:nth-child(4){--seat:#bc58ff!important}
+html[data-spectacle="v13"] .gunart{width:68px!important;height:68px!important;transform:translateY(-8px);background:radial-gradient(circle at 50% 26%,#fff 0 4%,color-mix(in srgb,var(--seat) 88%,#1b2b38) 12%,#07111a 48%,#010408 78%)!important;box-shadow:0 0 22px color-mix(in srgb,var(--seat) 72%,transparent),0 -8px 26px color-mix(in srgb,var(--seat) 35%,transparent),inset 0 0 24px #ffffff20!important}
+html[data-spectacle="v13"] .seatgun.v13-fire .gunart{animation:v13CannonKick .16s ease-out}
+html[data-spectacle="v13"] .v13-fever-core{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:29;width:118px;height:118px;border-radius:50%;display:grid;place-items:center;pointer-events:none;background:radial-gradient(circle,#fff9bb 0 3%,#ffbc32 9%,#2c1740 18%,#061629 49%,#02060c 72%);border:5px solid #ffcf54;box-shadow:0 0 0 6px #173c5e,0 0 28px #ffd04e66,inset 0 0 25px #2cddff44;color:#fff;text-align:center;font-weight:1000;letter-spacing:.04em}
+html[data-spectacle="v13"] .v13-fever-core small{display:block;font-size:9px;color:#ffe583;letter-spacing:.18em}.v13-fever-core b{display:block;font-size:25px;color:#fff4a4;text-shadow:0 0 10px #ff7a32}.v13-fever-core.v13-hot{animation:v13FeverCore .54s ease-in-out infinite alternate}
+html[data-spectacle="v13"] .v13-callout{position:absolute;left:50%;top:47%;z-index:31;transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:none;text-align:center;font-weight:1000;font-style:italic;text-transform:uppercase;letter-spacing:.02em;color:#fff0a2;text-shadow:0 3px 0 #7a2100,0 0 18px #ff9a1f,0 0 40px #ff3d3d;font-size:clamp(30px,5vw,76px)}
+html[data-spectacle="v13"] .v13-callout span{display:block;font-size:.35em;color:#fff;letter-spacing:.18em;text-shadow:0 2px 0 #361000,0 0 10px #ff7a23}
+html[data-spectacle="v13"] .v13-callout.on{animation:v13Callout .85s cubic-bezier(.2,1.1,.25,1)}
+html[data-spectacle="v13"] .v13-treasure-burst{position:absolute;left:50%;top:51%;z-index:27;width:16px;height:16px;pointer-events:none;opacity:0}
+html[data-spectacle="v13"] .v13-treasure-burst.on{opacity:1}
+html[data-spectacle="v13"] .v13-coin{position:absolute;left:0;top:0;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff7b9,#ffd648 42%,#b86a00 72%);border:1px solid #fff1a0;box-shadow:0 0 10px #ffc936;animation:v13Coin var(--d,.8s) ease-out forwards;transform:translate(0,0)}
+html[data-spectacle="v13"] .v13-boss-rage{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 44%,transparent 22%,#ff142e18 52%,#ff001f35 100%);box-shadow:inset 0 0 80px #ff143033}
+html[data-spectacle="v13"] .v13-boss-rage.on{opacity:1;animation:v13Rage 1s ease-in-out infinite alternate}
+html[data-spectacle="v13"] .v13-cannon-trails{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
+html[data-spectacle="v13"] .v13-beam{position:absolute;bottom:-12%;width:5px;height:58%;transform-origin:50% 100%;border-radius:999px;background:linear-gradient(0deg,var(--beam),#fff 62%,transparent);filter:drop-shadow(0 0 6px var(--beam));opacity:0;animation:v13Beam .22s ease-out}
+html[data-spectacle="v13"] .v13-critical-flare{position:absolute;z-index:28;pointer-events:none;font-size:22px;font-weight:1000;font-style:italic;color:#ffdb54;text-shadow:0 2px 0 #6a1700,0 0 12px #ff6d23;animation:v13Crit .7s ease-out forwards}
+html[data-spectacle="v13"][data-v13-intensity="legendary"] .battle{box-shadow:inset 0 0 70px #ff8b2722}html[data-spectacle="v13"][data-v13-intensity="legendary"] #battleCanvas{filter:saturate(1.48) contrast(1.16) brightness(1.06)}
+@keyframes v13ComboPop{0%{transform:scale(.72)}65%{transform:scale(1.28)}100%{transform:scale(1)}}
+@keyframes v13CannonKick{0%{transform:translateY(-8px) scale(1)}40%{transform:translateY(-2px) scale(1.09)}100%{transform:translateY(-8px) scale(1)}}
+@keyframes v13FeverCore{from{box-shadow:0 0 0 6px #173c5e,0 0 24px #ffd04e55,inset 0 0 22px #2cddff33}to{box-shadow:0 0 0 7px #ffb843,0 0 52px #ff9b35aa,inset 0 0 36px #ff4ab344}}
+@keyframes v13Callout{0%{opacity:0;transform:translate(-50%,-50%) scale(.45) rotate(-4deg)}22%{opacity:1;transform:translate(-50%,-50%) scale(1.18) rotate(1deg)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-62%) scale(.9)}}
+@keyframes v13Coin{0%{opacity:1;transform:translate(0,0) scale(.6) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1.15) rotate(720deg)}}
+@keyframes v13Rage{from{filter:brightness(.8)}to{filter:brightness(1.35)}}
+@keyframes v13Beam{0%{opacity:0;transform:rotate(var(--a)) scaleY(.4)}35%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) scaleY(1.05)}}
+@keyframes v13Crit{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-110%) scale(.92)}}
+@media(min-width:1180px){html[data-spectacle="v13"] .game-main{grid-template-columns:184px minmax(0,1fr) 184px!important}}
+@media(max-width:900px){html[data-spectacle="v13"] .v13-fever-core{width:92px;height:92px;bottom:7px}.v13-fever-core b{font-size:20px}html[data-spectacle="v13"] .sidehud{width:164px!important}}
+@media(max-width:760px){html[data-spectacle="v13"] .v13-fever-core{width:76px;height:76px;bottom:4px;border-width:3px}.v13-fever-core small{font-size:6px}.v13-fever-core b{font-size:15px}html[data-spectacle="v13"] .sidehud{width:min(66vw,224px)!important}html[data-spectacle="v13"] .weapon-switch button{min-width:auto!important;padding:6px 8px!important;font-size:7px!important}}
+@media(max-height:520px) and (orientation:landscape){html[data-spectacle="v13"] .v13-fever-core{width:64px;height:64px;bottom:2px}.v13-fever-core b{font-size:13px}.v13-fever-core small{font-size:5px}html[data-spectacle="v13"] .v13-callout{font-size:34px}}
+@media(prefers-reduced-motion:reduce){html[data-spectacle="v13"] .v13-fever-core.v13-hot,html[data-spectacle="v13"] .v13-boss-rage.on{animation:none!important}}
