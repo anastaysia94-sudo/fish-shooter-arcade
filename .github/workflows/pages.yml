@@ -48,6 +48,24 @@ jobs:
             sleep 2
           done
           exit 1
+      - name: Verify Visual QA Experience route
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          QA_URL="${PAGE_URL%/}/qa/"
+          EVIDENCE_URL="${PAGE_URL%/}/qa/evidence/10-five-reel-jackpot.jpg"
+          for i in {1..30}; do
+            BODY="$(curl -fsS --max-time 15 "$QA_URL" || true)"
+            if grep -q 'VISUAL QA EXPERIENCE' <<<"$BODY" \
+              && grep -q '12/12 CERTIFIED' <<<"$BODY" \
+              && curl -fsS --max-time 15 -o /dev/null "$EVIDENCE_URL"; then
+              echo "FSA_VISUAL_QA_ROUTE=PASS url=$QA_URL"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Visual QA Experience route did not become verifiable in time" >&2
+          exit 1
       - name: Capture live visual acceptance set
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
