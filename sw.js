@@ -1,5 +1,5 @@
 // Cloud-account completion + cinematic gameplay cache. The playable shell remains usable without account/network availability.
-const CACHE='fsa-arcade-v21-dense-v14-20260916';
+const CACHE='fsa-arcade-v22-dense-v14-1-20260916';
 const CORE=[
   './','./index.html','./activate.html','./activate.js','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./lobby-fidelity-v13.css','./arcade-intensity-v12.css','./boss-spectacle-v13.css','./dense-mode-v14.css','./dense-mode-v14-overlay.css','./fsa-v9.js','./arcade-intensity-v12.js','./boss-spectacle-v13.js','./dense-mode-v14.js','./cloud-sync-v11.js','./arcade-intensity-v12-bridge.js','./manifest.webmanifest',
   './assets/fsa-mark.svg','./assets/fsa-boss-event.svg','./assets/fsa-gameplay.svg','./assets/fsa-lobby.svg','./assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg',
