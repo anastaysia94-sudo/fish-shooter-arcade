@@ -14,7 +14,7 @@ async function page(width,height,mobile=false,low=false){
   if(low) await c.addInitScript(()=>{const v={saveData:true,effectiveType:'2g',downlink:.25,rtt:900,addEventListener(){},removeEventListener(){}};for(const k of ['connection','mozConnection','webkitConnection'])try{Object.defineProperty(navigator,k,{get:()=>v})}catch{};try{Object.defineProperty(navigator,'deviceMemory',{get:()=>2})}catch{};try{Object.defineProperty(navigator,'hardwareConcurrency',{get:()=>2})}catch{}});
   const p=await c.newPage();
   p.setDefaultTimeout(45000);
-  p.setDefaultNavigationTimeout(30000);
+  p.setDefaultNavigationTimeout(45000);
   p.on('pageerror',error=>console.error(`FSA_BROWSER_PAGEERROR ${error.message}`));
   p.on('requestfailed',request=>console.error(`FSA_BROWSER_REQUEST_FAILED ${request.method()} ${request.url()} ${request.failure()?.errorText||''}`));
   return {c,p};
@@ -24,10 +24,12 @@ async function go(p,path=''){
   let lastError;
   for(let attempt=1;attempt<=3;attempt++){
     try{
-      const response=await p.goto(url,{waitUntil:'commit',timeout:30000});
+      const response=await p.goto(url,{waitUntil:'commit',timeout:45000});
       if(response&&!response.ok())throw new Error(`navigation returned HTTP ${response.status()}`);
-      await p.waitForSelector('body',{state:'attached',timeout:20000});
-      await p.waitForFunction(()=>document.readyState==='interactive'||document.readyState==='complete',null,{timeout:20000});
+      // Every capture path has its own domain-specific readiness gate below.
+      // Avoid a redundant generic body/document-ready wait here: Chromium can
+      // have committed and rendered the shell while heavy game startup keeps
+      // Playwright's injected readiness checks from being scheduled promptly.
       await p.waitForTimeout(500);
       return;
     }catch(error){
