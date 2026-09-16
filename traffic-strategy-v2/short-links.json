@@ -1,0 +1,15 @@
+{
+  "public": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/p/","destination":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/traffic-strategy-v2/"},
+  "console": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/c/","destination":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/traffic-strategy-v2/console.html"},
+  "facebook": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/f/","utm_source":"facebook","utm_medium":"organic_social","utm_campaign":"2hr_launch","utm_content":"launch_post"},
+  "instagram": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/i/","utm_source":"instagram","utm_medium":"organic_social","utm_campaign":"2hr_launch","utm_content":"story_or_bio"},
+  "tiktok": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/t/","utm_source":"tiktok","utm_medium":"organic_video","utm_campaign":"2hr_launch","utm_content":"launch_video"},
+  "telegram": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/g/","utm_source":"telegram","utm_medium":"community","utm_campaign":"2hr_launch","utm_content":"community_post"},
+  "whatsapp": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/w/","utm_source":"whatsapp","utm_medium":"direct_share","utm_campaign":"2hr_launch","utm_content":"status_share"},
+  "solo_founders": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/s/","utm_source":"telegram_solofounders","utm_medium":"community","utm_campaign":"2hr_launch","utm_content":"feedback_pitch"},
+  "fusion42": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/42/","utm_source":"telegram_fusion42","utm_medium":"community","utm_campaign":"2hr_launch","utm_content":"danger_room"},
+  "supahunt": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/u/","utm_source":"supahunt","utm_medium":"directory","utm_campaign":"2hr_launch","utm_content":"listing"},
+  "product_hunt": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/ph/","utm_source":"producthunt","utm_medium":"directory","utm_campaign":"2hr_launch","utm_content":"launch"},
+  "hacker_news": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/h/","utm_source":"hackernews","utm_medium":"community","utm_campaign":"2hr_launch","utm_content":"show_hn"},
+  "hub": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/l/"}
+}
