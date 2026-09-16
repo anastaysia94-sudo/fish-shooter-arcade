@@ -20,7 +20,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - name: Configure GitHub Pages
@@ -44,7 +44,7 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           for i in {1..30}; do
-            if curl -fsS "$PAGE_URL" >/dev/null; then exit 0; fi
+            if curl -fsS --max-time 15 "$PAGE_URL" >/dev/null; then exit 0; fi
             sleep 2
           done
           exit 1
@@ -66,6 +66,28 @@ jobs:
           done
           echo "Visual QA Experience route did not become verifiable in time" >&2
           exit 1
+      - name: Warm critical live runtime assets
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          ROOT="${PAGE_URL%/}"
+          assets=(
+            "/"
+            "/index.html"
+            "/fsa-v9.js"
+            "/fsa-v8.css"
+            "/gameplay-layout-v9.css"
+            "/visual-fidelity-v10.css"
+            "/arcade-intensity-v12.css"
+            "/boss-spectacle-v13.css"
+            "/arcade-intensity-v12.js"
+            "/boss-spectacle-v13.js"
+          )
+          for asset in "${assets[@]}"; do
+            echo "Preflighting $asset"
+            curl --retry 5 --retry-all-errors --retry-delay 2 -fsS --max-time 30 -o /dev/null "$ROOT$asset"
+          done
+          echo "FSA_LIVE_RUNTIME_PREFLIGHT=PASS"
       - name: Capture live visual acceptance set
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
@@ -73,8 +95,8 @@ jobs:
           if node tests/visual-acceptance-capture.mjs "$PAGE_URL"; then
             exit 0
           fi
-          echo "First live visual capture attempt failed; retrying once after a short Pages/browser settle window."
-          sleep 5
+          echo "First live visual capture attempt failed; retrying once after a longer Pages/browser settle window."
+          sleep 12
           node tests/visual-acceptance-capture.mjs "$PAGE_URL"
       - name: Upload live visual acceptance evidence
         if: always()
