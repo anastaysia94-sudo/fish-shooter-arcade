@@ -58,8 +58,6 @@ async function snapAtTargetDensity(p,name,item,minVisible=18){
     if(before<minVisible)continue;
     await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});
     const after=await visibleTargetCount(p);
-    // The density gate is evaluated immediately before capture. Targets move continuously while Playwright encodes the PNG,
-    // so requiring the same count after capture made a valid crowded screenshot fail whenever fish crossed the radar edge mid-encode.
     rows.push({item,name,file:`${name}.png`,visibleTargetsAtCaptureGate:before,visibleTargetsAfter:after,minVisibleTargets:minVisible});
     return;
   }
@@ -70,11 +68,14 @@ async function verifySlotLobby(p){
     const cards=[...document.querySelectorAll('#slotGrid .slot-card')];
     const states=cards.map(card=>{
       const cs=getComputedStyle(card),symbols=card.querySelector('.slot-symbols'),ss=symbols?getComputedStyle(symbols):null;
+      const layers=cs.backgroundSize.split(',').map(x=>x.trim());
       return {
         atlas:cs.backgroundImage.includes('fsa-slot-atlas-v10.svg'),
         clipped:cs.overflowX==='hidden'&&cs.overflowY==='hidden',
         symbolsHidden:!!ss&&ss.opacity==='0'&&ss.visibility==='hidden',
+        atlasWidthSized:layers.length>=2&&/^2000%\s+auto$/i.test(layers[1]),
         position:cs.backgroundPosition,
+        size:cs.backgroundSize,
         width:card.getBoundingClientRect().width,
         height:card.getBoundingClientRect().height
       };
@@ -84,7 +85,9 @@ async function verifySlotLobby(p){
       atlasCards:states.filter(x=>x.atlas).length,
       clippedCards:states.filter(x=>x.clipped).length,
       hiddenLegacySymbolCards:states.filter(x=>x.symbolsHidden).length,
+      widthSizedAtlasCards:states.filter(x=>x.atlasWidthSized).length,
       distinctAtlasPositions:new Set(states.map(x=>x.position)).size,
+      distinctAtlasSizes:new Set(states.map(x=>x.size)).size,
       measurableCards:states.filter(x=>x.width>40&&x.height>80).length
     };
   });
@@ -92,6 +95,7 @@ async function verifySlotLobby(p){
   if(qa.atlasCards!==20)throw new Error(`Slot lobby atlas missing on ${20-qa.atlasCards} cards`);
   if(qa.clippedCards!==20)throw new Error(`Slot lobby clipping missing on ${20-qa.clippedCards} cards`);
   if(qa.hiddenLegacySymbolCards!==20)throw new Error(`Legacy slot symbols remain visible on ${20-qa.hiddenLegacySymbolCards} cards`);
+  if(qa.widthSizedAtlasCards!==20)throw new Error(`Slot atlas is not width-sized on ${20-qa.widthSizedAtlasCards} cards`);
   if(qa.distinctAtlasPositions!==20)throw new Error(`Slot lobby expected 20 distinct atlas positions, found ${qa.distinctAtlasPositions}`);
   if(qa.measurableCards!==20)throw new Error(`Slot lobby contains collapsed cards`);
   return qa;
