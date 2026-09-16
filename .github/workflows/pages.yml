@@ -83,6 +83,7 @@ jobs:
             "/"
             "/index.html"
             "/fsa-v9.js"
+            "/telemetry-v1.js"
             "/fsa-v8.css"
             "/gameplay-layout-v9.css"
             "/visual-fidelity-v10.css"
@@ -109,6 +110,7 @@ jobs:
           files=(
             "index.html"
             "fsa-v9.js"
+            "telemetry-v1.js"
             "fsa-v8.css"
             "gameplay-layout-v9.css"
             "visual-fidelity-v10.css"
