@@ -11,6 +11,16 @@ drop index if exists public.fsa_players_auth_user_uidx;
 create index if not exists fsa_player_cloud_state_last_game_id_idx
   on public.fsa_player_cloud_state(last_game_id);
 
+-- Telemetry tables are intentionally RPC-only for clients. Explicit deny-all policies
+-- preserve the previous implicit RLS deny behavior while documenting the boundary.
+drop policy if exists fsa_telemetry_sessions_client_deny_all on public.fsa_telemetry_sessions;
+create policy fsa_telemetry_sessions_client_deny_all on public.fsa_telemetry_sessions
+  as restrictive for all to anon, authenticated using (false) with check (false);
+
+drop policy if exists fsa_telemetry_events_client_deny_all on public.fsa_telemetry_events;
+create policy fsa_telemetry_events_client_deny_all on public.fsa_telemetry_events
+  as restrictive for all to anon, authenticated using (false) with check (false);
+
 -- Merge equivalent permissive SELECT policy pairs into one policy per table.
 -- Existing restrictive founder-MFA policies remain untouched and continue to gate
 -- sensitive reads.
