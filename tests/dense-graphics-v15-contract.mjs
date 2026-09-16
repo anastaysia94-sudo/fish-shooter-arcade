@@ -27,6 +27,8 @@ assert(!/fetch\s*\(/.test(js),'Dense Graphics V15 must remain local-first and mu
 assert(!/Fire Kirin|Juwa|Panda Master/i.test(js),'V15 runtime must remain original and not embed competitor branding');
 for(const marker of ['#v15Backdrop','#v15Fx','pointer-events:none','data-density-mode="extreme"','prefers-reduced-motion','data-cinematic-lite']) assert(css.includes(marker),`V15 CSS contract missing ${marker}`);
 assert(css.includes('#v15Backdrop{z-index:3')&&css.includes('#v15Fx{z-index:5'),'V15 canvas layering must remain deterministic');
-assert(sw.includes("fsa-arcade-v23-dense-graphics-v15-20260916"),'V15 must bump the installed-PWA cache generation');
+assert(sw.includes("fsa-arcade-v24-dense-v15-telemetry-20260916"),'V15 + telemetry must bump the installed-PWA cache generation');
+assert(sw.includes('./telemetry-v1.js')&&sw.includes('telemetry-v1\\.js'),'V15 cache generation must preserve telemetry runtime caching and refresh');
+assert(spectacle.includes('telemetry-v1.js'),'V15 spectacle loader must preserve telemetry v1 attachment');
 
-console.log('FSA_DENSE_GRAPHICS_V15_CONTRACT=PASS targets=live boss=phased impacts=weapon-specific coins=magnetic schools=5 environment=procedural lite=preserved');
+console.log('FSA_DENSE_GRAPHICS_V15_CONTRACT=PASS targets=live boss=phased impacts=weapon-specific coins=magnetic schools=5 environment=procedural telemetry=preserved lite=preserved');
