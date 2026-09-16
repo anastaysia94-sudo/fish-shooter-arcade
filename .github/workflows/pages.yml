@@ -88,68 +88,70 @@ jobs:
             curl --retry 5 --retry-all-errors --retry-delay 2 -fsS --max-time 30 -o /dev/null "$ROOT$asset"
           done
           echo "FSA_LIVE_RUNTIME_PREFLIGHT=PASS"
-      - name: Capture live visual acceptance set
+      - name: Verify deployed runtime byte parity
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          ROOT="${PAGE_URL%/}"
+          files=(
+            "index.html"
+            "fsa-v9.js"
+            "fsa-v8.css"
+            "gameplay-layout-v9.css"
+            "visual-fidelity-v10.css"
+            "cloud-sync-v11.css"
+            "cloud-sync-v11.js"
+            "arcade-intensity-v12.css"
+            "arcade-intensity-v12.js"
+            "boss-spectacle-v13.css"
+            "boss-spectacle-v13.js"
+            "arcade-intensity-v12-bridge.js"
+            "assets/fsa-fish-hd-atlas.webp"
+            "assets/fsa-slots-hd-atlas.webp"
+            "assets/reef-run-hd-battle.webp"
+            "assets/fsa-slot-atlas-v10.svg"
+            "assets/fsa-title-atlas-v10.svg"
+            "admin/index.html"
+            "admin/styles.css"
+            "admin/app.js"
+          )
+          rm -rf /tmp/fsa-live-parity
+          mkdir -p /tmp/fsa-live-parity
+          : > /tmp/fsa-parity-files.txt
+          for file in "${files[@]}"; do
+            remote="/tmp/fsa-live-parity/$file"
+            mkdir -p "$(dirname "$remote")"
+            curl --retry 5 --retry-all-errors --retry-delay 2 --compressed -fsS --max-time 30 "$ROOT/$file" -o "$remote"
+            if ! cmp -s "$file" "$remote"; then
+              echo "DEPLOYED BYTE PARITY FAILED: $file" >&2
+              echo "checkout:" >&2
+              sha256sum "$file" >&2
+              echo "production:" >&2
+              sha256sum "$remote" >&2
+              exit 1
+            fi
+            printf '%s\n' "$file" >> /tmp/fsa-parity-files.txt
+          done
+          echo "FSA_DEPLOYED_BYTE_PARITY=PASS files=${#files[@]} source=$ROOT/"
+      - name: Capture byte-verified visual acceptance set
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           export FSA_LIVE_SOURCE_URL="${PAGE_URL%/}/"
-          python3 - <<'PY' >/tmp/fsa-live-proxy.log 2>&1 &
-          import os
-          import urllib.request
-          from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-
-          target = os.environ["FSA_LIVE_SOURCE_URL"].rstrip("/") + "/"
-
-          class Handler(BaseHTTPRequestHandler):
-              def do_GET(self):
-                  url = target + self.path.lstrip("/")
-                  req = urllib.request.Request(
-                      url,
-                      headers={
-                          "User-Agent": "FSA-Visual-QA-Proxy/1.0",
-                          "Cache-Control": "no-cache",
-                      },
-                  )
-                  try:
-                      with urllib.request.urlopen(req, timeout=30) as response:
-                          body = response.read()
-                          self.send_response(response.status)
-                          for key, value in response.headers.items():
-                              if key.lower() not in {"content-length", "transfer-encoding", "connection", "content-encoding"}:
-                                  self.send_header(key, value)
-                          self.send_header("Content-Length", str(len(body)))
-                          self.end_headers()
-                          self.wfile.write(body)
-                  except Exception as exc:
-                      body = f"upstream fetch failed: {exc}".encode()
-                      self.send_response(502)
-                      self.send_header("Content-Type", "text/plain; charset=utf-8")
-                      self.send_header("Content-Length", str(len(body)))
-                      self.end_headers()
-                      self.wfile.write(body)
-
-              def log_message(self, fmt, *args):
-                  print("FSA_LIVE_PROXY", fmt % args, flush=True)
-
-          ThreadingHTTPServer(("127.0.0.1", 4173), Handler).serve_forever()
-          PY
-          PROXY_PID=$!
-          trap 'kill "$PROXY_PID" 2>/dev/null || true' EXIT
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/fsa-static-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 
           for i in {1..30}; do
-            if curl -fsS --max-time 15 http://127.0.0.1:4173/ >/dev/null; then
-              echo "FSA_LIVE_PROXY=PASS source=$FSA_LIVE_SOURCE_URL"
+            if curl -fsS --max-time 10 http://127.0.0.1:4173/ >/dev/null; then
+              echo "FSA_BYTE_VERIFIED_LOCAL_SERVER=PASS"
               break
             fi
             sleep 1
           done
-          curl -fsS --max-time 15 http://127.0.0.1:4173/ >/dev/null
+          curl -fsS --max-time 10 http://127.0.0.1:4173/ >/dev/null
 
-          if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
-            echo "First proxied live capture attempt failed; retrying once."
-            sleep 5
-            node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"
-          fi
+          node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"
 
           python3 - <<'PY'
           import json
@@ -158,12 +160,19 @@ jobs:
 
           path = Path("artifacts/visual-acceptance/manifest.json")
           data = json.loads(path.read_text())
+          parity_files = [line.strip() for line in Path("/tmp/fsa-parity-files.txt").read_text().splitlines() if line.strip()]
           data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceCommit"] = os.environ.get("GITHUB_SHA")
-          data["captureTransport"] = "same-origin reverse proxy streaming deployed GitHub Pages bytes"
+          data["captureTransport"] = "localhost static server from the exact Pages deployment source after production byte-parity verification"
+          data["deploymentParity"] = {
+              "verified": True,
+              "productionUrl": os.environ["FSA_LIVE_SOURCE_URL"],
+              "verifiedFileCount": len(parity_files),
+              "verifiedFiles": parity_files,
+          }
           path.write_text(json.dumps(data, indent=2) + "\n")
-          print("FSA_VISUAL_MANIFEST_SOURCE=PASS", data["sourceUrl"], data["sourceCommit"])
+          print("FSA_VISUAL_MANIFEST_SOURCE=PASS", data["sourceUrl"], data["sourceCommit"], "parityFiles=", len(parity_files))
           PY
       - name: Upload live visual acceptance evidence
         if: always()
