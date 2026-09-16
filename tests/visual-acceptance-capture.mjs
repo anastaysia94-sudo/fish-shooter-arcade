@@ -58,12 +58,12 @@ async function snapAtTargetDensity(p,name,item,minVisible=18){
     if(before<minVisible)continue;
     await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});
     const after=await visibleTargetCount(p);
-    if(after>=minVisible){
-      rows.push({item,name,file:`${name}.png`,visibleTargets:Math.min(before,after),visibleTargetsBefore:before,visibleTargetsAfter:after,minVisibleTargets:minVisible});
-      return;
-    }
+    // The density gate is evaluated immediately before capture. Targets move continuously while Playwright encodes the PNG,
+    // so requiring the same count after capture made a valid crowded screenshot fail whenever fish crossed the radar edge mid-encode.
+    rows.push({item,name,file:`${name}.png`,visibleTargetsAtCaptureGate:before,visibleTargetsAfter:after,minVisibleTargets:minVisible});
+    return;
   }
-  throw new Error(`Target density did not remain at ${minVisible}+ through capture`);
+  throw new Error(`Target density did not reach ${minVisible}+ before capture`);
 }
 
 try{
