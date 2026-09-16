@@ -100,7 +100,7 @@ begin
   end if;
 
   return true;
-end
+end;
 $$;
 
 revoke all on function fsa_private.telemetry_payload_allowed(jsonb) from public, anon, authenticated;
@@ -155,7 +155,7 @@ begin
   where id=sid;
 
   return sid;
-end
+end;
 $$;
 
 -- Serialize writes per session and cap a single session at 5,000 observations.
@@ -233,7 +233,7 @@ begin
   where id=p_session_id and player_id=pid;
 
   return eid;
-end
+end;
 $$;
 
 -- Replace the raw player UUID in the EGM4000 feed with a stable pseudonymous key.
@@ -279,7 +279,7 @@ begin
   where e.id > greatest(coalesce(p_after_id,0),0)
   order by e.id asc
   limit least(greatest(coalesce(p_limit,200),1),1000);
-end
+end;
 $$;
 
 revoke all on function public.fsa_rpc_telemetry_start(text,boolean,text) from public, anon;
