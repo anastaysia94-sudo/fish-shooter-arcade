@@ -113,7 +113,7 @@ class GameActivity : ComponentActivity() {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
-                    val uri = runCatching { Uri.parse(url) }.getOrNull()
+                    val uri = url?.let { value -> runCatching { Uri.parse(value) }.getOrNull() }
                     if (uri == null || !isTrustedFsaUri(uri)) return
                     // Mark the trusted F.S.A. page as running inside the Android cabinet.
                     view?.evaluateJavascript(
