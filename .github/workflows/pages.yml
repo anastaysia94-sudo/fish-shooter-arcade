@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -34,6 +34,11 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+      - name: Validate Dense Graphics V15 before browser QA
+        run: |
+          node --check dense-graphics-v15.js
+          node --check tests/dense-graphics-v15-contract.mjs
+          node tests/dense-graphics-v15-contract.mjs
       - name: Install visual QA browser
         run: |
           npm init -y >/dev/null 2>&1
@@ -80,8 +85,13 @@ jobs:
             "/visual-fidelity-v10.css"
             "/arcade-intensity-v12.css"
             "/boss-spectacle-v13.css"
+            "/dense-mode-v14.css"
+            "/dense-mode-v14-overlay.css"
+            "/dense-graphics-v15.css"
             "/arcade-intensity-v12.js"
             "/boss-spectacle-v13.js"
+            "/dense-mode-v14.js"
+            "/dense-graphics-v15.js"
           )
           for asset in "${assets[@]}"; do
             echo "Preflighting $asset"
@@ -106,6 +116,11 @@ jobs:
             "boss-spectacle-v13.css"
             "boss-spectacle-v13.js"
             "arcade-intensity-v12-bridge.js"
+            "dense-mode-v14.css"
+            "dense-mode-v14-overlay.css"
+            "dense-mode-v14.js"
+            "dense-graphics-v15.css"
+            "dense-graphics-v15.js"
             "assets/fsa-fish-hd-atlas.webp"
             "assets/fsa-slots-hd-atlas.webp"
             "assets/reef-run-hd-battle.webp"
@@ -151,7 +166,28 @@ jobs:
           done
           curl -fsS --max-time 10 http://127.0.0.1:4173/ >/dev/null
 
-          node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"
+          if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+            echo "First deterministic capture attempt failed; retrying once." >&2
+            sleep 3
+            if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+              mkdir -p artifacts/visual-acceptance
+              python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          Path('artifacts/visual-acceptance/failure.json').write_text(json.dumps({
+              'schema':'fsa.visual-acceptance.failure.v2',
+              'sourceUrl':os.environ.get('FSA_LIVE_SOURCE_URL'),
+              'sourceCommit':os.environ.get('GITHUB_SHA'),
+              'generatedAt':datetime.now(timezone.utc).isoformat(),
+              'message':'Production byte parity passed, but both deterministic browser-render attempts failed.'
+          },indent=2)+'\n')
+          PY
+              echo "--- local static-server diagnostics ---" >&2
+              tail -n 200 /tmp/fsa-static-server.log >&2 || true
+              exit 1
+            fi
+          fi
 
           python3 - <<'PY'
           import json
