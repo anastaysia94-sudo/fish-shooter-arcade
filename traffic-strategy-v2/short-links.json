@@ -11,6 +11,7 @@
   "supahunt": {"short":"https://cleanuri.com/vGQ5gw","owned_fallback":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/u/","utm_source":"supahunt","utm_medium":"directory","utm_campaign":"2hr_launch","utm_content":"listing"},
   "product_hunt": {"short":"https://cleanuri.com/80VvbZ","owned_fallback":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/ph/","utm_source":"producthunt","utm_medium":"directory","utm_campaign":"2hr_launch","utm_content":"launch"},
   "hacker_news": {"short":"https://cleanuri.com/WA8XOM","owned_fallback":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/h/","utm_source":"hackernews","utm_medium":"community","utm_campaign":"2hr_launch","utm_content":"show_hn"},
+  "referral_share": {"short":"https://cleanuri.com/96vEbd","destination":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/traffic-strategy-v2/?utm_source=share&utm_medium=referral&utm_campaign=organic_loop&utm_content=result_share","utm_source":"share","utm_medium":"referral","utm_campaign":"organic_loop","utm_content":"result_share"},
   "hub": {"short":"https://anastaysia94-sudo.github.io/fish-shooter-arcade/l/"},
   "provider": {"name":"CleanURI","docs":"https://cleanuri.com/docs","auth":"none","verified_at":"2026-09-16"}
 }
