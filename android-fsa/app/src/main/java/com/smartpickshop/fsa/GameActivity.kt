@@ -5,9 +5,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -111,6 +113,13 @@ class GameActivity : ComponentActivity() {
                     return openExternally(uri)
                 }
 
+                override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                    super.onReceivedError(view, request, error)
+                    if (request?.isForMainFrame == true) {
+                        Log.e("FSAAndroid", "MAIN_FRAME_ERROR code=${error?.errorCode} description=${error?.description}")
+                    }
+                }
+
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     val uri = url?.let { value -> runCatching { Uri.parse(value) }.getOrNull() }
@@ -122,10 +131,12 @@ class GameActivity : ComponentActivity() {
                           document.documentElement.classList.add('fsa-android-cabinet');
                           document.body && document.body.setAttribute('data-fsa-android','v12');
                           try { localStorage.setItem('fsa.android.cabinet','v12'); } catch(e) {}
+                          return document.readyState + ':' + (document.body?.getAttribute('data-fsa-android') || 'missing');
                         })();
-                        """.trimIndent(),
-                        null
-                    )
+                        """.trimIndent()
+                    ) { result ->
+                        Log.i("FSAAndroid", "TRUSTED_PAGE_FINISHED host=${uri.host} path=${uri.path} cabinet=$result")
+                    }
                 }
             }
         }
