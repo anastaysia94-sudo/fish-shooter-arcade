@@ -51,7 +51,13 @@ jobs:
       - name: Capture live visual acceptance set
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: node tests/visual-acceptance-capture.mjs "$PAGE_URL"
+        run: |
+          if node tests/visual-acceptance-capture.mjs "$PAGE_URL"; then
+            exit 0
+          fi
+          echo "First live visual capture attempt failed; retrying once after a short Pages/browser settle window."
+          sleep 5
+          node tests/visual-acceptance-capture.mjs "$PAGE_URL"
       - name: Upload live visual acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
