@@ -43,6 +43,10 @@ function loadDenseV14(){
     const script=document.createElement('script');script.src='dense-mode-v14.js';script.async=false;document.body.appendChild(script);
   }
 }
-mount();updateCombo();updateFever();parseBoss();loadDenseV14();
+function loadTelemetryV1(){
+  if(document.querySelector('script[src="telemetry-v1.js"]'))return;
+  const script=document.createElement('script');script.src='telemetry-v1.js';script.async=false;script.dataset.optional='analytics';document.body.appendChild(script);
+}
+mount();updateCombo();updateFever();parseBoss();loadDenseV14();loadTelemetryV1();
 window.__FSA_SPECTACLE_V13__={version:'v13',state:()=>({...V,armed:[...V.armed]}),callout,coinBurst};
 })();
