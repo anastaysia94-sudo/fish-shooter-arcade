@@ -44,7 +44,11 @@ jobs:
       - name: Install visual QA browser
         run: |
           npm init -y >/dev/null 2>&1
-          npm install --no-save playwright@1.63.0
+          # Playwright 1.55 / Chromium 140 is the last browser stack that
+          # completed the full 12-screen certified F.S.A. capture on this
+          # runner image. 1.63 / Chrome 153 stalls in waitForFunction even
+          # after the exact runtime has loaded byte-for-byte.
+          npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
           node -e "const p=require('playwright/package.json'); console.log('FSA_PLAYWRIGHT_VERSION='+p.version)"
       - name: Wait for deployed site
@@ -209,7 +213,7 @@ jobs:
           data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceCommit"] = os.environ.get("GITHUB_SHA")
-          data["captureTransport"] = "Playwright 1.63 on deterministic no-cache Node localhost server from exact Pages checkout after production byte-parity verification"
+          data["captureTransport"] = "Playwright 1.55 on deterministic no-cache Node localhost server from exact Pages checkout after production byte-parity verification"
           data["deploymentParity"] = {
               "verified": True,
               "productionUrl": os.environ["FSA_LIVE_SOURCE_URL"],
