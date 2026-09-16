@@ -1,11 +1,11 @@
 // Cloud-account completion + cinematic gameplay cache. The playable shell remains usable without account/network availability.
-const CACHE='fsa-arcade-v19-lobby-fidelity-20260916';
+const CACHE='fsa-arcade-v20-boss-spectacle-20260916';
 const CORE=[
-  './','./index.html','./activate.html','./activate.js','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./lobby-fidelity-v13.css','./arcade-intensity-v12.css','./fsa-v9.js','./arcade-intensity-v12.js','./cloud-sync-v11.js','./arcade-intensity-v12-bridge.js','./manifest.webmanifest',
+  './','./index.html','./activate.html','./activate.js','./fsa-v8.css','./gameplay-layout-v9.css','./visual-fidelity-v10.css','./cloud-sync-v11.css','./lobby-fidelity-v13.css','./arcade-intensity-v12.css','./boss-spectacle-v13.css','./fsa-v9.js','./arcade-intensity-v12.js','./boss-spectacle-v13.js','./cloud-sync-v11.js','./arcade-intensity-v12-bridge.js','./manifest.webmanifest',
   './assets/fsa-mark.svg','./assets/fsa-boss-event.svg','./assets/fsa-gameplay.svg','./assets/fsa-lobby.svg','./assets/fsa-title-atlas-v10.svg','./assets/fsa-slot-atlas-v10.svg',
   './admin/','./admin/index.html','./admin/styles.css','./admin/app.js','./admin/security-completion.js','./admin/cloud-player-admin.js'
 ];
-const FRESH_RUNTIME=/\/(?:fsa-v8\.css|gameplay-layout-v9\.css|visual-fidelity-v10\.css|cloud-sync-v11\.css|lobby-fidelity-v13\.css|arcade-intensity-v12\.css|fsa-v9\.js|arcade-intensity-v12\.js|cloud-sync-v11\.js|arcade-intensity-v12-bridge\.js)$/;
+const FRESH_RUNTIME=/\/(?:fsa-v8\.css|gameplay-layout-v9\.css|visual-fidelity-v10\.css|cloud-sync-v11\.css|lobby-fidelity-v13\.css|arcade-intensity-v12\.css|boss-spectacle-v13\.css|fsa-v9\.js|arcade-intensity-v12\.js|boss-spectacle-v13\.js|cloud-sync-v11\.js|arcade-intensity-v12-bridge\.js)$/;
 const cacheResponse=(request,response)=>{if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy));}return response;};
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(
