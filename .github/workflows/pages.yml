@@ -24,13 +24,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+        uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
@@ -44,8 +44,9 @@ jobs:
       - name: Install visual QA browser
         run: |
           npm init -y >/dev/null 2>&1
-          npm install --no-save playwright@1.55.0
+          npm install --no-save playwright@1.63.0
           npx playwright install --with-deps chromium
+          node -e "const p=require('playwright/package.json'); console.log('FSA_PLAYWRIGHT_VERSION='+p.version)"
       - name: Wait for deployed site
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
@@ -161,7 +162,8 @@ jobs:
 
           for i in {1..30}; do
             if grep -q 'FSA_VISUAL_ACCEPTANCE_SERVER=READY' /tmp/fsa-static-server.log 2>/dev/null \
-              && curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/ >/dev/null; then
+              && curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/ >/dev/null \
+              && curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/__fsa_qa_bootstrap__ >/dev/null; then
               echo "FSA_BYTE_VERIFIED_LOCAL_SERVER=PASS"
               break
             fi
@@ -169,6 +171,7 @@ jobs:
           done
           grep -q 'FSA_VISUAL_ACCEPTANCE_SERVER=READY' /tmp/fsa-static-server.log
           curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/ >/dev/null
+          curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/__fsa_qa_bootstrap__ >/dev/null
 
           if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
             echo "First deterministic capture attempt failed; retrying once." >&2
@@ -180,11 +183,11 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           Path('artifacts/visual-acceptance/failure.json').write_text(json.dumps({
-              'schema':'fsa.visual-acceptance.failure.v3',
+              'schema':'fsa.visual-acceptance.failure.v4',
               'sourceUrl':os.environ.get('FSA_LIVE_SOURCE_URL'),
               'sourceCommit':os.environ.get('GITHUB_SHA'),
               'generatedAt':datetime.now(timezone.utc).isoformat(),
-              'message':'Production byte parity passed, but both deterministic browser-render attempts failed on the no-cache Node QA server.'
+              'message':'Production byte parity passed, but both browser-render attempts failed on the deterministic QA server.'
           },indent=2)+'\n')
           PY
               echo "--- deterministic Node static-server diagnostics ---" >&2
@@ -204,7 +207,7 @@ jobs:
           data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
           data["sourceCommit"] = os.environ.get("GITHUB_SHA")
-          data["captureTransport"] = "deterministic no-cache Node localhost server from exact Pages checkout after production byte-parity verification"
+          data["captureTransport"] = "Playwright 1.63 on deterministic no-cache Node localhost server from exact Pages checkout after production byte-parity verification"
           data["deploymentParity"] = {
               "verified": True,
               "productionUrl": os.environ["FSA_LIVE_SOURCE_URL"],
@@ -216,7 +219,7 @@ jobs:
           PY
       - name: Upload live visual acceptance evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fsa-live-visual-acceptance-${{ github.sha }}
           path: artifacts/visual-acceptance/
