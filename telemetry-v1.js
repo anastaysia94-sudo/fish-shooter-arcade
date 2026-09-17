@@ -123,7 +123,7 @@ function install(){
     fire('slot_spin',{gameId:currentGameId(),room:null,payload:{slot_id:currentGameId(),result_class:resultClass}})
   });
   const sampleMs=LOW?30000:15000;
-  setInterval(()=>{if(!gameOpen())return;const sample=performancePayload();state.lastSample=sample;fire('performance_sample',{gameId:currentGameId(),room:currentRoom(),payload:sample)},sampleMs)};
+  setInterval(()=>{if(!gameOpen())return;const sample=performancePayload();state.lastSample=sample;fire('performance_sample',{gameId:currentGameId(),room:currentRoom(),payload:sample})},sampleMs);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&gameOpen()){const sample=performancePayload();state.lastSample=sample;fire('performance_sample',{gameId:currentGameId(),room:currentRoom(),payload:sample})}});
   addEventListener('pagehide',()=>{void endSession({keepalive:true})},{capture:true});
 }
