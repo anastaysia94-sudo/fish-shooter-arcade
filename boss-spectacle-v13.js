@@ -32,7 +32,7 @@ function updateCombo(){const n=Math.max(0,parseInt(combo.textContent,10)||0);if(
 function observe(node,fn){new MutationObserver(fn).observe(node,{subtree:true,childList:true,characterData:true,attributes:true})}
 observe(combo,updateCombo);observe(fever,updateFever);observe(bossText,parseBoss);
 canvas.addEventListener('pointerdown',e=>{V.shotIndex++;const colors=['#ff5a37','#38a9ff','#53f27a','#bc58ff'];kickSeat(0);beam(e.clientX,e.clientY,colors[V.shotIndex%colors.length]);if(V.combo>=4&&Math.random()<Math.min(.18,.03+V.combo*.004))crit(e.clientX,e.clientY,V.combo>=25?'LEGENDARY!':'CRITICAL!')},{passive:true});
-const feed=$('#liveFeed');if(feed)observe(feed,()=>{const first=feed.querySelector('.live-row'),text=(first?.textContent||'').trim();if(!text)return;if(/BOSS/i.test(text)){coinBurst(28);callout('BOSS BREAK','TREASURE EXPLOSION')}else if(/ELITE|downed/i.test(text)&&Date.now()-V.lastBurst>1200){V.lastBurst=Date.now();coinBurst(9)}});
+const feed=$('#liveFeed');if(feed)observe(feed,()=>{const first=feed.querySelector('.live-row');if(!first)return;const text=first.textContent||'';if(/BOSS/i.test(text)){coinBurst(28);callout('BOSS BREAK','TREASURE EXPLOSION')}else if(/ELITE|downed/i.test(text)&&Date.now()-V.lastBurst>1200){V.lastBurst=Date.now();coinBurst(9)}});
 const game=$('#game');if(game)observe(game,()=>{if(!game.classList.contains('on')){V.combo=0;V.armed.clear();$('.v13-boss-rage')?.classList.remove('on')}});
 function installLobbyRenderGovernor(){
   if(window.__FSA_LOBBY_RENDER_GOVERNOR__)return;
