@@ -1,0 +1,29 @@
+name: Validate F.S.A. RPC Security Hardening
+
+on:
+  pull_request:
+    paths:
+      - 'backend/supabase/migrations/**'
+      - 'tests/security-rpc-hardening-contract.mjs'
+      - '.github/workflows/security-rpc-hardening.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'backend/supabase/migrations/**'
+      - 'tests/security-rpc-hardening-contract.mjs'
+      - '.github/workflows/security-rpc-hardening.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate privileged RPC hardening contract
+        run: node tests/security-rpc-hardening-contract.mjs
