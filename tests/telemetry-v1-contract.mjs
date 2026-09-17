@@ -18,7 +18,7 @@ has(telemetry, /if\(!token\)\{state\.skipped\+\+;return null\}/, 'missing auth t
 has(telemetry, /sampleMs=LOW\?30000:15000/, 'Low-Data mode must halve telemetry sample frequency');
 has(telemetry, /wrap\('openGame'[\s\S]*?if\(!gameOpen\(\)\)return;[\s\S]*?fire\('game_open'/, 'denied game opens must not emit game_open telemetry');
 has(telemetry, /wrap\('openSlot'[\s\S]*?if\(!slotOpen\(\)\)return;[\s\S]*?fire\('slot_open'/, 'denied slot opens must not emit slot_open telemetry');
-has(telemetry, /setInterval\(\(\)=>\{[\s\S]*?fire\('performance_sample'[\s\S]*?\}\),sampleMs\);/, 'performance sampling must preserve the configured interval delay');
+has(telemetry, /setInterval\(\(\)=>\{[\s\S]*?fire\('performance_sample'[\s\S]*?\},sampleMs\);/, 'performance sampling must preserve the configured interval delay');
 
 // Only the narrow RPC surface may receive client telemetry.
 for (const rpc of ['fsa_rpc_telemetry_start', 'fsa_rpc_telemetry_event', 'fsa_rpc_telemetry_end']) {
