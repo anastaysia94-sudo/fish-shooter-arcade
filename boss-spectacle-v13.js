@@ -36,11 +36,18 @@ const feed=$('#liveFeed');if(feed)observe(feed,()=>{const first=feed.querySelect
 const game=$('#game');if(game)observe(game,()=>{if(!game.classList.contains('on')){V.combo=0;V.armed.clear();$('.v13-boss-rage')?.classList.remove('on')}});
 function installLobbyRenderGovernor(){
   if(window.__FSA_LOBBY_RENDER_GOVERNOR__)return;
-  const nativeRaf=window.requestAnimationFrame.bind(window),nativeCaf=window.cancelAnimationFrame.bind(window),jobs=new Map();let seq=0;
-  window.requestAnimationFrame=cb=>{const id=++seq,run=t=>{jobs.delete(id);cb(t)};if(game&&!game.classList.contains('on')){const timer=setTimeout(()=>{if(!jobs.has(id))return;const raf=nativeRaf(run);jobs.set(id,{raf})},250);jobs.set(id,{timer})}else{const raf=nativeRaf(run);jobs.set(id,{raf})}return id};
-  window.cancelAnimationFrame=id=>{const job=jobs.get(id);if(!job)return;if(job.timer)clearTimeout(job.timer);if(job.raf)nativeCaf(job.raf);jobs.delete(id)};
-  document.documentElement.dataset.renderGovernor='v1';
-  window.__FSA_LOBBY_RENDER_GOVERNOR__={version:'v1',idleDelayMs:250,status:()=>({active:!!game?.classList.contains('on'),pending:jobs.size})};
+  const nativeRaf=window.requestAnimationFrame.bind(window),nativeCaf=window.cancelAnimationFrame.bind(window),jobs=new Map(),denseNames=new Set(['drawAtmos','frame']);let seq=0;
+  window.requestAnimationFrame=cb=>{
+    if(!(game&&!game.classList.contains('on')&&denseNames.has(cb?.name)))return nativeRaf(cb);
+    const id=-(++seq),run=t=>{jobs.delete(id);cb(t)},timer=setTimeout(()=>{if(!jobs.has(id))return;const raf=nativeRaf(run);jobs.set(id,{raf})},250);
+    jobs.set(id,{timer});return id;
+  };
+  window.cancelAnimationFrame=id=>{
+    if(id>=0){nativeCaf(id);return}
+    const job=jobs.get(id);if(!job)return;if(job.timer)clearTimeout(job.timer);if(job.raf)nativeCaf(job.raf);jobs.delete(id);
+  };
+  document.documentElement.dataset.renderGovernor='v2';
+  window.__FSA_LOBBY_RENDER_GOVERNOR__={version:'v2',idleDelayMs:250,scopedCallbacks:[...denseNames],status:()=>({active:!!game?.classList.contains('on'),pending:jobs.size})};
 }
 function loadDenseVisualStack(){
   for(const href of ['dense-mode-v14.css','dense-mode-v14-overlay.css','dense-graphics-v15.css']){
@@ -57,5 +64,5 @@ function loadTelemetryV1(){
   const script=document.createElement('script');script.src='telemetry-v1.js';script.async=false;script.dataset.optional='analytics';document.body.appendChild(script);
 }
 mount();updateCombo();updateFever();parseBoss();installLobbyRenderGovernor();loadDenseVisualStack();loadTelemetryV1();
-window.__FSA_SPECTACLE_V13__={version:'v13',denseGraphics:'v15',telemetry:'v1',renderGovernor:'v1',state:()=>({...V,armed:[...V.armed]}),callout,coinBurst};
+window.__FSA_SPECTACLE_V13__={version:'v13',denseGraphics:'v15',telemetry:'v1',renderGovernor:'v2',state:()=>({...V,armed:[...V.armed]}),callout,coinBurst};
 })();
