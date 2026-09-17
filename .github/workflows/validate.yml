@@ -46,7 +46,11 @@ jobs:
           for p in ['public.fsa_distributors','distributor_id uuid','can_manage_agents','can_manage_users','schema_version=2']: assert p in schema,p
           for p in ['assert_operator_v2','session_distributor_id','FSA_DISTRIBUTOR_CREDIT_CEILING_EXCEEDED','FSA_AGENT_CREDIT_CEILING_EXCEEDED','fsa_rpc_update_distributor','fsa_rpc_reassign_agent','fsa_rpc_set_distributor_games','fsa_distributors_scope_read']: assert p in auth,p
           assert 'localStorage.setItem(' not in admin and 'SUPABASE_SERVICE_ROLE_KEY' not in admin
-          assert "Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')" in edge and "jwtPayload(token).aal !== 'aal2'" in edge
+          assert "Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')" in edge
+          assert re.search(r"jwtPayload\(token\)\.aal\s*!==\s*'aal2'",edge)
+          assert 'fsa_rpc_provision_distributor_operator' in edge and 'fsa_rpc_provision_agent_operator' in edge
+          assert 'fsa_service_create_network_player' in edge
+          assert not re.search(r"from\('fsa_(?:distributors|agents)'\)\.insert",edge)
           m=re.search(r"const CACHE='fsa-arcade-v(\d+)-",sw)
           assert m and int(m.group(1))>=13
           assert "/\\/admin\\/(?:app\\.js|styles\\.css|index\\.html)$/" in sw

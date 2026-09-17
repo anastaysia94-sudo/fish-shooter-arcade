@@ -26,11 +26,17 @@ assert(authority.includes("a.distributor_id=(select fsa_private.session_distribu
 
 assert(base.includes('fsa_credit_ledger_immutable')&&base.includes('fsa_audit_log_immutable'),'immutable v1 ledger/audit triggers must remain foundational');
 assert(edge.includes("Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')"),'Edge Function must keep service credential server-side');
-assert(edge.includes("jwtPayload(token).aal !== 'aal2'"),'provisioning must require MFA/AAL2');
-assert(edge.includes("action==='invite_distributor'")&&edge.includes("action==='invite_agent'"),'Distributor/Agent provisioning actions missing');
+assert(edge.includes("Deno.env.get('SUPABASE_ANON_KEY')"),'Edge Function must construct caller-scoped RPC client with anon key');
+assert(/jwtPayload\(token\)\.aal\s*!==\s*'aal2'/.test(edge),'provisioning must require MFA/AAL2');
+assert(edge.includes("action==='invite_distributor'")&&edge.includes("action==='invite_agent'")&&edge.includes("action==='invite_player'"),'Distributor/Agent/player provisioning actions missing');
 assert(edge.includes("operator.profile.role==='distributor'"),'Distributor-scoped Agent provisioning missing');
-assert(edge.includes('FSA_AGENT_CEILING_OUTSIDE_DISTRIBUTOR'),'Agent provisioning ceiling inheritance missing');
-assert(edge.includes('fsa_distributor_game_access'),'Agent provisioning game inheritance missing');
+assert(edge.includes('fsa_rpc_provision_distributor_operator'),'Distributor provisioning must use caller-scoped authority RPC');
+assert(edge.includes('fsa_rpc_provision_agent_operator'),'Agent provisioning must use caller-scoped authority RPC');
+assert(edge.includes('fsa_service_create_network_player'),'Player provisioning must use service-only network-player RPC');
+assert(edge.includes('ensureUnlinkedAuthUser'),'provisioning must reject already-linked Auth identities');
+assert(edge.includes("const ADMIN_ORIGIN = 'https://anastaysia94-sudo.github.io'"),'Founder Edge Function CORS must stay pinned to the production origin');
+assert(!/from\('fsa_distributors'\)\.insert/.test(edge),'Edge Function must not bypass Distributor authority RPC with direct service-role inserts');
+assert(!/from\('fsa_agents'\)\.insert/.test(edge),'Edge Function must not bypass Agent authority RPC with direct service-role inserts');
 assert(!js.includes('SUPABASE_SERVICE_ROLE_KEY'),'service-role credential reference must never appear in browser client');
 
 // Cache generations may advance for unrelated public-runtime releases. The hierarchy contract is
