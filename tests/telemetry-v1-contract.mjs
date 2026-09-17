@@ -16,6 +16,9 @@ has(sw, /telemetry-v1\.js/, 'service worker must cache/refresh telemetry-v1.js')
 has(telemetry, /window\.__FSA_TELEMETRY_V1__/, 'runtime must expose a diagnostics-only telemetry handle');
 has(telemetry, /if\(!token\)\{state\.skipped\+\+;return null\}/, 'missing auth token must skip rather than block gameplay');
 has(telemetry, /sampleMs=LOW\?30000:15000/, 'Low-Data mode must halve telemetry sample frequency');
+has(telemetry, /wrap\('openGame'[\s\S]*?if\(!gameOpen\(\)\)return;[\s\S]*?fire\('game_open'/, 'denied game opens must not emit game_open telemetry');
+has(telemetry, /wrap\('openSlot'[\s\S]*?if\(!slotOpen\(\)\)return;[\s\S]*?fire\('slot_open'/, 'denied slot opens must not emit slot_open telemetry');
+has(telemetry, /setInterval\(\(\)=>\{[\s\S]*?fire\('performance_sample'[\s\S]*?\}\),sampleMs\);/, 'performance sampling must preserve the configured interval delay');
 
 // Only the narrow RPC surface may receive client telemetry.
 for (const rpc of ['fsa_rpc_telemetry_start', 'fsa_rpc_telemetry_event', 'fsa_rpc_telemetry_end']) {
