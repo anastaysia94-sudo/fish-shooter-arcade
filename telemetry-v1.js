@@ -105,13 +105,17 @@ function wrap(name,before,after){
 function install(){
   if(window.__FSA_TELEMETRY_INSTALLED__)return;window.__FSA_TELEMETRY_INSTALLED__=true;
   wrap('openGame',()=>{openingGame=true},args=>{
-    openingGame=false;const i=Math.max(0,Math.min(FISH_IDS.length-1,Number(args[0])||0));state.mode='fish';state.gameId=FISH_IDS[i];state.room=currentRoom();fire('game_open',{gameId:state.gameId,room:state.room,payload:{client:clientKind(),low_data:LOW}})
+    openingGame=false;if(!gameOpen())return;
+    const i=Math.max(0,Math.min(FISH_IDS.length-1,Number(args[0])||0));state.mode='fish';state.gameId=FISH_IDS[i];state.room=currentRoom();fire('game_open',{gameId:state.gameId,room:state.room,payload:{client:clientKind(),low_data:LOW}})
   });
   wrap('closeGame',null,()=>{if(state.mode==='fish')fire('game_close',{gameId:state.gameId,room:state.room,payload:performancePayload()});state.mode=null});
   wrap('chooseRoom',null,args=>{state.room=Math.max(0,Math.min(2,Number(args[0])||0));if(!openingGame&&gameOpen())fire('room_change',{gameId:currentGameId(),room:state.room,payload:{}})});
   wrap('switchGun',null,args=>{if(gameOpen())fire('weapon_change',{gameId:currentGameId(),room:currentRoom(),payload:{gun:Math.max(0,Math.min(2,Number(args[0])||0))}})});
   wrap('power',args=>{if(gameOpen())fire('power_used',{gameId:currentGameId(),room:currentRoom(),payload:{power:String(args[0]||'').slice(0,32)}})});
-  wrap('openSlot',null,args=>{const i=Math.max(0,Math.min(SLOT_IDS.length-1,Number(args[0])||0));state.mode='slot';state.gameId=SLOT_IDS[i];state.room=null;fire('slot_open',{gameId:state.gameId,room:null,payload:{slot_id:state.gameId,client:clientKind(),low_data:LOW}})});
+  wrap('openSlot',null,args=>{
+    if(!slotOpen())return;
+    const i=Math.max(0,Math.min(SLOT_IDS.length-1,Number(args[0])||0));state.mode='slot';state.gameId=SLOT_IDS[i];state.room=null;fire('slot_open',{gameId:state.gameId,room:null,payload:{slot_id:state.gameId,client:clientKind(),low_data:LOW}})
+  });
   wrap('closeSlot',null,()=>{if(state.mode==='slot')fire('slot_close',{gameId:state.gameId,room:null,payload:{slot_id:state.gameId}});state.mode=null});
   wrap('spin',null,()=>{
     if(!slotOpen())return;const result=(document.getElementById('slotResult')?.textContent||'').toUpperCase();
@@ -119,7 +123,7 @@ function install(){
     fire('slot_spin',{gameId:currentGameId(),room:null,payload:{slot_id:currentGameId(),result_class:resultClass}})
   });
   const sampleMs=LOW?30000:15000;
-  setInterval(()=>{if(!gameOpen())return;const sample=performancePayload();state.lastSample=sample;fire('performance_sample',{gameId:currentGameId(),room:currentRoom(),payload:sample})},sampleMs);
+  setInterval(()=>{if(!gameOpen())return;const sample=performancePayload();state.lastSample=sample;fire('performance_sample',{gameId:currentGameId(),room:currentRoom(),payload:sample)},sampleMs)};
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&gameOpen()){const sample=performancePayload();state.lastSample=sample;fire('performance_sample',{gameId:currentGameId(),room:currentRoom(),payload:sample})}});
   addEventListener('pagehide',()=>{void endSession({keepalive:true})},{capture:true});
 }
