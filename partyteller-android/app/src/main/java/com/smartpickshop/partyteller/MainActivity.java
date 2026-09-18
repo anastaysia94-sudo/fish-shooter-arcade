@@ -293,6 +293,50 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void createZipBundle(File file, JSONObject payload) throws Exception {
+        try (ZipOutputStream z = new ZipOutputStream(new FileOutputStream(file))) {
+            zipEntry(z, "PartyTeller_Boss_Report.txt", payload.optString("reportText", ""));
+            JSONObject data = payload.optJSONObject("data");
+            zipEntry(z, "PartyTeller_Data.json", data == null ? "{}" : data.toString(2));
+
+            JSONArray receipts = payload.optJSONArray("receipts");
+            if (receipts != null) {
+                for (int i = 0; i < receipts.length(); i++) {
+                    JSONObject item = receipts.optJSONObject(i);
+                    if (item == null) continue;
+                    String dataUrl = item.optString("dataUrl", "");
+                    int comma = dataUrl.indexOf(',');
+                    if (comma < 0) continue;
+                    String header = dataUrl.substring(0, comma);
+                    String encoded = dataUrl.substring(comma + 1);
+                    byte[] bytes = Base64.decode(encoded, Base64.DEFAULT);
+                    String ext = header.contains("png") ? ".png" : ".jpg";
+                    z.putNextEntry(new ZipEntry(String.format(Locale.US, "receipts/Receipt_%03d%s", i + 1, ext)));
+                    z.write(bytes);
+                    z.closeEntry();
+                }
+            }
+
+            JSONArray photos = payload.optJSONArray("photos");
+            if (photos != null) {
+                for (int i = 0; i < photos.length(); i++) {
+                    JSONObject item = photos.optJSONObject(i);
+                    if (item == null) continue;
+                    String dataUrl = item.optString("dataUrl", "");
+                    int comma = dataUrl.indexOf(',');
+                    if (comma < 0) continue;
+                    String header = dataUrl.substring(0, comma);
+                    String encoded = dataUrl.substring(comma + 1);
+                    byte[] bytes = Base64.decode(encoded, Base64.DEFAULT);
+                    String ext = header.contains("png") ? ".png" : ".jpg";
+                    z.putNextEntry(new ZipEntry(String.format(Locale.US, "job_photos/Photo_%03d%s", i + 1, ext)));
+                    z.write(bytes);
+                    z.closeEntry();
+                }
+            }
+        }
+    }
+
     private void shareFile(File file, String mime, String title) throws Exception {
         Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
         Intent send = new Intent(Intent.ACTION_SEND);
@@ -343,6 +387,18 @@ public class MainActivity extends Activity {
                 shareFile(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PartyTeller Excel Work Log");
             } catch (Exception e) {
                 toast("Excel export could not be prepared. Your work is still saved.");
+            }
+        }
+
+        @JavascriptInterface public void exportZip(String payloadJson) {
+            try {
+                File dir = new File(getCacheDir(), "partyteller_share");
+                if (!dir.exists()) dir.mkdirs();
+                File file = new File(dir, "PartyTeller_Report_Package.zip");
+                createZipBundle(file, new JSONObject(payloadJson));
+                shareFile(file, "application/zip", "PartyTeller Report Package");
+            } catch (Exception e) {
+                toast("ZIP export could not be prepared. Your saved work was not deleted.");
             }
         }
 
