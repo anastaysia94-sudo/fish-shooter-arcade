@@ -64,19 +64,24 @@ async function forceBossIntoView(p){
 }
 async function waitForVisibleBoss(p){
   await forceBossIntoView(p);
-  await p.waitForFunction(()=>{
-    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
+  await p.waitForTimeout(350);
+  const state=await p.evaluate(()=>{
+    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss||null;
     const hud=(document.querySelector('#bossText')?.textContent||'').trim();
     const width=parseFloat(document.querySelector('#bossHP')?.style.width||'0');
     const radarBoss=document.querySelector('#radar .dot[data-kind="boss"]');
-    return !!boss&&boss.hp>0&&boss.x>140&&boss.x<1140&&boss.y>80&&boss.y<640&&/\d+\s*\/\s*\d+/.test(hud.replaceAll(',',''))&&Number.isFinite(width)&&width>0&&!!radarBoss;
-  },null,{timeout:10000,polling:100});
-  await p.waitForTimeout(300);
-  return p.evaluate(()=>{
-    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
     const dense=window.__FSA_DENSE_GRAPHICS_V15__?.status?.()||null;
-    return boss?{bossX:Number(boss.x),bossY:Number(boss.y),bossHp:Number(boss.hp),bossMaxHp:Number(boss.max),denseBossVisible:!!dense?.bossVisible,semanticRadarBoss:!!document.querySelector('#radar .dot[data-kind="boss"]')}:null;
+    return {
+      boss:boss?{x:Number(boss.x),y:Number(boss.y),hp:Number(boss.hp),max:Number(boss.max)}:null,
+      hud,
+      hpWidth:width,
+      semanticRadarBoss:!!radarBoss,
+      denseBossVisible:!!dense?.bossVisible
+    };
   });
+  const valid=!!state.boss&&state.boss.hp>0&&state.boss.x>140&&state.boss.x<1140&&state.boss.y>80&&state.boss.y<640&&/\d+\s*\/\s*\d+/.test(state.hud.replaceAll(',',''))&&Number.isFinite(state.hpWidth)&&state.hpWidth>0&&state.semanticRadarBoss;
+  if(!valid)throw new Error(`Boss visual state did not become valid: ${JSON.stringify(state)}`);
+  return {bossX:state.boss.x,bossY:state.boss.y,bossHp:state.boss.hp,bossMaxHp:state.boss.max,denseBossVisible:state.denseBossVisible,semanticRadarBoss:state.semanticRadarBoss};
 }
 async function visibleTargetCount(p){
   return p.evaluate(()=>{
