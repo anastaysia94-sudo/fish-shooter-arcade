@@ -1,0 +1,26 @@
+name: Build PartyTeller APK
+on:
+  push:
+    branches: [ partyteller-android ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: partyteller-android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - run: gradle assembleDebug
+      - run: cp app/build/outputs/apk/debug/app-debug.apk PartyTeller-Done-Boss.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PartyTeller-Done-Boss-APK
+          path: partyteller-android/PartyTeller-Done-Boss.apk
