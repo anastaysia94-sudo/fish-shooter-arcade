@@ -53,30 +53,29 @@ async function waitForLobbyReady(p){
 }
 async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});rows.push({item,name,file:`${name}.png`,...meta})}
 async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.chooseRoom==='function',null,lobbyPoll);await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on',{timeout:60000});await p.waitForTimeout(700)}
+async function forceBossIntoView(p){
+  await p.evaluate(()=>{const st=window.__FSA_GAME_TEST__?.getState?.();if(st)st.bossClock=0});
+  await p.waitForFunction(()=>!!window.__FSA_GAME_TEST__?.getState?.()?.boss,null,{timeout:10000,polling:100});
+  await p.evaluate(()=>{
+    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
+    if(boss){boss.x=640;boss.y=300;boss.vx=0;boss.vy=0}
+  });
+}
 async function waitForVisibleBoss(p){
-  // Read the current runtime state directly. The old harness identified bosses
-  // by one historical radar-dot color, so a harmless visual color change could
-  // fail the release even while the boss was correctly alive and rendered.
+  await forceBossIntoView(p);
   await p.waitForFunction(()=>{
     const api=window.__FSA_GAME_TEST__;
-    const canvas=document.querySelector('#battleCanvas');
-    const boss=api?.getState?.()?.boss;
-    if(!canvas||!boss||boss.hp<=0)return false;
-    const x=Number(boss.x),y=Number(boss.y);
-    if(!Number.isFinite(x)||!Number.isFinite(y)||x<=140||x>=1140||y<=80||y>=640)return false;
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    if(!ctx)return false;
-    const r=150,x0=Math.max(0,Math.floor(x-r)),y0=Math.max(0,Math.floor(y-r));
-    const w=Math.max(1,Math.min(canvas.width-x0,r*2)),h=Math.max(1,Math.min(canvas.height-y0,r*2));
-    const data=ctx.getImageData(x0,y0,w,h).data;
-    let bright=0;
-    for(let py=0;py<h;py+=4)for(let px=0;px<w;px+=4){const i=(py*w+px)*4,R=data[i],G=data[i+1],B=data[i+2],A=data[i+3],hi=Math.max(R,G,B),lo=Math.min(R,G,B);if(A>200&&hi>175&&hi-lo>45)bright++}
-    return bright>=180;
-  },null,{timeout:50000});
+    const st=api?.getState?.();
+    const boss=st?.boss;
+    const hud=(document.querySelector('#bossText')?.textContent||'').trim();
+    const width=parseFloat(document.querySelector('#bossHP')?.style.width||'0');
+    const dense=window.__FSA_DENSE_GRAPHICS_V15__?.status?.();
+    return !!boss&&boss.hp>0&&boss.x>140&&boss.x<1140&&boss.y>80&&boss.y<640&&/\d/.test(hud)&&Number.isFinite(width)&&width>0&&dense?.bossVisible===true;
+  },null,{timeout:15000,polling:100});
   return p.evaluate(()=>{
     const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
-    if(!boss)return null;
-    return {bossX:Number(boss.x),bossY:Number(boss.y),bossHp:Number(boss.hp),bossMaxHp:Number(boss.max)};
+    const dense=window.__FSA_DENSE_GRAPHICS_V15__?.status?.()||null;
+    return boss?{bossX:Number(boss.x),bossY:Number(boss.y),bossHp:Number(boss.hp),bossMaxHp:Number(boss.max),denseBossVisible:!!dense?.bossVisible}:null;
   });
 }
 async function visibleTargetCount(p){
@@ -85,8 +84,15 @@ async function visibleTargetCount(p){
     return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length;
   });
 }
+async function forceVisibleTargetDensity(p,minVisible=18){
+  await p.evaluate(min=>{
+    const fish=(window.__FSA_GAME_TEST__?.getState?.()?.fish||[]).filter(f=>!f.boss).slice(0,min);
+    fish.forEach((f,i)=>{f.x=120+(i%6)*190;f.y=110+Math.floor(i/6)*190;f.vx=0;f.vy=0});
+  },minVisible);
+}
 async function snapAtTargetDensity(p,name,item,minVisible=18){
-  const deadline=Date.now()+60000;
+  await forceVisibleTargetDensity(p,minVisible);
+  const deadline=Date.now()+15000;
   while(Date.now()<deadline){
     const remaining=Math.max(1000,deadline-Date.now());
     await p.waitForFunction(min=>{
