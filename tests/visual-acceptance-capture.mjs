@@ -54,15 +54,16 @@ async function waitForLobbyReady(p){
 async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});rows.push({item,name,file:`${name}.png`,...meta})}
 async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.chooseRoom==='function',null,lobbyPoll);await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on',{timeout:60000});await p.waitForTimeout(700)}
 async function waitForVisibleBoss(p){
+  // Read the current runtime state directly. The old harness identified bosses
+  // by one historical radar-dot color, so a harmless visual color change could
+  // fail the release even while the boss was correctly alive and rendered.
   await p.waitForFunction(()=>{
+    const api=window.__FSA_GAME_TEST__;
     const canvas=document.querySelector('#battleCanvas');
-    const dots=[...document.querySelectorAll('#radar .dot')];
-    if(!canvas||!dots.length)return false;
-    const boss=dots.find(d=>getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)');
-    if(!boss)return false;
-    const left=parseFloat(boss.style.left),top=parseFloat(boss.style.top);
-    if(!Number.isFinite(left)||!Number.isFinite(top)||left<=20||left>=72||top<=14||top>=86)return false;
-    const x=(left-8)/84*(canvas.width||1280),y=(top-8)/84*(canvas.height||720);
+    const boss=api?.getState?.()?.boss;
+    if(!canvas||!boss||boss.hp<=0)return false;
+    const x=Number(boss.x),y=Number(boss.y);
+    if(!Number.isFinite(x)||!Number.isFinite(y)||x<=140||x>=1140||y<=80||y>=640)return false;
     const ctx=canvas.getContext('2d',{willReadFrequently:true});
     if(!ctx)return false;
     const r=150,x0=Math.max(0,Math.floor(x-r)),y0=Math.max(0,Math.floor(y-r));
@@ -72,24 +73,26 @@ async function waitForVisibleBoss(p){
     for(let py=0;py<h;py+=4)for(let px=0;px<w;px+=4){const i=(py*w+px)*4,R=data[i],G=data[i+1],B=data[i+2],A=data[i+3],hi=Math.max(R,G,B),lo=Math.min(R,G,B);if(A>200&&hi>175&&hi-lo>45)bright++}
     return bright>=180;
   },null,{timeout:50000});
-  return p.evaluate(()=>{const boss=[...document.querySelectorAll('#radar .dot')].find(d=>getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)');return boss?{radarLeft:parseFloat(boss.style.left),radarTop:parseFloat(boss.style.top)}:null});
+  return p.evaluate(()=>{
+    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
+    if(!boss)return null;
+    return {bossX:Number(boss.x),bossY:Number(boss.y),bossHp:Number(boss.hp),bossMaxHp:Number(boss.max)};
+  });
 }
 async function visibleTargetCount(p){
-  return p.evaluate(()=>[...document.querySelectorAll('#radar .dot')].filter(d=>{
-    if(getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)')return false;
-    const left=parseFloat(d.style.left),top=parseFloat(d.style.top);
-    return Number.isFinite(left)&&Number.isFinite(top)&&left>10&&left<90&&top>10&&top<90;
-  }).length);
+  return p.evaluate(()=>{
+    const fish=window.__FSA_GAME_TEST__?.getState?.()?.fish||[];
+    return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length;
+  });
 }
 async function snapAtTargetDensity(p,name,item,minVisible=18){
   const deadline=Date.now()+60000;
   while(Date.now()<deadline){
     const remaining=Math.max(1000,deadline-Date.now());
-    await p.waitForFunction(min=>[...document.querySelectorAll('#radar .dot')].filter(d=>{
-      if(getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)')return false;
-      const left=parseFloat(d.style.left),top=parseFloat(d.style.top);
-      return Number.isFinite(left)&&Number.isFinite(top)&&left>10&&left<90&&top>10&&top<90;
-    }).length>=min,minVisible,{timeout:remaining});
+    await p.waitForFunction(min=>{
+      const fish=window.__FSA_GAME_TEST__?.getState?.()?.fish||[];
+      return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length>=min;
+    },minVisible,{timeout:remaining});
     const before=await visibleTargetCount(p);
     if(before<minVisible)continue;
     await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});
