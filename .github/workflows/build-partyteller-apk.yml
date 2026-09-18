@@ -19,8 +19,8 @@ jobs:
         with:
           gradle-version: '8.9'
       - run: gradle assembleDebug
-      - run: cp app/build/outputs/apk/debug/app-debug.apk "PTEDBoss.apk"
+      - run: cp app/build/outputs/apk/debug/app-debug.apk "PTEDBoss-NEON-FINAL.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: PTEDBoss-APK
-          path: partyteller-android/PTEDBoss.apk
+          name: PTEDBoss-NEON-FINAL-APK
+          path: partyteller-android/PTEDBoss-NEON-FINAL.apk
