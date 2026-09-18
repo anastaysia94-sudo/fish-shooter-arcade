@@ -1,4 +1,15 @@
 plugins { id 'com.android.application' }
-android { namespace 'com.smartpickshop.partyteller'; compileSdk 35
- defaultConfig { applicationId 'com.smartpickshop.partyteller'; minSdk 24; targetSdk 35; versionCode 752; versionName '1.0.752' }
+android {
+    namespace 'com.smartpickshop.partyteller'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.smartpickshop.partyteller'
+        minSdk 24
+        targetSdk 35
+        versionCode 752
+        versionName '1.0.752'
+    }
+}
+dependencies {
+    implementation 'androidx.core:core:1.15.0'
 }
