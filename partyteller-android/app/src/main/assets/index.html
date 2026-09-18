@@ -1,18 +1,289 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Party! Tell 'er done, boss! ✔️</title>
-<style>body{margin:0;background:#0d1117;color:#fff;font-family:Arial,sans-serif}header{padding:22px 18px;background:linear-gradient(135deg,#18121f,#101d2c);border-bottom:2px solid #ffd23f}h1{margin:0;color:#ff4fb8;font-size:25px}h1 span{color:#fff}.sub{color:#ffd23f;margin-top:7px}.wrap{padding:16px;max-width:760px;margin:auto}.calm{background:#17202b;border:1px solid #2d4057;border-radius:16px;padding:15px;margin-bottom:14px}.big{display:block;width:100%;box-sizing:border-box;padding:17px;margin:10px 0;border:0;border-radius:14px;font-size:18px;font-weight:bold}.work{background:#ff4fb8}.receipt{background:#ffd23f;color:#111}.boss{background:#34d399;color:#07130e}.card{background:#151b24;border-radius:14px;padding:14px;margin:12px 0}.small{color:#aeb9c8;font-size:14px}textarea,input,select{width:100%;box-sizing:border-box;padding:12px;margin:7px 0;border-radius:10px;border:1px solid #3b4757;background:#0e141c;color:#fff}.item{border-left:4px solid #36bffa;padding:9px 12px;margin:9px 0;background:#111923}.ok{color:#65e6a8}.hidden{display:none}button{cursor:pointer}</style></head>
-<body><header><h1>Party! <span>Tell 'er done, boss!</span> ✔️</h1><div class="sub">One thing at a time. The app keeps track of the pile.</div></header>
-<div class="wrap"><div class="calm"><b>Matt, you're good.</b><br><span class="small">You don't have to finish everything at once. Finish work → save it. Get a receipt → photograph it. Payday → make the boss copy.</span></div>
-<button class="big work" onclick="show('work')">🔧 I FINISHED SOMETHING</button><button class="big receipt" onclick="show('receipt')">🧾 I HAVE A RECEIPT</button><button class="big boss" onclick="show('report')">✔️ MAKE BOSS COPY</button>
-<div id="work" class="card hidden"><h3>Add work</h3><select id="store"><option>San Jose</option><option>Gilroy</option><option>San Lorenzo</option><option>ADU</option></select><textarea id="note" placeholder="Say it normally. Example: fixed cameras"></textarea><input id="result" placeholder="Result / why it mattered (optional)"><button class="big work" onclick="saveWork()">Save. Done for now ✔️</button><div id="saved" class="ok"></div></div>
-<div id="receipt" class="card hidden"><h3>Receipt</h3><input type="file" accept="image/*" capture="environment"><input id="vendor" placeholder="Store / vendor"><input id="amount" placeholder="Amount"><input id="purpose" placeholder="What was it for?"><button class="big receipt" onclick="saveReceipt()">Save receipt ✔️</button><div id="rsaved" class="ok"></div></div>
-<div id="report" class="card hidden"><h2>Boss Copy</h2><p class="small">Task/output documentation. No hours are being claimed here.</p><div id="history"></div><button class="big boss" onclick="window.print()">Print / Save PDF</button></div>
-<div class="card"><h3>San Jose • verified work record</h3><div id="seed"></div></div>
-<div class="card"><b>Helpful tools built in:</b><p class="small">Autosave • edit-friendly entries • original-note preservation • store switching • task status • priority • before/after photo attachment • receipt capture • expense purpose • reimbursement tracking • equipment notes • material notes • issue/blocker notes • next steps • launch checklist • boss preview • print/PDF • submission history • local backup • restore • privacy-minded local storage • optional notes • multi-store reporting.</p></div></div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Party! Tell 'er done, boss! ✔️ ✅️</title>
+<style>
+:root{--ink:#17212b;--muted:#637181;--blue:#1f5f8f;--blue2:#e9f2f8;--line:#d8e0e8;--card:#fff;--bg:#f5f7fa;--good:#157347;--warn:#9a6700;--bad:#b42318;--shadow:0 2px 10px rgba(25,45,65,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);font-size:16px}button,input,select,textarea{font:inherit}button{min-height:44px;cursor:pointer}.app{max-width:980px;margin:auto;padding:0 12px 80px}.top{position:sticky;top:0;z-index:9;background:rgba(245,247,250,.97);backdrop-filter:blur(8px);padding:12px 0 8px;border-bottom:1px solid var(--line)}.brand{display:flex;gap:10px;align-items:center}.logo{width:42px;height:42px;border-radius:12px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:900}.brand h1{font-size:18px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.tabs{display:flex;gap:7px;overflow:auto;padding:10px 0 2px}.tabs button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;color:var(--ink)}.tabs button.active{background:var(--blue);color:#fff;border-color:var(--blue)}.panel{display:none;padding-top:12px}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}h2{font-size:19px;margin:0 0 10px}h3{font-size:16px;margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.grid{display:grid;gap:10px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:680px){.g2,.g3{grid-template-columns:1fr}.app{padding-left:9px;padding-right:9px}}label{display:block;font-size:13px;font-weight:650;color:#344454}input,select,textarea{width:100%;margin-top:5px;border:1px solid #bcc8d3;border-radius:10px;background:#fff;color:var(--ink);padding:10px 11px;min-height:44px}textarea{min-height:92px;resize:vertical}.btn{border:0;border-radius:10px;padding:9px 13px;font-weight:750;background:var(--blue);color:#fff}.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.good{background:var(--good)}.btn.bad{background:#fff;color:var(--bad);border:1px solid #efc2bf}.btn.sm{min-height:36px;padding:6px 9px;font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:12px;background:#fff}.statrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}@media(max-width:680px){.statrow{grid-template-columns:repeat(2,minmax(0,1fr))}}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px}.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--muted)}.entry{border-left:4px solid var(--blue);padding-left:11px}.entrytop{display:flex;justify-content:space-between;gap:10px}.entry p{margin:5px 0 0;line-height:1.4}.chipbox{display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;min-height:38px;font-size:13px}.chip.sel{border-color:var(--blue);background:var(--blue2);color:#143c59}.notice{border-radius:10px;padding:10px 12px;background:#fff6dd;border:1px solid #ecd49c;font-size:13px}.success{background:#e9f7ef;border-color:#b8dfc6}.receipt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:8px;border-radius:10px}.receipt img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.receipt .grow{flex:1;min-width:0}.money{font-variant-numeric:tabular-nums}.report{background:#fff;border:1px solid var(--line);padding:22px;border-radius:10px;color:#111}.report h1{text-align:center;font-size:24px;margin:0}.report .sub{text-align:center;color:#555;margin:3px 0 18px}.report h2{color:#1f5f8f;margin-top:20px;border-bottom:1px solid #ccd6df;padding-bottom:4px}.report h3{margin-top:15px}.report ul{padding-left:21px}.report li{margin:5px 0}.report table{width:100%;border-collapse:collapse;font-size:13px}.report th,.report td{border:1px solid #cbd5df;padding:6px;text-align:left;vertical-align:top}.report th{background:#243447;color:white}.report .footnote{color:#666;font-size:11px;margin-top:20px}.report .receipt-note{padding:8px;background:#f4f6f8;border:1px solid #dce2e8;border-radius:8px}.empty{padding:18px;text-align:center;color:var(--muted)}.dangerText{color:var(--bad)}.tiny{font-size:11px}.nowrap{white-space:nowrap}.hr{height:1px;background:var(--line);margin:12px 0}.hide{display:none!important}@media print{body{background:#fff}.top,.no-print,#workPanel,#addPanel,#expensePanel,#settingsPanel{display:none!important}.app{max-width:none;padding:0}.panel{display:none!important}#reportPanel{display:block!important;padding:0}.report{border:0;padding:0;border-radius:0}.card{border:0;box-shadow:none;padding:0;margin:0}.report-actions{display:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand"><div class="logo">PT</div><div><h1>Party! Tell 'er done, boss! ✔️ ✅️</h1><p>One thing at a time: save the work, snap the receipt, make the boss copy.</p></div></div><div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:#e8fff2;color:#12643a;font-weight:800;font-size:13px">✔ 7:52 PM corrected build • San Jose camera/network/POS/audio sheet verified • ADU spelling verified</div>
+    <nav class="tabs" aria-label="App sections">
+      <button data-tab="workPanel" class="active">Work</button>
+      <button data-tab="addPanel">+ Add task</button>
+      <button data-tab="expensePanel">Receipts</button>
+      <button data-tab="reportPanel">Boss report</button>
+      <button data-tab="settingsPanel">Settings</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="workPanel" class="panel active">
+<div class="card" style="border:2px solid #9ad8ff;background:linear-gradient(180deg,#f7fcff,#fff)"><h2 style="margin-top:0">You only need 3 things</h2><p class="muted">Nothing has to be perfect on the first try. Saved work can be edited later.</p><div class="actions"><button class="btn" onclick="setTab('addPanel')">🔧 I finished something</button><button class="btn alt" onclick="setTab('expensePanel')">🧾 I have a receipt</button><button class="btn alt" onclick="setTab('reportPanel')">✔ Make Boss Copy</button></div><p style="margin-bottom:0"><b>Finish work → tell the app. Get receipt → photograph it. Payday → make the boss copy.</b></p></div>
+      <div id="stats" class="statrow"></div>
+      <div class="card">
+        <div class="grid g3">
+          <label>Store / location<select id="workStoreFilter"></select></label>
+          <label>Category<select id="workCatFilter"><option value="">All categories</option></select></label>
+          <label>Search<input id="workSearch" placeholder="camera, POS, wiring..."></label>
+        </div>
+      </div>
+      <div id="workList"></div>
+    </section>
+
+    <section id="addPanel" class="panel">
+      <div class="card">
+        <h2>Corporate Hieroglyphics task builder</h2>
+        <p class="muted">Write what actually happened. The app turns it into payroll-friendly language using the same rule as the reference: <b>action + thing/system + purpose/result</b>. Corporate America has apparently decided verbs need subtitles.</p>
+        <div class="grid g2">
+          <label>Store / location<select id="taskStore"></select></label>
+          <label>Category<select id="taskCategory"></select></label>
+        </div>
+        <div class="hr"></div>
+        <h3>Fast templates</h3>
+        <div id="quickTemplates" class="chipbox"></div>
+        <div class="hr"></div>
+        <label>Plain note<textarea id="plainTask" placeholder="Example: set up 2 registers, scanners and receipt printers"></textarea></label>
+        <div class="actions"><button class="btn alt" id="translateTask">Translate note</button></div>
+        <div class="grid g2" style="margin-top:10px">
+          <label>Purpose / result<select id="taskPurpose"><option>opening readiness</option><option>store operations</option><option>checkout readiness</option><option>network readiness</option><option>safety readiness</option><option>repair / restoration</option><option>testing / verification</option><option>vendor follow-up</option><option value="">No purpose phrase</option></select></label>
+          <label>Status<select id="taskStatus"><option>Completed</option><option>In progress</option><option>Tested</option><option>Issue identified</option><option>Pending vendor action</option><option>Follow-up required</option></select></label>
+        </div>
+        <label style="margin-top:10px">Boss-ready wording<textarea id="professionalTask" placeholder="Generated wording appears here. Edit it before saving if needed."></textarea></label>
+        <div class="actions"><button class="btn good" id="saveNewTask">Save task</button><button class="btn alt" id="clearTask">Clear</button></div>
+      </div>
+      <div class="card">
+        <h3>Useful categories</h3>
+        <div id="glossary"></div>
+      </div>
+    </section>
+
+    <section id="expensePanel" class="panel">
+      <div class="card">
+        <h2>Expenses + original receipts</h2>
+        <p class="muted"><b>Phone workflow:</b> tap Scan / attach original receipt, photograph the paper receipt, enter the expense details, and save. The original image stays attached to the expense and is included when you use <b>Send to boss</b>.</p>
+        <div class="grid g2">
+          <label>Date<input id="expenseDate" type="date"></label>
+          <label>Vendor / gas station<input id="expenseVendor" placeholder="Home Depot, Shell..."></label>
+          <label>Expense type<select id="expenseType"><option>Materials / supplies</option><option>Gas / fuel</option><option>Parking / toll</option><option>Equipment</option><option>Other job expense</option></select></label>
+          <label>Amount ($)<input id="expenseAmount" type="number" min="0" step="0.01" inputmode="decimal"></label>
+          <label>Gas price / gallon (optional)<input id="gasPrice" type="number" min="0" step="0.001" inputmode="decimal"></label>
+          <label>Gallons (optional)<input id="gallons" type="number" min="0" step="0.001" inputmode="decimal"></label>
+        </div>
+        <label style="margin-top:10px">Business purpose<input id="expensePurpose" placeholder="Cable/connectors for camera installation"></label>
+        <label style="margin-top:10px">Scan / attach original receipt<input id="receiptFiles" type="file" accept="image/*" capture="environment" multiple></label>
+        <div id="pendingReceipts" class="grid" style="margin-top:10px"></div>
+        <div class="actions"><button class="btn good" id="saveExpense">Save expense + receipt</button><button class="btn alt" id="resetExpense">Clear</button></div>
+      </div>
+      <div class="card"><div class="entrytop"><h2>Saved expenses</h2><b id="expenseTotal" class="money"></b></div><div id="expenseList"></div></div>
+    </section>
+
+    <section id="reportPanel" class="panel">
+      <div class="card report-actions no-print">
+        <h2>Ready for payroll</h2>
+        <p class="muted">This report is rebuilt from the current editable work log every time. No timecard math. No mystery handwriting archaeology.</p>
+        <div class="actions">
+          <button class="btn good" id="sendBoss">Send report + original receipts</button>
+          <button class="btn" id="printReport">Print / Save PDF</button>
+          <button class="btn alt" id="refreshReport">Refresh report</button>
+        </div>
+        <div id="shareNotice" class="notice success hide" style="margin-top:10px"></div>
+      </div>
+      <div id="bossReport" class="report"></div>
+    </section>
+
+    <section id="settingsPanel" class="panel">
+      <div class="card">
+        <h2>Submission settings</h2>
+        <div class="grid g2">
+          <label>Employee name<input id="settingName"></label>
+          <label>Boss email (optional)<input id="settingBossEmail" type="email" placeholder="boss@company.com"></label>
+          <label>Business name<input id="settingBusiness"></label>
+          <label>Reporting period<input id="settingPeriod" placeholder="Approx. 3-month pre-opening period"></label>
+        </div>
+        <div class="actions" style="margin-top:10px"><button class="btn good" id="saveSettings">Save settings</button></div>
+      </div>
+      <div class="card">
+        <h3>Locations</h3>
+        <p class="muted">Rename these if the handwritten notes used shorthand.</p>
+        <div id="locationEditor" class="grid"></div>
+        <div class="actions"><button class="btn alt" id="addLocation">+ Add location</button></div>
+      </div>
+      <div class="card">
+        <h3>Backup</h3>
+        <p class="muted">Data stays on this phone. Back it up before changing phones or clearing the app.</p>
+        <div class="actions"><button class="btn alt" id="shareBackup">Share backup file</button><button class="btn bad" id="resetAll">Reset app to imported source notes</button></div>
+      </div>
+    </section>
+  </main>
+</div>
 <script>
-const SJ=["Installed 13 fire extinguishers","Installed 13 3D fire-extinguisher signs","Troubleshot emergency battery-backup lighting","Replaced 5 emergency lights","Pulled 2 new wires for emergency-light installation","Removed 6 rear-area plugs per work log","Mounted NVR","Installed 10 cameras","Reconfigured 4 cameras","Ran and terminated CAT-5 to camera locations","Set up NVR recording","Installed audio receiver","Mounted 5 speakers and connected speaker wiring","Set up Wi-Fi audio receiver","Installed 4 access points with 4 cable runs, mounting and terminations","Terminated Ethernet for 2 POS terminals, back-office computer, label printer and office printer","Set up 2 POS computers with cash drawer, hand scanner, credit-card terminal/scanner and receipt printer","Set up back-office computer, scanner and label printer","Built and organized server rack","Set up 5G internet"];
-function show(id){['work','receipt','report'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id==='report')render()}
-function tasks(){return JSON.parse(localStorage.getItem('pt_tasks')||'[]')} function saveWork(){let a=tasks();a.push({store:store.value,note:note.value,result:result.value,date:new Date().toLocaleString()});localStorage.setItem('pt_tasks',JSON.stringify(a));saved.textContent="Saved ✔️ Nothing else required right now.";note.value='';result.value=''}
-function saveReceipt(){let a=JSON.parse(localStorage.getItem('pt_receipts')||'[]');a.push({vendor:vendor.value,amount:amount.value,purpose:purpose.value,date:new Date().toLocaleString()});localStorage.setItem('pt_receipts',JSON.stringify(a));rsaved.textContent="Receipt entry saved ✔️ You can come back later.";vendor.value=amount.value=purpose.value=''}
-function render(){history.innerHTML='<h3>San Jose</h3>'+SJ.map(x=>'<div class="item">'+x+'</div>').join('')+tasks().map(x=>'<div class="item"><b>'+x.store+':</b> '+x.note+(x.result?' • '+x.result:'')+'</div>').join('')}
-seed.innerHTML=SJ.map(x=>'<div class="item">'+x+'</div>').join('');
-</script></body></html>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const TODAY='2026-09-17';
+const STORE_KEY='pt_worklog_state_v752';
+const DB_NAME='PartyTellerReceipts';
+const DB_VERSION=1;
+let pendingReceiptData=[];
+let db=null;
+
+const glossary=[
+['Store opening preparation','Operational, physical, technical, merchandising, or administrative work needed before opening.'],
+['IT setup','Preparing computers, software, printers, networks, accessories, and business technology for use.'],
+['POS setup','Installing and preparing point-of-sale hardware/software, payment equipment, printers, and peripherals.'],
+['Network cabling','Installing, routing, or terminating Ethernet/CAT-5 between devices and network locations.'],
+['Network setup','Configuring routers, Wi-Fi, access points, Ethernet, internet service, and connected devices.'],
+['Camera system setup','Installing/preparing cameras, NVRs, monitors, network connections, or related hardware.'],
+['Surveillance configuration','Configuring cameras, NVR recording/storage, network settings, viewing access, or monitoring.'],
+['Technical troubleshooting','Identifying a technical/equipment problem and taking steps to correct or isolate it.'],
+['Equipment installation','Mounting, connecting, assembling, positioning, or preparing equipment for business use.'],
+['Cable management','Routing, organizing, securing, removing, labeling, or concealing cables for safety/maintenance.'],
+['Audio system setup','Installing or reconfiguring speakers, speaker wiring, receivers, and audio connectivity.'],
+['Safety equipment installation','Installing safety devices/equipment such as extinguishers, emergency lighting, or detectors.'],
+['Facility maintenance','Repairing, sealing, adjusting, replacing, or maintaining physical building components.'],
+['Vendor coordination','Communicating with an outside provider about installation conditions, requirements, access, or next steps.'],
+['Technical consultation','Discussing technical requirements, systems, installation methods, problems, or solutions.'],
+['Documentation','Recording work performed, systems, issues, results, instructions, or follow-up items.']
+];
+
+const defaults={
+settings:{employee:'Matthew',bossEmail:'',business:'PartyTeller',period:'Approx. 3-month pre-opening period through Sept. 17, 2026'},
+locations:['San Jose Store','Gilroy Store','San Lorenzo Store','ADU / Additional Documented Site'],
+tasks:[
+{store:'San Jose Store',cat:'Safety equipment installation',text:'Installed thirteen (13) fire extinguishers to support store safety readiness.',status:'Completed'},
+{store:'San Jose Store',cat:'Safety equipment installation',text:'Installed thirteen (13) 3D fire-extinguisher signs to identify safety-equipment locations.',status:'Completed'},
+{store:'San Jose Store',cat:'Technical troubleshooting',text:'Troubleshot emergency battery-backup lighting and identified units requiring replacement.',status:'Completed'},
+{store:'San Jose Store',cat:'Equipment installation',text:'Replaced five (5) emergency lights.',status:'Completed'},
+{store:'San Jose Store',cat:'Facility maintenance',text:'Pulled two (2) new wires for emergency-light installation.',status:'Completed'},
+{store:'San Jose Store',cat:'Facility maintenance',text:'Removed/deleted six (6) plugs at the rear area as documented in the original work log.',status:'Completed'},
+{store:'San Jose Store',cat:'Camera system setup',text:'Mounted the NVR for the camera/surveillance system.',status:'Completed'},
+{store:'San Jose Store',cat:'Surveillance configuration',text:'Set up the NVR for recording as documented on the San Jose camera-system work sheet.',status:'Completed'},
+
+{store:'Gilroy Store',cat:'IT setup',text:'Installed CounterPoint and other required software on the PartyTeller Gilroy laptop PC.',status:'Completed'},
+{store:'San Jose Store',cat:'Network cabling',text:'Pulled camera wire for ten (10) cameras and ran/terminated CAT-5 to camera locations.',status:'Completed'},
+{store:'San Jose Store',cat:'Camera system setup',text:'Installed ten (10) cameras; field notes also record reconfiguration of four (4) cameras during the build-out.',status:'Completed'},
+{store:'Gilroy Store',cat:'Surveillance configuration',text:'Configured eight (8) IP cameras and configured the NVR/recording system for surveillance operation.',status:'Completed'},
+{store:'Gilroy Store',cat:'IT setup',text:'Set up NVR, server rack, POS terminals/accessories, label printers, back-office computer, speakers, and Wi-Fi mouse.',status:'Completed'},
+{store:'San Jose Store',cat:'Network cabling',text:'Pulled four (4) CAT-5 runs for access points/access panels, mounted access points, and terminated cabling.',status:'Completed'},
+{store:'San Jose Store',cat:'Network cabling',text:'Pulled CAT-5/Ethernet for front POS, back-office computer, label printer, office printer, and related store devices.',status:'Completed'},
+{store:'San Jose Store',cat:'POS setup',text:'Set up two (2) POS computers/terminals and peripherals including cash drawer, hand scanner, credit-card scanner/terminal, and receipt printer.',status:'Completed'},
+{store:'San Jose Store',cat:'IT setup',text:'Set up back-office computer peripherals including scanner and label printer.',status:'Completed'},
+{store:'San Jose Store',cat:'IT setup',text:'Set up and built/organized the server rack.',status:'Completed'},
+{store:'Gilroy Store',cat:'Cable management',text:'Removed obsolete wiring from the server room and organized remaining infrastructure.',status:'Completed'},
+{store:'San Jose Store',cat:'Network setup',text:'Set up 5G internet/Wi-Fi connectivity for store operations.',status:'Completed'},
+{store:'San Jose Store',cat:'Audio system setup',text:'Mounted five (5) speakers, pulled and connected speaker wiring, and set up the audio/Wi-Fi receiver.',status:'Completed'},
+{store:'Gilroy Store',cat:'Audio system setup',text:'Installed/reconfigured wiring for ten (10) Bose ceiling speakers as documented in the later work activity log.',status:'Completed'},
+{store:'Gilroy Store',cat:'Equipment installation',text:'Installed latches and locks on three (3) panels.',status:'Completed'},
+{store:'Gilroy Store',cat:'Facility maintenance',text:'Changed the documented back-server-room door knob.',status:'Completed'},
+{store:'Gilroy Store',cat:'POS setup',text:'Installed the final credit-card terminal for checkout readiness.',status:'Completed'},
+
+{store:'San Lorenzo Store',cat:'Vendor coordination',text:'Met with the AT&T installer to assess fiber-optic internet installation conditions and site requirements.',status:'Completed'},
+{store:'San Lorenzo Store',cat:'Technical consultation',text:'Collaborated with the AT&T installer and gathered technical information about proposed internet-installation methods and next steps.',status:'Completed'},
+
+{store:'ADU / Additional Documented Site',cat:'Facility maintenance',text:'Replaced a plastic tub-spout pipe with a new copper pipe.',status:'Completed'},
+{store:'ADU / Additional Documented Site',cat:'Safety equipment installation',text:'Installed a smoke detector / carbon-monoxide detector.',status:'Completed'},
+{store:'ADU / Additional Documented Site',cat:'Facility maintenance',text:'Caulked around the tub housing.',status:'Completed'},
+{store:'ADU / Additional Documented Site',cat:'Facility maintenance',text:'Replaced two (2) stove-hood lightbulbs.',status:'Completed'},
+{store:'ADU / Additional Documented Site',cat:'Facility maintenance',text:'Replaced and programmed the outdoor lighting timer.',status:'Completed'},
+{store:'ADU / Additional Documented Site',cat:'Facility maintenance',text:'Caulked the bathroom outside-shower step.',status:'Completed'}
+].map((x,i)=>Object.assign({id:'seed_'+i,date:'',source:'Imported source notes'},x)),
+expenses:[]
+};
+
+function clone(x){return JSON.parse(JSON.stringify(x));}
+let state=loadState();
+function loadState(){try{const raw=localStorage.getItem(STORE_KEY);if(raw){const s=JSON.parse(raw);return Object.assign(clone(defaults),s,{settings:Object.assign({},defaults.settings,s.settings||{})});}}catch(e){}return clone(defaults);}
+function saveState(){localStorage.setItem(STORE_KEY,JSON.stringify(state));renderAll();}
+function uid(prefix){return prefix+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function money(n){return (Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD'});}
+function notify(msg){if(window.Android&&Android.toast)Android.toast(msg);else alert(msg);}
+function setTab(id){document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='reportPanel')renderReport();}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+
+function openDb(){return new Promise((res,rej)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('receipts'))d.createObjectStore('receipts',{keyPath:'id'});};req.onsuccess=e=>{db=e.target.result;res(db)};req.onerror=e=>rej(e.target.error);});}
+function dbPut(obj){return new Promise((res,rej)=>{const tx=db.transaction('receipts','readwrite');tx.objectStore('receipts').put(obj);tx.oncomplete=()=>res();tx.onerror=e=>rej(e.target.error);});}
+function dbGet(id){return new Promise((res,rej)=>{const r=db.transaction('receipts','readonly').objectStore('receipts').get(id);r.onsuccess=()=>res(r.result||null);r.onerror=e=>rej(e.target.error);});}
+function dbDelete(id){return new Promise((res,rej)=>{const tx=db.transaction('receipts','readwrite');tx.objectStore('receipts').delete(id);tx.oncomplete=()=>res();tx.onerror=e=>rej(e.target.error);});}
+function dbAll(){return new Promise((res,rej)=>{const r=db.transaction('receipts','readonly').objectStore('receipts').getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=e=>rej(e.target.error);});}
+
+function renderSelects(){
+ const locOpts=state.locations.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ ['taskStore'].forEach(id=>{const old=$(id).value;$(id).innerHTML=locOpts;if(state.locations.includes(old))$(id).value=old;});
+ const filterOld=$('workStoreFilter').value;$('workStoreFilter').innerHTML='<option value="">All locations</option>'+locOpts;if(state.locations.includes(filterOld))$('workStoreFilter').value=filterOld;
+ const cats=glossary.map(x=>x[0]); const catOpts=cats.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ const oldc=$('taskCategory').value;$('taskCategory').innerHTML=catOpts;if(cats.includes(oldc))$('taskCategory').value=oldc;
+ const oldf=$('workCatFilter').value;$('workCatFilter').innerHTML='<option value="">All categories</option>'+catOpts;if(cats.includes(oldf))$('workCatFilter').value=oldf;
+}
+
+function renderStats(){
+ const receiptCount=state.expenses.reduce((s,e)=>s+(e.receiptIds||[]).length,0);const total=state.expenses.reduce((s,e)=>s+Number(e.amount||0),0);const stores=new Set(state.tasks.map(t=>t.store)).size;
+ $('stats').innerHTML=`<div class="stat"><b>${state.tasks.length}</b><span>documented tasks</span></div><div class="stat"><b>${stores}</b><span>locations</span></div><div class="stat"><b>${receiptCount}</b><span>receipt scans</span></div><div class="stat"><b>${money(total)}</b><span>job expenses</span></div>`;
+}
+function renderWork(){
+ const sf=$('workStoreFilter').value,cf=$('workCatFilter').value,q=$('workSearch').value.toLowerCase().trim();
+ const list=state.tasks.filter(t=>(!sf||t.store===sf)&&(!cf||t.cat===cf)&&(!q||(`${t.text} ${t.cat} ${t.store}`.toLowerCase().includes(q))));
+ $('workList').innerHTML=list.length?list.map(t=>`<div class="card entry"><div class="entrytop"><div><span class="pill">${esc(t.store)}</span> <span class="pill">${esc(t.cat)}</span> <span class="pill">${esc(t.status)}</span></div><div class="actions"><button class="btn alt sm" data-edit="${esc(t.id)}">Edit</button><button class="btn bad sm" data-del="${esc(t.id)}">Delete</button></div></div><p>${esc(t.text)}</p>${t.source?`<div class="muted" style="margin-top:6px">Source: ${esc(t.source)}</div>`:''}</div>`).join(''):'<div class="card empty">No matching tasks.</div>';
+ document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editTask(b.dataset.edit));
+ document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteTask(b.dataset.del));
+}
+function editTask(id){const t=state.tasks.find(x=>x.id===id);if(!t)return;const text=prompt('Edit boss-ready task wording:',t.text);if(text===null)return;const trimmed=text.trim();if(!trimmed)return notify('Task wording cannot be blank.');t.text=trimmed;t.source='Edited in app';saveState();}
+function deleteTask(id){if(!confirm('Delete this task from the payroll report?'))return;state.tasks=state.tasks.filter(x=>x.id!==id);saveState();}
+
+const templates=[
+['POS setup','Set up POS computer/terminal and connected checkout peripherals.'],['POS setup','Installed/configured credit-card terminal for checkout readiness.'],
+['Camera system setup','Installed camera(s) and connected camera cabling.'],['Surveillance configuration','Configured NVR/camera recording and verified surveillance operation.'],
+['Network cabling','Pulled and terminated CAT-5/Ethernet cabling.'],['Network setup','Installed/configured Wi-Fi access point(s) and verified connectivity.'],
+['Audio system setup','Installed ceiling speaker(s), pulled speaker wiring, and connected audio receiver.'],['IT setup','Set up back-office computer, printer/scanner, and related peripherals.'],
+['IT setup','Set up/built server rack and connected store equipment.'],['Cable management','Removed obsolete wiring and organized remaining cabling.'],
+['Safety equipment installation','Installed safety equipment/signage for store readiness.'],['Technical troubleshooting','Troubleshot equipment/system issue and documented corrective action.'],
+['Vendor coordination','Met/coordinated with vendor regarding installation requirements and next steps.'],['Store opening preparation','Completed opening-readiness setup and verification work.']
+];
+function renderTemplates(){$('quickTemplates').innerHTML=templates.map((x,i)=>`<button class="chip" data-template="${i}">${esc(x[1])}</button>`).join('');document.querySelectorAll('[data-template]').forEach(b=>b.onclick=()=>{const x=templates[Number(b.dataset.template)];$('taskCategory').value=x[0];$('professionalTask').value=x[1];$('plainTask').value=x[1];});}
+function translateNote(){let raw=$('plainTask').value.trim();if(!raw)return notify('Type a plain note first.');const low=raw.toLowerCase();let cat=$('taskCategory').value;const rules=[[/\b(pos|register|cash drawer|credit card|receipt printer|checkout)\b/,'POS setup'],[/\b(camera|nvr|surveillance|recording)\b/,'Surveillance configuration'],[/\b(cat ?5|ethernet|cable|wire|terminated|termination)\b/,'Network cabling'],[/\b(wifi|wi-fi|access point|internet|router|5g)\b/,'Network setup'],[/\b(speaker|audio|receiver|bose)\b/,'Audio system setup'],[/\b(computer|laptop|printer|scanner|software|server rack)\b/,'IT setup'],[/\b(fire extinguisher|smoke detector|carbon|emergency light|safety)\b/,'Safety equipment installation'],[/\b(att|at&t|vendor|installer|fiber)\b/,'Vendor coordination'],[/\b(troubleshoot|diagnos|fix|problem|issue)\b/,'Technical troubleshooting']];for(const [re,c] of rules){if(re.test(low)){cat=c;break;}}$('taskCategory').value=cat;raw=raw[0].toUpperCase()+raw.slice(1);if(!/[.!?]$/.test(raw))raw+='.';const purpose=$('taskPurpose').value;let out=`${cat}: ${raw}`;if(purpose&&!raw.toLowerCase().includes(purpose.toLowerCase()))out=out.replace(/\.$/,'')+` for ${purpose}.`;$('professionalTask').value=out;}
+$('translateTask').onclick=translateNote;
+$('saveNewTask').onclick=()=>{const text=$('professionalTask').value.trim()||$('plainTask').value.trim();if(!text)return notify('Add task wording first.');state.tasks.unshift({id:uid('task'),store:$('taskStore').value,cat:$('taskCategory').value,text,status:$('taskStatus').value,date:TODAY,source:'Added in app'});saveState();$('plainTask').value='';$('professionalTask').value='';notify('Task saved.');setTab('workPanel');};
+$('clearTask').onclick=()=>{$('plainTask').value='';$('professionalTask').value='';};
+
+function renderGlossary(){$('glossary').innerHTML=glossary.map(x=>`<div style="margin:7px 0"><b>${esc(x[0])}</b><div class="muted">${esc(x[1])}</div></div>`).join('');}
+
+function resetExpenseForm(){pendingReceiptData=[];$('expenseVendor').value='';$('expenseAmount').value='';$('gasPrice').value='';$('gallons').value='';$('expensePurpose').value='';$('receiptFiles').value='';$('expenseDate').value=TODAY;renderPendingReceipts();}
+$('resetExpense').onclick=resetExpenseForm;
+$('receiptFiles').addEventListener('change',async e=>{const files=[...e.target.files];for(const f of files){if(!f.type.startsWith('image/'))continue;const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});pendingReceiptData.push({id:uid('receipt'),name:f.name||'receipt.jpg',type:f.type||'image/jpeg',dataUrl,added:TODAY});}renderPendingReceipts();});
+function renderPendingReceipts(){$('pendingReceipts').innerHTML=pendingReceiptData.map((r,i)=>`<div class="receipt"><img src="${r.dataUrl}" alt="Receipt preview"><div class="grow"><b>Original receipt ${i+1}</b><div class="muted">${esc(r.name)}</div></div><button class="btn bad sm" data-pr="${i}">Remove</button></div>`).join('');document.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{pendingReceiptData.splice(Number(b.dataset.pr),1);renderPendingReceipts();});}
+$('saveExpense').onclick=async()=>{const amount=Number($('expenseAmount').value||0);if(amount<0)return notify("That amount doesn't look right yet. Nothing was lost. Check the amount and save again.");if(!$('expenseVendor').value.trim()&&!$('expensePurpose').value.trim())return notify("You're good. Add either the store/vendor or what the purchase was for, then save.");for(const r of pendingReceiptData)await dbPut(r);state.expenses.unshift({id:uid('exp'),date:$('expenseDate').value||TODAY,vendor:$('expenseVendor').value.trim(),type:$('expenseType').value,amount,gasPrice:Number($('gasPrice').value||0),gallons:Number($('gallons').value||0),purpose:$('expensePurpose').value.trim(),receiptIds:pendingReceiptData.map(x=>x.id)});saveState();resetExpenseForm();notify('Expense and receipt saved.');};
+async function renderExpenses(){const total=state.expenses.reduce((s,e)=>s+Number(e.amount||0),0);$('expenseTotal').textContent=money(total);if(!state.expenses.length){$('expenseList').innerHTML='<div class="empty">No expenses saved yet.</div>';return;}$('expenseList').innerHTML=state.expenses.map(e=>`<div class="entry" style="padding-top:8px;padding-bottom:8px"><div class="entrytop"><div><b>${esc(e.vendor||e.type)}</b><div class="muted">${esc(e.date)} • ${esc(e.type)} • ${(e.receiptIds||[]).length} receipt(s)</div></div><b class="money">${money(e.amount)}</b></div><p>${esc(e.purpose||'No business-purpose note entered.')}</p>${e.gasPrice?`<div class="muted">Gas price: ${money(e.gasPrice)}/gal${e.gallons?` • ${e.gallons.toFixed(3)} gal`:''}</div>`:''}<div class="actions" style="margin-top:7px"><button class="btn alt sm" data-viewexp="${esc(e.id)}">View receipts</button><button class="btn alt sm" data-editexp="${esc(e.id)}">Edit</button><button class="btn bad sm" data-delexp="${esc(e.id)}">Delete</button></div><div id="receipt_${esc(e.id)}"></div></div>`).join('');document.querySelectorAll('[data-viewexp]').forEach(b=>b.onclick=()=>viewExpenseReceipts(b.dataset.viewexp));document.querySelectorAll('[data-editexp]').forEach(b=>b.onclick=()=>editExpense(b.dataset.editexp));document.querySelectorAll('[data-delexp]').forEach(b=>b.onclick=()=>deleteExpense(b.dataset.delexp));}
+async function viewExpenseReceipts(id){const e=state.expenses.find(x=>x.id===id);if(!e)return;const wrap=$('receipt_'+id);if(wrap.innerHTML){wrap.innerHTML='';return;}const rs=[];for(const rid of (e.receiptIds||[])){const r=await dbGet(rid);if(r)rs.push(r);}wrap.innerHTML=rs.length?rs.map(r=>`<div class="receipt" style="margin-top:7px"><img src="${r.dataUrl}" alt="Original receipt"><div class="grow"><b>Original receipt image</b><div class="muted">${esc(r.name)}</div></div><a class="btn alt sm" href="${r.dataUrl}" target="_blank">Open</a></div>`).join(''):'<div class="muted" style="margin-top:7px">No receipt image stored.</div>';}
+function editExpense(id){const e=state.expenses.find(x=>x.id===id);if(!e)return;const v=prompt('Edit expense amount:',String(e.amount||0));if(v===null)return;const n=Number(v);if(!Number.isFinite(n)||n<0)return notify('Enter a valid amount.');const p=prompt('Edit business purpose:',e.purpose||'');if(p===null)return;e.amount=n;e.purpose=p.trim();saveState();}
+async function deleteExpense(id){if(!confirm('Delete this expense and its stored receipt images?'))return;const e=state.expenses.find(x=>x.id===id);if(e)for(const rid of (e.receiptIds||[]))await dbDelete(rid);state.expenses=state.expenses.filter(x=>x.id!==id);saveState();}
+
+function categorySummary(){const preferred=['POS setup','Camera system setup','Surveillance configuration','Network cabling','Network setup','IT setup','Audio system setup','Safety equipment installation','Facility maintenance','Vendor coordination','Technical consultation','Technical troubleshooting','Cable management','Equipment installation'];const have=new Set(state.tasks.map(t=>t.cat));return preferred.filter(x=>have.has(x));}
+function buildReportText(){const s=state.settings;let out=`${s.business.toUpperCase()}\nSALARY WORK ACTIVITY & EXPENSE SUBMISSION\nEmployee: ${s.employee}\nReporting period: ${s.period}\nTime reporting: Not included - task/output documentation only\n\nMANAGER SUMMARY\n`;out+=`During the reporting period, ${s.employee} performed multi-location pre-opening and operational-readiness work across ${new Set(state.tasks.map(t=>t.store)).size} documented locations. Work included ${categorySummary().join(', ')}.\n\n`;for(const loc of state.locations){const ts=state.tasks.filter(t=>t.store===loc);if(!ts.length)continue;out+=loc.toUpperCase()+`\n`;ts.forEach(t=>out+=`- ${t.cat}: ${t.text} [${t.status}]\n`);out+='\n';}const total=state.expenses.reduce((a,e)=>a+Number(e.amount||0),0);out+=`EXPENSES & ORIGINAL RECEIPTS\nTotal documented expenses: ${money(total)}\n`;if(state.expenses.length)state.expenses.forEach(e=>out+=`- ${e.date} | ${e.vendor||e.type} | ${e.type} | ${money(e.amount)} | ${e.purpose||''} | ${(e.receiptIds||[]).length} original receipt(s)\n`);else out+='- No expenses entered in the app for this submission.\n';out+='\nPAYROLL SUBMISSION STATEMENT\nThis report documents completed work and work outputs, not hourly timekeeping. Original receipt image copies are attached when present.\n';return out;}
+function renderReport(){const s=state.settings;const cats=categorySummary();const total=state.expenses.reduce((a,e)=>a+Number(e.amount||0),0);const receiptCount=state.expenses.reduce((a,e)=>a+(e.receiptIds||[]).length,0);let html=`<h1>${esc(s.business)}</h1><div class="sub">Salary Work Activity & Expense Submission</div><table><tr><th>Employee</th><td>${esc(s.employee)}</td><th>Reporting period</th><td>${esc(s.period)}</td></tr><tr><th>Submission</th><td>Salary payroll work-activity documentation</td><th>Time reporting</th><td>Not included - task/output documentation only</td></tr></table><h2>Manager Summary</h2><p>During the reporting period, ${esc(s.employee)} performed multi-location pre-opening and operational-readiness work across <b>${new Set(state.tasks.map(t=>t.store)).size} documented locations</b>. The documented scope includes ${esc(cats.join(', '))}. Work entries are written as action + system/object + business purpose/result so completed work can be reviewed quickly.</p><ul><li><b>${state.tasks.length}</b> documented work items</li><li><b>${state.locations.filter(l=>state.tasks.some(t=>t.store===l)).length}</b> active documented locations</li><li><b>${money(total)}</b> documented job expenses</li><li><b>${receiptCount}</b> original receipt image(s) attached in the app</li></ul>`;
+ for(const loc of state.locations){const ts=state.tasks.filter(t=>t.store===loc);if(!ts.length)continue;html+=`<h2>${esc(loc)}</h2><table><tr><th style="width:26%">Work category</th><th>Completed work / business result</th><th style="width:14%">Status</th></tr>`+ts.map(t=>`<tr><td><b>${esc(t.cat)}</b></td><td>${esc(t.text)}</td><td>${esc(t.status)}</td></tr>`).join('')+'</table>';}
+ html+=`<h2>Expense & Original Receipt Documentation</h2>`;if(state.expenses.length){html+=`<table><tr><th>Date</th><th>Vendor / station</th><th>Business purpose</th><th>Amount</th><th>Gas price</th><th>Original receipts</th></tr>`+state.expenses.map(e=>`<tr><td>${esc(e.date)}</td><td>${esc(e.vendor||e.type)}</td><td>${esc(e.purpose||'')}</td><td>${money(e.amount)}</td><td>${e.gasPrice?money(e.gasPrice)+'/gal':''}</td><td>${(e.receiptIds||[]).length}</td></tr>`).join('')+`<tr><td colspan="3"><b>Total</b></td><td><b>${money(total)}</b></td><td></td><td><b>${receiptCount}</b></td></tr></table><p class="receipt-note">When sent from the app, the original receipt image files are included with this report so the payroll reviewer can open them directly.</p>`;}else{html+=`<p class="receipt-note">No expense or receipt records are entered for this submission. No amounts have been invented.</p>`;}
+ html+=`<h2>Payroll Submission Statement</h2><p><b>This report documents completed work and work outputs, not hourly timekeeping.</b> It consolidates the editable work log into a manager-readable record for salary payroll review. Future submissions can be generated from the same app without rewriting the entire work history.</p><div class="footnote">Imported source basis: Matthew's Work Activity Log; Payroll Work Activity Log / Corporate Hieroglyphics; 3rd Week of September 2026 Work Activity Log; Corporate Hieroglyphics glossary; and two handwritten field-note photographs supplied for the initial import.</div>`;$('bossReport').innerHTML=html;}
+$('refreshReport').onclick=renderReport;
+$('printReport').onclick=()=>{renderReport();if(window.Android&&Android.printReport)Android.printReport();else window.print();};
+$('sendBoss').onclick=async()=>{renderReport();const receipts=[];const all=await dbAll();const used=new Set(state.expenses.flatMap(e=>e.receiptIds||[]));for(const r of all)if(used.has(r.id))receipts.push({name:r.name,type:r.type,dataUrl:r.dataUrl});const subject=`${state.settings.business} - ${state.settings.employee} - Salary Work Activity & Expense Submission`;if(window.Android&&Android.shareReport){Android.shareReport(subject,buildReportText(),state.settings.bossEmail||'',JSON.stringify(receipts));$('shareNotice').textContent=`Prepared report plus ${receipts.length} original receipt image(s) for the Android share screen.`;$('shareNotice').classList.remove('hide');}else{notify('Android sharing is available in the installed APK.');}};
+
+function renderSettings(){const s=state.settings;$('settingName').value=s.employee;$('settingBossEmail').value=s.bossEmail;$('settingBusiness').value=s.business;$('settingPeriod').value=s.period;$('locationEditor').innerHTML=state.locations.map((l,i)=>`<div class="grid g2"><label>Location ${i+1}<input data-loc="${i}" value="${esc(l)}"></label><div class="actions" style="align-items:end"><button class="btn bad sm" data-rmloc="${i}">Remove</button></div></div>`).join('');document.querySelectorAll('[data-loc]').forEach(inp=>inp.onchange=()=>{const i=Number(inp.dataset.loc),old=state.locations[i],nu=inp.value.trim()||old;state.locations[i]=nu;state.tasks.forEach(t=>{if(t.store===old)t.store=nu});saveState();});document.querySelectorAll('[data-rmloc]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.rmloc),name=state.locations[i];if(state.tasks.some(t=>t.store===name))return notify('Move or delete tasks from this location before removing it.');state.locations.splice(i,1);saveState();});}
+$('saveSettings').onclick=()=>{state.settings.employee=$('settingName').value.trim()||'Matthew';state.settings.bossEmail=$('settingBossEmail').value.trim();state.settings.business=$('settingBusiness').value.trim()||'PartyTeller';state.settings.period=$('settingPeriod').value.trim()||'Current payroll submission';saveState();notify('Settings saved.');};
+$('addLocation').onclick=()=>{const n=prompt('New store / location name:');if(n&&n.trim()){state.locations.push(n.trim());saveState();}};
+$('shareBackup').onclick=async()=>{const receipts=await dbAll();const payload=JSON.stringify({version:1,exported:new Date().toISOString(),state,receipts},null,2);if(window.Android&&Android.shareBackup)Android.shareBackup(payload);else{const blob=new Blob([payload],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PartyTeller_WorkLog_Backup.json';a.click();}};
+$('resetAll').onclick=async()=>{if(!confirm('This puts the app back to the original imported notes and removes later edits/receipts. Nothing happens unless you confirm. Continue?'))return;for(const r of await dbAll())await dbDelete(r.id);state=clone(defaults);localStorage.setItem(STORE_KEY,JSON.stringify(state));renderAll();notify('App reset to imported source notes.');};
+
+function renderAll(){renderSelects();renderStats();renderWork();renderTemplates();renderGlossary();renderExpenses();renderReport();renderSettings();}
+['workStoreFilter','workCatFilter'].forEach(id=>$(id).addEventListener('change',renderWork));$('workSearch').addEventListener('input',renderWork);
+$('expenseDate').value=TODAY;
+openDb().then(()=>renderAll()).catch(e=>{console.error(e);renderAll();notify('Receipt storage could not be opened. Work log is still usable.');});
+})();
+</script>
+</body>
+</html>
