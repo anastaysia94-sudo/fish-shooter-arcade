@@ -3,11 +3,11 @@ android {
     namespace 'com.smartpickshop.partyteller'
     compileSdk 35
     defaultConfig {
-        applicationId 'com.smartpickshop.partyteller'
+        applicationId 'com.smartpickshop.ptedboss'
         minSdk 24
         targetSdk 35
-        versionCode 1001
-        versionName '1.0.1001'
+        versionCode 2001
+        versionName '2.0.1'
     }
 }
 configurations.configureEach {
