@@ -53,43 +53,60 @@ async function waitForLobbyReady(p){
 }
 async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});rows.push({item,name,file:`${name}.png`,...meta})}
 async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.chooseRoom==='function',null,lobbyPoll);await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on',{timeout:60000});await p.waitForTimeout(700)}
+async function forceBossIntoView(p){
+  const spawned=await p.evaluate(()=>{
+    const api=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__);
+    if(typeof api?.spawnBossForTest!=='function')return null;
+    const boss=api.spawnBossForTest();
+    return boss?{x:Number(boss.x),y:Number(boss.y),hp:Number(boss.hp),max:Number(boss.max)}:null;
+  });
+  if(!spawned)throw new Error('Current runtime did not expose or create the deterministic QA boss');
+}
 async function waitForVisibleBoss(p){
-  await p.waitForFunction(()=>{
-    const canvas=document.querySelector('#battleCanvas');
-    const dots=[...document.querySelectorAll('#radar .dot')];
-    if(!canvas||!dots.length)return false;
-    const boss=dots.find(d=>getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)');
-    if(!boss)return false;
-    const left=parseFloat(boss.style.left),top=parseFloat(boss.style.top);
-    if(!Number.isFinite(left)||!Number.isFinite(top)||left<=20||left>=72||top<=14||top>=86)return false;
-    const x=(left-8)/84*(canvas.width||1280),y=(top-8)/84*(canvas.height||720);
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    if(!ctx)return false;
-    const r=150,x0=Math.max(0,Math.floor(x-r)),y0=Math.max(0,Math.floor(y-r));
-    const w=Math.max(1,Math.min(canvas.width-x0,r*2)),h=Math.max(1,Math.min(canvas.height-y0,r*2));
-    const data=ctx.getImageData(x0,y0,w,h).data;
-    let bright=0;
-    for(let py=0;py<h;py+=4)for(let px=0;px<w;px+=4){const i=(py*w+px)*4,R=data[i],G=data[i+1],B=data[i+2],A=data[i+3],hi=Math.max(R,G,B),lo=Math.min(R,G,B);if(A>200&&hi>175&&hi-lo>45)bright++}
-    return bright>=180;
-  },null,{timeout:50000});
-  return p.evaluate(()=>{const boss=[...document.querySelectorAll('#radar .dot')].find(d=>getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)');return boss?{radarLeft:parseFloat(boss.style.left),radarTop:parseFloat(boss.style.top)}:null});
+  await forceBossIntoView(p);
+  await p.waitForTimeout(350);
+  const state=await p.evaluate(()=>{
+    const boss=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__)?.getState?.()?.boss||null;
+    const hud=(document.querySelector('#bossText')?.textContent||'').trim();
+    const width=parseFloat(document.querySelector('#bossHP')?.style.width||'0');
+    const radarBoss=document.querySelector('#radar .dot[data-kind="boss"]');
+    const dense=window.__FSA_DENSE_GRAPHICS_V15__?.status?.()||null;
+    return {
+      boss:boss?{x:Number(boss.x),y:Number(boss.y),hp:Number(boss.hp),max:Number(boss.max)}:null,
+      hud,
+      hpWidth:width,
+      semanticRadarBoss:!!radarBoss,
+      denseBossVisible:!!dense?.bossVisible
+    };
+  });
+  const valid=!!state.boss&&state.boss.hp>0&&state.boss.x>140&&state.boss.x<1140&&state.boss.y>80&&state.boss.y<640&&/\d+\s*\/\s*\d+/.test(state.hud.replaceAll(',',''))&&Number.isFinite(state.hpWidth)&&state.hpWidth>0&&state.semanticRadarBoss;
+  if(!valid)throw new Error(`Boss visual state did not become valid: ${JSON.stringify(state)}`);
+  return {bossX:state.boss.x,bossY:state.boss.y,bossHp:state.boss.hp,bossMaxHp:state.boss.max,denseBossVisible:state.denseBossVisible,semanticRadarBoss:state.semanticRadarBoss};
 }
 async function visibleTargetCount(p){
-  return p.evaluate(()=>[...document.querySelectorAll('#radar .dot')].filter(d=>{
-    if(getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)')return false;
-    const left=parseFloat(d.style.left),top=parseFloat(d.style.top);
-    return Number.isFinite(left)&&Number.isFinite(top)&&left>10&&left<90&&top>10&&top<90;
-  }).length);
+  return p.evaluate(()=>{
+    const fish=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__)?.getState?.()?.fish||[];
+    return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length;
+  });
+}
+async function forceVisibleTargetDensity(p,minVisible=18){
+  await p.evaluate(min=>{
+    const api=window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__;
+    if(typeof api?.forceVisibleTargetsForTest==='function')return api.forceVisibleTargetsForTest(min);
+    const fish=(api?.getState?.()?.fish||[]).filter(f=>!f.boss).slice(0,min);
+    fish.forEach((f,i)=>{f.x=120+(i%6)*190;f.y=110+Math.floor(i/6)*190;f.vx=0;f.vy=0});
+    return fish.length;
+  },minVisible);
 }
 async function snapAtTargetDensity(p,name,item,minVisible=18){
-  const deadline=Date.now()+60000;
+  await forceVisibleTargetDensity(p,minVisible);
+  const deadline=Date.now()+15000;
   while(Date.now()<deadline){
     const remaining=Math.max(1000,deadline-Date.now());
-    await p.waitForFunction(min=>[...document.querySelectorAll('#radar .dot')].filter(d=>{
-      if(getComputedStyle(d).backgroundColor==='rgb(255, 64, 88)')return false;
-      const left=parseFloat(d.style.left),top=parseFloat(d.style.top);
-      return Number.isFinite(left)&&Number.isFinite(top)&&left>10&&left<90&&top>10&&top<90;
-    }).length>=min,minVisible,{timeout:remaining});
+    await p.waitForFunction(min=>{
+      const fish=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__)?.getState?.()?.fish||[];
+      return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length>=min;
+    },minVisible,{timeout:remaining});
     const before=await visibleTargetCount(p);
     if(before<minVisible)continue;
     await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});

@@ -72,4 +72,8 @@ assert(dense.includes("local.mode==='extreme'?10:local.mode==='dense'?6:2.5"),'D
 assert(!/fetch\s*\(/.test(dense),'dense v14 runtime must remain local-first without fetch');
 assert(!dense.includes('Fire Kirin'),'dense runtime must remain original and not embed competitor branding');
 
+assert(js.includes("d.dataset.kind=f.boss?'boss':f.hard?'hard':'fish'"),'V12 radar dots must expose semantic boss/hard/fish labels');
+assert(js.includes('__FSA_INTENSITY_V12_TEST__'),'V12 must expose deterministic visual-QA state hooks');
+assert(js.includes('spawnBossForTest'),'V12 visual QA must be able to trigger the real boss path deterministically');
+assert(js.includes('forceVisibleTargetsForTest'),'V12 visual QA must be able to stage a deterministic crowded table');
 console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS cinematic_v13=PASS dense_v14_1=PASS');

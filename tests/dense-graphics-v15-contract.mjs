@@ -31,4 +31,7 @@ assert(sw.includes("fsa-arcade-v24-dense-v15-telemetry-20260916"),'V15 + telemet
 assert(sw.includes('./telemetry-v1.js')&&sw.includes('telemetry-v1\\.js'),'V15 cache generation must preserve telemetry runtime caching and refresh');
 assert(spectacle.includes('telemetry-v1.js'),'V15 spectacle loader must preserve telemetry v1 attachment');
 
+
+if(!js.includes("Array.from(document.querySelectorAll('#radar .dot'))")) fail('Dense Graphics must iterate the full radar-dot collection explicitly.');
+if(!/dataset\.kind/.test(js)||!/kind==='boss'/.test(js)||!/kind==='hard'/.test(js)) fail('Dense Graphics must classify radar targets by semantic data-kind, not historical colors.');
 console.log('FSA_DENSE_GRAPHICS_V15_CONTRACT=PASS targets=live boss=phased impacts=weapon-specific coins=magnetic schools=5 environment=procedural telemetry=preserved lite=preserved');
