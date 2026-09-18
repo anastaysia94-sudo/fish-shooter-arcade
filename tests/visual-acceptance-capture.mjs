@@ -55,7 +55,7 @@ async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`$
 async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.chooseRoom==='function',null,lobbyPoll);await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on',{timeout:60000});await p.waitForTimeout(700)}
 async function forceBossIntoView(p){
   const spawned=await p.evaluate(()=>{
-    const api=window.__FSA_GAME_TEST__;
+    const api=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__);
     if(typeof api?.spawnBossForTest!=='function')return null;
     const boss=api.spawnBossForTest();
     return boss?{x:Number(boss.x),y:Number(boss.y),hp:Number(boss.hp),max:Number(boss.max)}:null;
@@ -66,7 +66,7 @@ async function waitForVisibleBoss(p){
   await forceBossIntoView(p);
   await p.waitForTimeout(350);
   const state=await p.evaluate(()=>{
-    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss||null;
+    const boss=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__)?.getState?.()?.boss||null;
     const hud=(document.querySelector('#bossText')?.textContent||'').trim();
     const width=parseFloat(document.querySelector('#bossHP')?.style.width||'0');
     const radarBoss=document.querySelector('#radar .dot[data-kind="boss"]');
@@ -85,14 +85,17 @@ async function waitForVisibleBoss(p){
 }
 async function visibleTargetCount(p){
   return p.evaluate(()=>{
-    const fish=window.__FSA_GAME_TEST__?.getState?.()?.fish||[];
+    const fish=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__)?.getState?.()?.fish||[];
     return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length;
   });
 }
 async function forceVisibleTargetDensity(p,minVisible=18){
   await p.evaluate(min=>{
-    const fish=(window.__FSA_GAME_TEST__?.getState?.()?.fish||[]).filter(f=>!f.boss).slice(0,min);
+    const api=window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__;
+    if(typeof api?.forceVisibleTargetsForTest==='function')return api.forceVisibleTargetsForTest(min);
+    const fish=(api?.getState?.()?.fish||[]).filter(f=>!f.boss).slice(0,min);
     fish.forEach((f,i)=>{f.x=120+(i%6)*190;f.y=110+Math.floor(i/6)*190;f.vx=0;f.vy=0});
+    return fish.length;
   },minVisible);
 }
 async function snapAtTargetDensity(p,name,item,minVisible=18){
@@ -101,7 +104,7 @@ async function snapAtTargetDensity(p,name,item,minVisible=18){
   while(Date.now()<deadline){
     const remaining=Math.max(1000,deadline-Date.now());
     await p.waitForFunction(min=>{
-      const fish=window.__FSA_GAME_TEST__?.getState?.()?.fish||[];
+      const fish=(window.__FSA_INTENSITY_V12_TEST__||window.__FSA_GAME_TEST__)?.getState?.()?.fish||[];
       return fish.filter(f=>!f.boss&&Number.isFinite(Number(f.x))&&Number.isFinite(Number(f.y))&&Number(f.x)>40&&Number(f.x)<1240&&Number(f.y)>40&&Number(f.y)<680).length>=min;
     },minVisible,{timeout:remaining});
     const before=await visibleTargetCount(p);
