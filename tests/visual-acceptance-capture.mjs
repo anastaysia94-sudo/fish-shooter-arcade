@@ -54,12 +54,13 @@ async function waitForLobbyReady(p){
 async function snap(p,name,item,meta={}){await p.screenshot({path:resolve(out,`${name}.png`),animations:'disabled'});rows.push({item,name,file:`${name}.png`,...meta})}
 async function openGame(p,i,r=1){await p.waitForFunction(()=>typeof window.openGame==='function'&&typeof window.chooseRoom==='function',null,lobbyPoll);await p.evaluate(({i,r})=>{window.openGame(i);window.chooseRoom(r)},{i,r});await p.waitForSelector('#game.on',{timeout:60000});await p.waitForTimeout(700)}
 async function forceBossIntoView(p){
-  await p.evaluate(()=>{const st=window.__FSA_GAME_TEST__?.getState?.();if(st)st.bossClock=0});
-  await p.waitForFunction(()=>!!window.__FSA_GAME_TEST__?.getState?.()?.boss,null,{timeout:10000,polling:100});
-  await p.evaluate(()=>{
-    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
-    if(boss){boss.x=640;boss.y=300;boss.vx=0;boss.vy=0}
+  const spawned=await p.evaluate(()=>{
+    const api=window.__FSA_GAME_TEST__;
+    if(typeof api?.spawnBossForTest!=='function')return null;
+    const boss=api.spawnBossForTest();
+    return boss?{x:Number(boss.x),y:Number(boss.y),hp:Number(boss.hp),max:Number(boss.max)}:null;
   });
+  if(!spawned)throw new Error('Current runtime did not expose or create the deterministic QA boss');
 }
 async function waitForVisibleBoss(p){
   await forceBossIntoView(p);
