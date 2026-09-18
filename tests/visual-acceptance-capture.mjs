@@ -65,18 +65,17 @@ async function forceBossIntoView(p){
 async function waitForVisibleBoss(p){
   await forceBossIntoView(p);
   await p.waitForFunction(()=>{
-    const api=window.__FSA_GAME_TEST__;
-    const st=api?.getState?.();
-    const boss=st?.boss;
+    const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
     const hud=(document.querySelector('#bossText')?.textContent||'').trim();
     const width=parseFloat(document.querySelector('#bossHP')?.style.width||'0');
-    const dense=window.__FSA_DENSE_GRAPHICS_V15__?.status?.();
-    return !!boss&&boss.hp>0&&boss.x>140&&boss.x<1140&&boss.y>80&&boss.y<640&&/\d/.test(hud)&&Number.isFinite(width)&&width>0&&dense?.bossVisible===true;
-  },null,{timeout:15000,polling:100});
+    const radarBoss=document.querySelector('#radar .dot[data-kind="boss"]');
+    return !!boss&&boss.hp>0&&boss.x>140&&boss.x<1140&&boss.y>80&&boss.y<640&&/\d+\s*\/\s*\d+/.test(hud.replaceAll(',',''))&&Number.isFinite(width)&&width>0&&!!radarBoss;
+  },null,{timeout:10000,polling:100});
+  await p.waitForTimeout(300);
   return p.evaluate(()=>{
     const boss=window.__FSA_GAME_TEST__?.getState?.()?.boss;
     const dense=window.__FSA_DENSE_GRAPHICS_V15__?.status?.()||null;
-    return boss?{bossX:Number(boss.x),bossY:Number(boss.y),bossHp:Number(boss.hp),bossMaxHp:Number(boss.max),denseBossVisible:!!dense?.bossVisible}:null;
+    return boss?{bossX:Number(boss.x),bossY:Number(boss.y),bossHp:Number(boss.hp),bossMaxHp:Number(boss.max),denseBossVisible:!!dense?.bossVisible,semanticRadarBoss:!!document.querySelector('#radar .dot[data-kind="boss"]')}:null;
   });
 }
 async function visibleTargetCount(p){
