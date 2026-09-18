@@ -32,6 +32,6 @@ assert(sw.includes('./telemetry-v1.js')&&sw.includes('telemetry-v1\\.js'),'V15 c
 assert(spectacle.includes('telemetry-v1.js'),'V15 spectacle loader must preserve telemetry v1 attachment');
 
 
-if(!/function\s+radarTargets\(\)\{const dots=\$\$\('#radar \\.dot'\)/.test(js)) fail('Dense Graphics must iterate the full radar-dot collection with $$().');
+if(!js.includes("Array.from(document.querySelectorAll('#radar .dot'))")) fail('Dense Graphics must iterate the full radar-dot collection explicitly.');
 if(!/dataset\.kind/.test(js)||!/kind==='boss'/.test(js)||!/kind==='hard'/.test(js)) fail('Dense Graphics must classify radar targets by semantic data-kind, not historical colors.');
 console.log('FSA_DENSE_GRAPHICS_V15_CONTRACT=PASS targets=live boss=phased impacts=weapon-specific coins=magnetic schools=5 environment=procedural telemetry=preserved lite=preserved');
