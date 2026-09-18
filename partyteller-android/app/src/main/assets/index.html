@@ -16,6 +16,61 @@
 .tabs button{background:#111b29;color:#f3f7fb;border-color:#33465e}
 .tabs button.active{background:linear-gradient(135deg,#00aeea,#a900ff);border-color:#00d8ff}
 @media(max-width:680px){.brandHero img{max-height:245px}}
+
+/* PartyTeller Vegas Fruit-Shop Neon System — 2026-09-18 */
+:root{
+ --ink:#fff8e7;--muted:#bfeeff;--blue:#00d9ff;--blue2:#082a38;--pink:#ff21d7;
+ --yellow:#ffd400;--night:#05020c;--line:#5b2378;--card:#10091c;--bg:#05020c;
+ --good:#29ff72;--warn:#ffad16;--bad:#ff476f;
+ --shadow:0 12px 34px rgba(0,0,0,.48),0 0 22px rgba(255,33,215,.12);
+ --vegas:0 0 8px currentColor,0 0 20px currentColor;
+}
+html{background:#05020c}
+body{
+ color:var(--ink);background:
+ radial-gradient(circle at 10% 5%,rgba(255,33,215,.22),transparent 26rem),
+ radial-gradient(circle at 88% 9%,rgba(0,217,255,.18),transparent 28rem),
+ radial-gradient(circle at 50% 100%,rgba(41,255,114,.08),transparent 32rem),
+ linear-gradient(180deg,#07020d,#05020c 62%,#020106);
+}
+.app{max-width:1040px;padding:0 12px 92px}
+.top{background:rgba(5,2,12,.94)!important;border-bottom:1px solid #ff21d7!important;box-shadow:0 8px 28px rgba(0,0,0,.42),0 1px 18px rgba(255,33,215,.18)}
+.logo{background:linear-gradient(135deg,#ffd400,#ff7b00 38%,#ff21d7 70%,#00d9ff);color:#07020d;border-radius:10px;box-shadow:0 0 18px rgba(255,212,0,.45);border:1px solid #fff06a}
+.brand h1{color:#fff;text-shadow:0 0 10px rgba(255,33,215,.7)}
+.brand p{color:#bfeeff}
+.tabs{padding-top:12px}
+.tabs button{background:#10091c!important;color:#fff!important;border:1px solid #64347a!important;border-radius:10px!important;font-weight:800;box-shadow:inset 0 0 12px rgba(0,217,255,.05)}
+.tabs button.active{background:linear-gradient(135deg,#ff21d7,#8d21ff 55%,#00d9ff)!important;border-color:#ffec5c!important;box-shadow:0 0 12px rgba(255,33,215,.55),0 0 20px rgba(0,217,255,.22)}
+.card,.stat,.notice,.report,.receipt{background:linear-gradient(145deg,rgba(22,10,35,.98),rgba(8,10,24,.98));color:#fff;border:1px solid #5b2378;box-shadow:var(--shadow)}
+.card{border-radius:14px}
+.card h2,.card h3{color:#fff}
+.muted{color:#b9cde2}
+.brandHero{border:0!important;border-radius:0!important;background:#05020c!important;box-shadow:0 0 34px rgba(255,33,215,.22)!important}
+.brandHero img{width:100%;max-height:none;object-fit:cover;filter:saturate(1.18) contrast(1.05)}
+.brandHeroCaption{background:linear-gradient(90deg,#07020d,#26103b,#07020d)!important;color:#fff;text-shadow:0 0 10px #ff21d7;border-top:1px solid #ff21d7;border-bottom:1px solid #00d9ff}
+.brandHeroCaption small{color:#65f4ff!important}
+.stat{border-top:2px solid #ff21d7}
+.stat:nth-child(2){border-top-color:#00d9ff}.stat:nth-child(3){border-top-color:#29ff72}.stat:nth-child(4){border-top-color:#ffd400}
+.stat b{color:#fff;text-shadow:0 0 12px rgba(255,33,215,.55)}
+.stat span{color:#bfeeff}
+label{color:#f7eaff}
+input,select,textarea{background:#090713;color:#fff;border:1px solid #62427c;border-radius:9px;box-shadow:inset 0 0 12px rgba(0,0,0,.28)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#00d9ff;box-shadow:0 0 0 2px rgba(0,217,255,.18),0 0 14px rgba(0,217,255,.18)}
+.btn{background:linear-gradient(135deg,#ff21d7,#8c22ff);color:#fff;border:1px solid #ff8bea;box-shadow:0 0 12px rgba(255,33,215,.2)}
+.btn.alt{background:#0b0a16;color:#fff;border:1px solid #00d9ff}.btn.good{background:linear-gradient(135deg,#0aa94d,#29ff72);color:#031509;border-color:#70ff9e}.btn.bad{background:#180912;color:#ff8da7;border-color:#ff476f}
+.pill,.chip{background:#0b0a16;color:#fff;border-color:#5c3974}.chip.sel{background:#152938;color:#8df4ff;border-color:#00d9ff}
+.entry{border-left:4px solid #ff21d7}.entry:nth-child(3n+2){border-left-color:#00d9ff}.entry:nth-child(3n){border-left-color:#29ff72}
+.hr{background:linear-gradient(90deg,transparent,#ff21d7,#ffd400,#00d9ff,transparent)}
+.notice{background:#241507;border-color:#ffad16}.success{background:#072415;border-color:#29ff72}
+.report{background:#fff;color:#15121a;border-color:#ffd400;box-shadow:0 0 22px rgba(255,212,0,.16)}
+.report h1{color:#111}.report h2{color:#6f187f;border-bottom-color:#e1b8e9}.report th{background:linear-gradient(90deg,#5f146f,#b5179e);color:#fff}
+.report .sub,.report .footnote{color:#555}.report .receipt-note{background:#fff7dc;border-color:#efcf5a;color:#222}
+#workPanel>.card:first-child{background:linear-gradient(135deg,#2b0b38,#10132b)!important;border:1px solid #ffd400!important;box-shadow:0 0 22px rgba(255,212,0,.16)!important}
+#workPanel>.card:first-child h2{color:#ffd400;text-shadow:0 0 12px rgba(255,212,0,.45)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:linear-gradient(#ff21d7,#00d9ff);border-radius:9px}
+@media(max-width:680px){.app{padding-left:8px;padding-right:8px}.top{margin:0 -8px;padding-left:8px;padding-right:8px}.brandHero{margin-left:-8px;margin-right:-8px}.brandHero img{max-height:none}}
+@media print{body{background:#fff;color:#111}.report{box-shadow:none}}
+
 </style>
 </head>
 <body>
