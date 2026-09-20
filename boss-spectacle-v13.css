@@ -1,4 +1,4 @@
-/* F.S.A. Boss Spectacle v13 — translates the high-energy boss-battle concept into the live table. */
+/* F.S.A. Boss Spectacle v13 — retained as the in-game effects layer beneath Brand Regeneration v14. */
 html[data-spectacle="v13"] .battle{--v13-p1:#ff5a37;--v13-p2:#38a9ff;--v13-p3:#53f27a;--v13-p4:#bc58ff}
 html[data-spectacle="v13"] .game-top{background:linear-gradient(180deg,#061b2bf5,#02111bef 70%,#02080cdd);box-shadow:0 10px 34px #000c,inset 0 -1px #54eaff55}
 html[data-spectacle="v13"] .game-logo strong{font-size:22px;letter-spacing:.08em;background:linear-gradient(180deg,#fff6b8,#ffc54c 46%,#a4620b 55%,#ffe27b);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 8px #45dfff88)}

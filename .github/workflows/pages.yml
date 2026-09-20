@@ -20,41 +20,212 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+        uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+      - name: Validate Dense Graphics V15 before browser QA
+        run: |
+          node --check dense-graphics-v15.js
+          node --check tests/dense-graphics-v15-contract.mjs
+          node --check tests/visual-acceptance-server.mjs
+          node --check tests/visual-acceptance-capture.mjs
+          node tests/dense-graphics-v15-contract.mjs
       - name: Install visual QA browser
         run: |
           npm init -y >/dev/null 2>&1
+          # Playwright 1.55 / Chromium 140 is the last browser stack that
+          # completed the full 12-screen certified F.S.A. capture on this
+          # runner image. 1.63 / Chrome 153 stalls in waitForFunction even
+          # after the exact runtime has loaded byte-for-byte.
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
+          node -e "const p=require('playwright/package.json'); console.log('FSA_PLAYWRIGHT_VERSION='+p.version)"
       - name: Wait for deployed site
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           for i in {1..30}; do
-            if curl -fsS "$PAGE_URL" >/dev/null; then exit 0; fi
+            if curl -fsS --max-time 15 "$PAGE_URL" >/dev/null; then exit 0; fi
             sleep 2
           done
           exit 1
-      - name: Capture live visual acceptance set
+      - name: Verify Visual QA Experience route
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: node tests/visual-acceptance-capture.mjs "$PAGE_URL"
+        run: |
+          QA_URL="${PAGE_URL%/}/qa/"
+          EVIDENCE_URL="${PAGE_URL%/}/qa/evidence/10-five-reel-jackpot.jpg"
+          for i in {1..30}; do
+            BODY="$(curl -fsS --max-time 15 "$QA_URL" || true)"
+            if grep -q 'VISUAL QA EXPERIENCE' <<<"$BODY" \
+              && grep -q '12/12 CERTIFIED' <<<"$BODY" \
+              && curl -fsS --max-time 15 -o /dev/null "$EVIDENCE_URL"; then
+              echo "FSA_VISUAL_QA_ROUTE=PASS url=$QA_URL"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Visual QA Experience route did not become verifiable in time" >&2
+          exit 1
+      - name: Warm critical live runtime assets
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          ROOT="${PAGE_URL%/}"
+          assets=(
+            "/"
+            "/index.html"
+            "/fsa-v9.js"
+            "/telemetry-v1.js"
+            "/fsa-v8.css"
+            "/gameplay-layout-v9.css"
+            "/visual-fidelity-v10.css"
+            "/arcade-intensity-v12.css"
+            "/boss-spectacle-v13.css"
+            "/dense-mode-v14.css"
+            "/dense-mode-v14-overlay.css"
+            "/dense-graphics-v15.css"
+            "/arcade-intensity-v12.js"
+            "/boss-spectacle-v13.js"
+            "/dense-mode-v14.js"
+            "/dense-graphics-v15.js"
+          )
+          for asset in "${assets[@]}"; do
+            echo "Preflighting $asset"
+            curl --retry 5 --retry-all-errors --retry-delay 2 -fsS --max-time 30 -o /dev/null "$ROOT$asset"
+          done
+          echo "FSA_LIVE_RUNTIME_PREFLIGHT=PASS"
+      - name: Verify deployed runtime byte parity
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          ROOT="${PAGE_URL%/}"
+          files=(
+            "index.html"
+            "fsa-v9.js"
+            "telemetry-v1.js"
+            "fsa-v8.css"
+            "gameplay-layout-v9.css"
+            "visual-fidelity-v10.css"
+            "cloud-sync-v11.css"
+            "cloud-sync-v11.js"
+            "arcade-intensity-v12.css"
+            "arcade-intensity-v12.js"
+            "boss-spectacle-v13.css"
+            "boss-spectacle-v13.js"
+            "arcade-intensity-v12-bridge.js"
+            "dense-mode-v14.css"
+            "dense-mode-v14-overlay.css"
+            "dense-mode-v14.js"
+            "dense-graphics-v15.css"
+            "dense-graphics-v15.js"
+            "assets/fsa-fish-hd-atlas.webp"
+            "assets/fsa-slots-hd-atlas.webp"
+            "assets/reef-run-hd-battle.webp"
+            "assets/fsa-slot-atlas-v10.svg"
+            "assets/fsa-title-atlas-v10.svg"
+            "admin/index.html"
+            "admin/styles.css"
+            "admin/app.js"
+          )
+          rm -rf /tmp/fsa-live-parity
+          mkdir -p /tmp/fsa-live-parity
+          : > /tmp/fsa-parity-files.txt
+          for file in "${files[@]}"; do
+            remote="/tmp/fsa-live-parity/$file"
+            mkdir -p "$(dirname "$remote")"
+            curl --retry 5 --retry-all-errors --retry-delay 2 --compressed -fsS --max-time 30 "$ROOT/$file" -o "$remote"
+            if ! cmp -s "$file" "$remote"; then
+              echo "DEPLOYED BYTE PARITY FAILED: $file" >&2
+              echo "checkout:" >&2
+              sha256sum "$file" >&2
+              echo "production:" >&2
+              sha256sum "$remote" >&2
+              exit 1
+            fi
+            printf '%s\n' "$file" >> /tmp/fsa-parity-files.txt
+          done
+          echo "FSA_DEPLOYED_BYTE_PARITY=PASS files=${#files[@]} source=$ROOT/"
+      - name: Capture byte-verified visual acceptance set
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          export FSA_LIVE_SOURCE_URL="${PAGE_URL%/}/"
+          node tests/visual-acceptance-server.mjs >/tmp/fsa-static-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          for i in {1..30}; do
+            if grep -q 'FSA_VISUAL_ACCEPTANCE_SERVER=READY' /tmp/fsa-static-server.log 2>/dev/null \
+              && curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/ >/dev/null \
+              && curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/__fsa_qa_bootstrap__ >/dev/null; then
+              echo "FSA_BYTE_VERIFIED_LOCAL_SERVER=PASS"
+              break
+            fi
+            sleep 1
+          done
+          grep -q 'FSA_VISUAL_ACCEPTANCE_SERVER=READY' /tmp/fsa-static-server.log
+          curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/ >/dev/null
+          curl -fsS --max-time 10 -H 'Cache-Control: no-cache' http://127.0.0.1:4173/__fsa_qa_bootstrap__ >/dev/null
+
+          if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+            echo "First deterministic capture attempt failed; retrying once." >&2
+            sleep 3
+            if ! node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"; then
+              mkdir -p artifacts/visual-acceptance
+              python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          Path('artifacts/visual-acceptance/failure.json').write_text(json.dumps({
+              'schema':'fsa.visual-acceptance.failure.v4',
+              'sourceUrl':os.environ.get('FSA_LIVE_SOURCE_URL'),
+              'sourceCommit':os.environ.get('GITHUB_SHA'),
+              'generatedAt':datetime.now(timezone.utc).isoformat(),
+              'message':'Production byte parity passed, but both browser-render attempts failed on the deterministic QA server.'
+          },indent=2)+'\n')
+          PY
+              echo "--- deterministic Node static-server diagnostics ---" >&2
+              tail -n 300 /tmp/fsa-static-server.log >&2 || true
+              exit 1
+            fi
+          fi
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("artifacts/visual-acceptance/manifest.json")
+          data = json.loads(path.read_text())
+          parity_files = [line.strip() for line in Path("/tmp/fsa-parity-files.txt").read_text().splitlines() if line.strip()]
+          data["baseUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
+          data["sourceUrl"] = os.environ["FSA_LIVE_SOURCE_URL"]
+          data["sourceCommit"] = os.environ.get("GITHUB_SHA")
+          data["captureTransport"] = "Playwright 1.55 on deterministic no-cache Node localhost server from exact Pages checkout after production byte-parity verification"
+          data["deploymentParity"] = {
+              "verified": True,
+              "productionUrl": os.environ["FSA_LIVE_SOURCE_URL"],
+              "verifiedFileCount": len(parity_files),
+              "verifiedFiles": parity_files,
+          }
+          path.write_text(json.dumps(data, indent=2) + "\n")
+          print("FSA_VISUAL_MANIFEST_SOURCE=PASS", data["sourceUrl"], data["sourceCommit"], "parityFiles=", len(parity_files))
+          PY
       - name: Upload live visual acceptance evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fsa-live-visual-acceptance-${{ github.sha }}
           path: artifacts/visual-acceptance/

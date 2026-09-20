@@ -1,1 +1,15 @@
-html[data-dense-ui="v14"] #v14Atmos{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;touch-action:none;mix-blend-mode:screen;opacity:.9}html[data-dense-ui="v14"][data-density-mode="standard"] #v14Atmos{opacity:.55}html[data-dense-ui="v14"][data-density-mode="extreme"] #v14Atmos{opacity:1;filter:saturate(1.2) contrast(1.06)}@media(prefers-reduced-motion:reduce){html[data-dense-ui="v14"] #v14Atmos{opacity:.35}}html[data-cinematic-lite="1"] #v14Atmos{opacity:.3!important}
+html[data-dense-ui="v14"] #v14Atmos{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;touch-action:none;mix-blend-mode:screen;opacity:.96;filter:saturate(1.12) contrast(1.04)}
+html[data-dense-ui="v14"] .battle:before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 50% 45%,transparent 0 36%,#04101828 78%,#02060ba8 100%),repeating-linear-gradient(118deg,transparent 0 48px,#55efff05 49px 50px,transparent 51px 96px);mix-blend-mode:screen}
+html[data-dense-ui="v14"] .battle:after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(90deg,#54efff08,transparent 16%,transparent 84%,#d96cff08),linear-gradient(180deg,#ffe36d06,transparent 18%,transparent 82%,#55efff08);box-shadow:inset 0 0 48px #50eaff12,inset 0 -36px 70px #5c2dff0d}
+html[data-dense-ui="v14"][data-density-mode="standard"] #v14Atmos{opacity:.62;filter:saturate(1.02)}
+html[data-dense-ui="v14"][data-density-mode="dense"] #v14Atmos{opacity:.98}
+html[data-dense-ui="v14"][data-density-mode="dense"] .battle{box-shadow:inset 0 0 60px #4ceeff14,inset 0 0 130px #6638ff0b!important}
+html[data-dense-ui="v14"][data-density-mode="extreme"] #v14Atmos{opacity:1;filter:saturate(1.35) contrast(1.1) brightness(1.06)}
+html[data-dense-ui="v14"][data-density-mode="extreme"] .battle:after{background:radial-gradient(circle at 50% 52%,#ffd45a08,transparent 35%),linear-gradient(90deg,#54efff12,transparent 18%,transparent 82%,#ff59ca12);box-shadow:inset 0 0 80px #ff566b1c,inset 0 0 160px #8b45ff14}
+html[data-dense-ui="v14"] .v14-combat-rail{backdrop-filter:blur(8px)}
+html[data-dense-ui="v14"] .v14-loot-stack{backdrop-filter:blur(6px)}
+html[data-dense-ui="v14"] .sidehud .hudbox{backdrop-filter:blur(7px)}
+html[data-dense-ui="v14"] .seatgun{box-shadow:0 0 18px color-mix(in srgb,var(--seat) 30%,transparent),inset 0 0 16px #ffffff08!important}
+html[data-dense-ui="v14"] .weapon-switch{backdrop-filter:blur(9px);box-shadow:0 8px 24px #0009,0 0 22px #48eaff12!important}
+@media(prefers-reduced-motion:reduce){html[data-dense-ui="v14"] #v14Atmos{opacity:.38;filter:none}html[data-dense-ui="v14"] .battle:before{display:none}}
+html[data-cinematic-lite="1"] #v14Atmos{opacity:.34!important;filter:none!important}html[data-cinematic-lite="1"] .battle:before{display:none!important}

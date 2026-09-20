@@ -1,0 +1,64 @@
+name: Validate F.S.A. -> EGM4000 Telemetry v1
+
+on:
+  pull_request:
+    paths:
+      - 'telemetry-v1.js'
+      - 'boss-spectacle-v13.js'
+      - 'sw.js'
+      - 'backend/supabase/migrations/20260916_fsa_egm4000_telemetry_v1.sql'
+      - 'backend/supabase/migrations/20260916_fsa_egm4000_telemetry_hardening_v1.sql'
+      - 'tests/telemetry-v1-contract.mjs'
+      - '.github/workflows/validate-egm4000-telemetry-v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'telemetry-v1.js'
+      - 'boss-spectacle-v13.js'
+      - 'sw.js'
+      - 'backend/supabase/migrations/20260916_fsa_egm4000_telemetry_v1.sql'
+      - 'backend/supabase/migrations/20260916_fsa_egm4000_telemetry_hardening_v1.sql'
+      - 'tests/telemetry-v1-contract.mjs'
+      - '.github/workflows/validate-egm4000-telemetry-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  telemetry-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check telemetry-v1.js
+          node --check boss-spectacle-v13.js
+          node --check sw.js
+      - name: Security and integration contract
+        run: node tests/telemetry-v1-contract.mjs
+      - name: Migration sanity
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=backend/supabase/migrations/20260916_fsa_egm4000_telemetry_v1.sql
+          HARD=backend/supabase/migrations/20260916_fsa_egm4000_telemetry_hardening_v1.sql
+          test -s "$BASE"
+          test -s "$HARD"
+          grep -q 'enable row level security' "$BASE"
+          grep -q 'FSA_FOUNDER_MFA_REQUIRED' "$BASE"
+          grep -q 'as restrictive' "$HARD"
+          grep -q 'player_key text' "$HARD"
+          grep -q 'FSA_TELEMETRY_SESSION_LIMIT' "$HARD"
+          ! grep -Eiq 'update[[:space:]]+public\.fsa_(players|player_cloud_state)' "$BASE" "$HARD"
+          HARD="$HARD" python - <<'PY'
+          import os, re
+          text = open(os.environ['HARD'], encoding='utf-8').read()
+          assert re.search(r'create\s+or\s+replace\s+function\s+fsa_private\.telemetry_payload_allowed[\s\S]*?language\s+sql[\s\S]*?as\s+\$\$', text, flags=re.I), 'payload validator must be the pure-SQL implementation'
+          bodies = re.findall(r'language\s+plpgsql[\s\S]*?as\s+\$\$(.*?)\$\$;', text, flags=re.I | re.S)
+          assert len(bodies) >= 3, f'expected at least 3 PL/pgSQL bodies, found {len(bodies)}'
+          assert all(body.strip().lower().endswith('end;') for body in bodies), 'PL/pgSQL function body missing final END; terminator'
+          PY

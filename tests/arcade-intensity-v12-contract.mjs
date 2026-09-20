@@ -56,7 +56,7 @@ for(const asset of ['dense-mode-v14.css','dense-mode-v14-overlay.css','dense-mod
   assert(sw.includes(`./${asset}`),`service worker must cache ${asset}`);
   assert(sw.includes(asset.replaceAll('.','\\.'))||sw.includes(asset),`service worker fresh-runtime policy must include ${asset}`);
 }
-for(const marker of ['__FSA_DENSE_UI__','v14CombatRail','v14Targeting','v14TargetInspector','v14FeverCore','v14LootStack','v14DensityCtl','v14Atmos','seedAtmosphere','drawAtmos','setTargetPolicy','setMode']){
+for(const marker of ['__FSA_DENSE_UI__','v14CombatRail','v14Targeting','v14TargetInspector','v14FeverCore','v14LootStack','v14DensityCtl','v14Atmos','seedAtmosphere','drawAtmos','drawRadarEchoes','drawCreature','setTargetPolicy','setMode']){
   assert(dense.includes(marker),`dense v14 runtime marker missing ${marker}`);
 }
 for(const marker of ['data-dense-ui="v14"','v14-combat-rail','v14-fever-core','v14-target-card','data-density-mode="extreme"','prefers-reduced-motion']){
@@ -66,8 +66,14 @@ assert(denseOverlay.includes('#v14Atmos'),'dense v14 overlay must style the atmo
 assert(denseOverlay.includes('pointer-events:none'),'dense atmosphere must never block canonical gameplay input');
 assert(dense.includes("LOW?'standard':'dense'"),'Dense must be the normal default while constrained/reduced-motion mode falls back to Standard');
 assert(dense.includes("local.mode==='extreme'?44:local.mode==='dense'?34:28"),'desktop density modes must expose explicit visual target budgets');
-assert(dense.includes("local.mode==='extreme'?38:local.mode==='dense'?28:16"),'dense mode must scale multi-depth ambient schools');
+assert(dense.includes("local.mode==='extreme'?52:local.mode==='dense'?38:22"),'V14.1 must scale multi-depth ambient schools beyond the original dense pass');
+for(const kind of ["'ray'","'jelly'","'shark'","'koi'"]) assert(dense.includes(kind),`dense atmosphere must include ${kind} silhouettes`);
+assert(dense.includes("local.mode==='extreme'?10:local.mode==='dense'?6:2.5"),'Dense/Extreme modes must increase tracer traffic');
 assert(!/fetch\s*\(/.test(dense),'dense v14 runtime must remain local-first without fetch');
 assert(!dense.includes('Fire Kirin'),'dense runtime must remain original and not embed competitor branding');
 
-console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS cinematic_v13=PASS dense_v14=PASS');
+assert(js.includes("d.dataset.kind=f.boss?'boss':f.hard?'hard':'fish'"),'V12 radar dots must expose semantic boss/hard/fish labels');
+assert(js.includes('__FSA_INTENSITY_V12_TEST__'),'V12 must expose deterministic visual-QA state hooks');
+assert(js.includes('spawnBossForTest'),'V12 visual QA must be able to trigger the real boss path deterministically');
+assert(js.includes('forceVisibleTargetsForTest'),'V12 visual QA must be able to stage a deterministic crowded table');
+console.log('FSA_ARCADE_INTENSITY_V12_CONTRACT=PASS cinematic_v13=PASS dense_v14_1=PASS');

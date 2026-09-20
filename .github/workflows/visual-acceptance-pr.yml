@@ -1,0 +1,87 @@
+name: F.S.A. 12-Screen Visual Acceptance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "fsa-v9.js"
+      - "fsa-v8.css"
+      - "gameplay-layout-v9.css"
+      - "visual-fidelity-v10.css"
+      - "arcade-intensity-v12.css"
+      - "arcade-intensity-v12.js"
+      - "arcade-intensity-v12-bridge.js"
+      - "boss-spectacle-v13.css"
+      - "boss-spectacle-v13.js"
+      - "dense-mode-v14.css"
+      - "dense-mode-v14-overlay.css"
+      - "dense-mode-v14.js"
+      - "dense-graphics-v15.css"
+      - "dense-graphics-v15.js"
+      - "brand-regeneration-v14.css"
+      - "brand-regeneration-v14.js"
+      - "telemetry-v1.js"
+      - "admin/**"
+      - "assets/**"
+      - "tests/visual-acceptance-capture.mjs"
+      - "tests/visual-acceptance-server.mjs"
+      - ".github/workflows/pages.yml"
+      - ".github/workflows/visual-acceptance-pr.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Validate visual QA scripts
+        run: |
+          node --check tests/visual-acceptance-server.mjs
+          node --check tests/visual-acceptance-capture.mjs
+      - name: Install browser used by production visual QA
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Capture all 12 current-runtime acceptance scenes
+        run: |
+          node tests/visual-acceptance-server.mjs >/tmp/fsa-static-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if grep -q 'FSA_VISUAL_ACCEPTANCE_SERVER=READY' /tmp/fsa-static-server.log 2>/dev/null \
+              && curl -fsS --max-time 10 http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q 'FSA_VISUAL_ACCEPTANCE_SERVER=READY' /tmp/fsa-static-server.log
+          node tests/visual-acceptance-capture.mjs "http://127.0.0.1:4173/"
+      - name: Verify complete evidence set
+        run: |
+          test -f artifacts/visual-acceptance/manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("artifacts/visual-acceptance/manifest.json").read_text())
+          assert data.get("acceptanceItems")==12, data
+          items={row["item"] for row in data.get("screenshots",[])}
+          assert items==set(range(1,13)), items
+          print("FSA_12_SCREEN_EVIDENCE=PASS items=12")
+          PY
+      - name: Upload 12-screen evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fsa-pr-12-screen-${{ github.sha }}
+          path: artifacts/visual-acceptance/
+          if-no-files-found: error
+          retention-days: 14

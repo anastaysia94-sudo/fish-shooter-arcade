@@ -11,7 +11,13 @@ for(const marker of ['CHAIN x10','COMBO x25','COMBO x50','LIGHTNING BONUS','LEGE
 for(const marker of ["window.power?.('lightning')","window.power?.('bomb')","window.power?.('nuke')",'bossRatio','v13-boss-rage','v13-fever-core','v13-treasure-burst','v13-critical-flare'])assert(js.includes(marker)||css.includes(marker),`missing spectacle mechanic ${marker}`);
 assert(js.includes('MutationObserver'),'v13 must react to real runtime state');
 assert(js.includes("observe(combo,updateCombo)")&&js.includes("observe(fever,updateFever)")&&js.includes("observe(bossText,parseBoss)"),'v13 must observe combo fever and boss HP');
+assert(!js.includes("if(game)observe(game,"),'game lifecycle observer must not use the generic deep #game observer');
+assert(js.includes(".observe(game,{attributes:true,attributeFilter:['class']})"),'game lifecycle observer must be scoped to #game class changes');
+assert(js.includes("new Set(['drawAtmos','frame'])"),'lobby render governor must scope throttling to dense visual loops');
+assert(js.includes("return nativeRaf(cb)"),'non-dense requestAnimationFrame callbacks must preserve native scheduling');
+assert(js.includes("if(id>=0){nativeCaf(id);return}"),'native requestAnimationFrame ids must preserve cancelAnimationFrame semantics');
+assert(js.includes("renderGovernor='v2'")&&js.includes("renderGovernor:'v2'"),'scoped render governor v2 must be exposed');
 assert(css.includes('prefers-reduced-motion'),'v13 must respect reduced motion');
 assert(css.includes('data-spectacle="v13"'),'v13 CSS must be scoped');
 assert(!js.includes('Fire Kirin')&&!css.includes('Fire Kirin'),'competitor branding must not ship in runtime');
-console.log('FSA_BOSS_SPECTACLE_V13_CONTRACT=PASS');
+console.log('FSA_BOSS_SPECTACLE_V13_CONTRACT=PASS renderGovernor=v2 gameObserver=class-only nativeRaf=preserved');
