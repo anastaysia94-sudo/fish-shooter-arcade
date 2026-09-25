@@ -36,7 +36,10 @@ grep -q 'Status: ok' "$OUT/launch.txt"
 READY=0
 for attempt in $(seq 1 45); do
   adb shell pidof "$PACKAGE" >/dev/null 2>&1 || { sleep 2; continue; }
-  FSA_LOG="$(adb logcat -d -s FSAAndroid:I FSAAndroid:E '*:S' 2>/dev/null || true)"
+  # Filter the complete logcat stream instead of relying on tag-filter syntax.
+  # Android's logcat accepted the FSAAndroid entries but the previous -s form
+  # returned an empty stream on the API 35 runner.
+  FSA_LOG="$(adb logcat -d 2>/dev/null | grep -F 'FSAAndroid:' || true)"
   printf '%s\n' "$FSA_LOG" > "$OUT/fsa-log.txt"
   if grep -q 'MAIN_FRAME_ERROR' "$OUT/fsa-log.txt"; then
     echo "F.S.A. WebView reported a main-frame load error" >&2
