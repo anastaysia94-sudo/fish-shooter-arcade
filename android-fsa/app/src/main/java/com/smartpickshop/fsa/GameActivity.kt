@@ -2,9 +2,11 @@ package com.smartpickshop.fsa
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +39,7 @@ class GameActivity : ComponentActivity() {
     private val canonicalOrigin = "https://anastaysia94-sudo.github.io"
     private val canonicalPathPrefix = "/fish-shooter-arcade/"
     private val gameUrl = "$canonicalOrigin$canonicalPathPrefix"
+    private val maxMainFrameRetries = 4
     private var lastCanonicalUrl = gameUrl
     private var showingOffline = false
 
@@ -105,6 +108,9 @@ class GameActivity : ComponentActivity() {
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(52))
         )
 
+        var mainFrameLoadFailed = false
+        var mainFrameRetryCount = 0
+
         webView = WebView(this).apply {
             setBackgroundColor(Color.BLACK)
             isFocusable = true
@@ -149,10 +155,16 @@ class GameActivity : ComponentActivity() {
                     return true
                 }
 
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    val uri = runCatching { Uri.parse(url ?: "") }.getOrNull()
+                    if (uri != null && isCanonical(uri)) mainFrameLoadFailed = false
+                }
+
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     val uri = runCatching { Uri.parse(url ?: "") }.getOrNull()
-                    if (uri == null || !isCanonical(uri) || showingOffline) return
+                    if (uri == null || !isCanonical(uri) || showingOffline || mainFrameLoadFailed) return
                     lastCanonicalUrl = uri.toString()
                     view?.evaluateJavascript(
                         """
@@ -160,10 +172,16 @@ class GameActivity : ComponentActivity() {
                           document.documentElement.classList.add('fsa-android-cabinet');
                           document.body && document.body.setAttribute('data-fsa-android','v12');
                           try { localStorage.setItem('fsa.android.cabinet','v12'); } catch(e) {}
+                          return document.readyState + ':' + (document.body?.getAttribute('data-fsa-android') || 'missing');
                         })();
-                        """.trimIndent(),
-                        null
-                    )
+                        """.trimIndent()
+                    ) { result ->
+                        mainFrameRetryCount = 0
+                        Log.i(
+                            "FSAAndroid",
+                            "TRUSTED_PAGE_FINISHED host=${uri.host} path=${uri.path} cabinet=$result"
+                        )
+                    }
                 }
 
                 override fun onReceivedError(
@@ -172,8 +190,29 @@ class GameActivity : ComponentActivity() {
                     error: WebResourceError?
                 ) {
                     super.onReceivedError(view, request, error)
-                    if (request?.isForMainFrame == true && isCanonical(request.url)) {
-                        view?.post { showOffline(error?.description?.toString() ?: "Network unavailable") }
+                    if (request?.isForMainFrame != true || !isCanonical(request.url)) return
+                    mainFrameLoadFailed = true
+                    val code = error?.errorCode
+                    val description = error?.description?.toString() ?: "Network unavailable"
+                    if (mainFrameRetryCount < maxMainFrameRetries) {
+                        mainFrameRetryCount += 1
+                        val delayMs = 1_500L * mainFrameRetryCount
+                        Log.w(
+                            "FSAAndroid",
+                            "MAIN_FRAME_RETRY attempt=$mainFrameRetryCount code=$code delayMs=$delayMs"
+                        )
+                        view?.postDelayed({
+                            if (!isFinishing && !isDestroyed) {
+                                showingOffline = false
+                                view.loadUrl(gameUrl)
+                            }
+                        }, delayMs)
+                    } else {
+                        Log.e(
+                            "FSAAndroid",
+                            "MAIN_FRAME_ERROR_FINAL code=$code description=$description"
+                        )
+                        view?.post { showOffline(description) }
                     }
                 }
 
@@ -188,6 +227,11 @@ class GameActivity : ComponentActivity() {
                         isCanonical(request.url) &&
                         (errorResponse?.statusCode ?: 0) >= 500
                     ) {
+                        mainFrameLoadFailed = true
+                        Log.e(
+                            "FSAAndroid",
+                            "MAIN_FRAME_ERROR_HTTP status=${errorResponse?.statusCode ?: 0}"
+                        )
                         view?.post { showOffline("F.S.A. is temporarily unavailable") }
                     }
                 }
