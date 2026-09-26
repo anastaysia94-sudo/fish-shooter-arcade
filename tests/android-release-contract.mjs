@@ -1,12 +1,13 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
-const [game, info, manifest, gradle, workflow] = await Promise.all([
+const [game, info, manifest, gradle, workflow, selftest] = await Promise.all([
   read('android-fsa/app/src/main/java/com/smartpickshop/fsa/GameActivity.kt'),
   read('android-fsa/app/src/main/java/com/smartpickshop/fsa/MainActivity.kt'),
   read('android-fsa/app/src/main/AndroidManifest.xml'),
   read('android-fsa/app/build.gradle.kts'),
   read('.github/workflows/build-fsa-android.yml'),
+  read('android-fsa/release-selftest.py'),
 ]);
 
 function must(text, marker, label = marker) {
@@ -71,17 +72,34 @@ for (const marker of [
   'versionName = "0.12.0-release-hardening"',
   'buildConfig = true',
   'checkReleaseBuilds = true',
+  'FSA_ANDROID_KEYSTORE_PATH',
+  'FSA_ANDROID_KEYSTORE_PASSWORD',
+  'FSA_ANDROID_KEY_ALIAS',
+  'FSA_ANDROID_KEY_PASSWORD',
+  'signingConfigs',
 ]) must(gradle, marker);
 
 for (const marker of [
   'node tests/android-release-contract.mjs',
+  'python3 android-fsa/release-selftest.py',
   ':app:lintRelease',
   ':app:testDebugUnitTest',
   ':app:assembleDebug',
+  ':app:assembleRelease',
   ':app:bundleRelease',
-  'app-debug.apk',
+  'FSA-v12-debug.apk',
+  'FSA-v12-unsigned-release.apk',
+  'FSA-v12-signed-release.apk',
   'app-release.aab',
+  'BUILD-STATUS.txt',
   'SHA256SUMS.txt',
+  'FSA_ANDROID_KEYSTORE_B64',
 ]) must(workflow, marker);
+
+for (const marker of [
+  'versionName=0.12.0-release-hardening',
+  'release apk task',
+  'optional signing secrets',
+]) must(selftest, marker);
 
 console.log('FSA_ANDROID_RELEASE_V12_CONTRACT=PASS');
