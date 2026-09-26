@@ -200,6 +200,10 @@ A release is not complete merely because files exist. Relevant GitHub CI must pa
 
 Previous hierarchy verification includes AAL1 rejection, AAL2 credit/reversal correctness, append-only ledger behavior, credit ceiling enforcement, RLS isolation and cross-Distributor scope denial. Cloud-account completion additionally verifies database function/ACL structure, one-to-one Auth linkage constraints, Edge Function deployment/JWT verification, browser boundary tests, optimistic sync invariants and PWA delivery.
 
+As of 2026-09-25, Android v12 repository-side certification is also reproducible on `main`: the debug APK builds, installs and launches in an API 35 Pixel 6 emulator; the trusted production page reaches the Android cabinet readiness marker; portrait/landscape captures and rotation-survival evidence are uploaded; and the Android release workflow produces a release-candidate artifact. This is emulator/repository certification only, not physical-device or store certification.
+
+The same `main` commit also passed the GitHub Pages deployment workflow, including live route preflight, deployed runtime byte-parity verification and visual-acceptance capture.
+
 ## 14. Low-data / Android rule
 
 Preserve a Lite path for `saveData`, 2G/slow-2G, reduced-motion and constrained devices. Heavy art/audio remains optional/lazy. HD enhances play but must not be required to reach a usable table. Keep the service-worker shell, compressed assets, scaled effects and touch-friendly layouts.
@@ -208,9 +212,9 @@ Preserve a Lite path for `saveData`, 2G/slow-2G, reduced-motion and constrained 
 
 Do not silently claim these complete merely because hierarchy/cloud accounts exist:
 - real network multiplayer/shared human tables unless its own live verification proves completion
-- production F.S.A. → EGM4000 telemetry API
+- the **F.S.A. telemetry producer** is implemented and production-hardened behind an explicit versioned boundary, but the **EGM4000 consumer/import + explicit pseudonymous identity-link workflow** remains a separate incomplete workstream
 - final bespoke production art/audio for every title
-- full physical Android/store QA
+- full physical Android/store QA; repository-side Android emulator certification is complete, but real-device/store certification is not
 - real-money functionality
 
 ## 16. Working rule
