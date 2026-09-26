@@ -212,7 +212,7 @@ Preserve a Lite path for `saveData`, 2G/slow-2G, reduced-motion and constrained 
 
 Do not silently claim these complete merely because hierarchy/cloud accounts exist:
 - real network multiplayer/shared human tables unless its own live verification proves completion
-- the **F.S.A. telemetry producer** is implemented and production-hardened behind an explicit versioned boundary, but the **EGM4000 consumer/import + explicit pseudonymous identity-link workflow** remains a separate incomplete workstream
+- the **F.S.A. telemetry producer** and the **EGM4000 Supabase consumer v2** are implemented behind an explicit versioned boundary. EGM4000 `main` contains the production-applied v2 migration, durable pseudonymous subject links, one F.S.A. session → one EGM gameplay-session mapping, automatic trigger ingestion, idempotent normalized events, virtual/non-cash financial-field isolation, and the restricted repair/backfill path. The remaining live-evidence gap is the first real linked F.S.A. production telemetry session; EGM4000's live verification records zero production telemetry rows so far, not an incomplete consumer implementation.
 - final bespoke production art/audio for every title
 - full physical Android/store QA; repository-side Android emulator certification is complete, but real-device/store certification is not
 - real-money functionality
