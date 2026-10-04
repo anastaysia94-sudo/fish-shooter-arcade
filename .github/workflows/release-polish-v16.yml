@@ -1,0 +1,45 @@
+name: Validate F.S.A. Release Polish v16
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'release-polish-v16.js'
+      - 'sw.js'
+      - 'tests/release-polish-v16-contract.mjs'
+      - '.github/workflows/release-polish-v16.yml'
+  push:
+    branches: [main, fsa-founder-completion-20261004]
+    paths:
+      - 'index.html'
+      - 'release-polish-v16.js'
+      - 'sw.js'
+      - 'tests/release-polish-v16-contract.mjs'
+      - '.github/workflows/release-polish-v16.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  release-polish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check release-polish-v16.js
+          node --check sw.js
+      - name: First-run and truthfulness contract
+        run: node tests/release-polish-v16-contract.mjs
+      - name: Public shell sanity
+        run: |
+          set -euo pipefail
+          ! grep -q 'href="admin/' index.html
+          ! grep -q 'OceanHunterX' index.html
+          grep -q 'Guest Diver' index.html
+          grep -q 'release-polish-v16.js' index.html
+          echo 'FSA_RELEASE_POLISH_V16=PASS'
