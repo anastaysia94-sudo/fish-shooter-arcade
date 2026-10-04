@@ -26,3 +26,7 @@ Fish Shooter Arcade plus Founder Console module.
 
 ## Current gate
 Do not redesign the Android release lane. Resume at physical-device certification when an authorized Android device is reachable, then production signing/store acceptance. Keep the first real linked F.S.A. telemetry session as a separate integration-evidence gate.
+
+## 2026-10-04 PT — repo maintenance notes (The Albino · Pit Keeper)
+- Licence: an all-rights-reserved SmartPickShop Holdings `LICENSE` notice is proposed in PR https://github.com/anastaysia94-sudo/fish-shooter-arcade/pull/66 (OPEN, not merged). Until it merges the repo still has no licence file. All 7 checks on the PR passed.
+- Nothing in this note is merged; PRs await Anastaysia's review. No secrets were read or changed.

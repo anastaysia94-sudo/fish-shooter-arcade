@@ -11,3 +11,6 @@ Updated: 2026-09-30 America/Los_Angeles
 6. Upload the signed AAB to an internal Play test track and run store-delivered smoke acceptance.
 7. Separately capture the first real linked F.S.A. production telemetry session in EGM4000.
 8. Preserve the already-green repository/emulator/release CI evidence; do not restart completed release-lane work.
+
+## 2026-10-04 PT — repo maintenance notes (The Albino · Pit Keeper)
+1. Review/merge licence PR #66. Other items above are unchanged.
