@@ -1,0 +1,46 @@
+name: Validate Founder Console Gameplay Logs
+
+on:
+  pull_request:
+    paths:
+      - 'admin/gameplay-logs.js'
+      - 'admin/index.html'
+      - 'backend/supabase/migrations/20261004_fsa_operator_gameplay_logs_v1.sql'
+      - 'tests/founder-gameplay-logs-contract.mjs'
+      - '.github/workflows/validate-founder-gameplay-logs.yml'
+  push:
+    branches: [main, fsa-founder-completion-20261004]
+    paths:
+      - 'admin/gameplay-logs.js'
+      - 'admin/index.html'
+      - 'backend/supabase/migrations/20261004_fsa_operator_gameplay_logs_v1.sql'
+      - 'tests/founder-gameplay-logs-contract.mjs'
+      - '.github/workflows/validate-founder-gameplay-logs.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  gameplay-log-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: node --input-type=module --check < admin/gameplay-logs.js
+      - name: Scoped telemetry contract
+        run: node tests/founder-gameplay-logs-contract.mjs
+      - name: Migration sanity
+        run: |
+          set -euo pipefail
+          M=backend/supabase/migrations/20261004_fsa_operator_gameplay_logs_v1.sql
+          test -s "$M"
+          grep -q "security definer" "$M"
+          grep -q "assert_operator_v2" "$M"
+          grep -q "actor.role='agent'" "$M"
+          grep -q "actor.role='distributor'" "$M"
+          grep -q "actor.role='founder'" "$M"
+          echo 'FSA_FOUNDER_GAMEPLAY_LOGS=PASS'
