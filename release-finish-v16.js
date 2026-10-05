@@ -21,35 +21,37 @@ function normalizeGuest(){
     Object.assign(profile,STARTER);try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}catch{}
   }
   const p=window.__FSA_GAME_TEST__?.getProfile?.()||STARTER;
-  ['coins','gcoins','slotCoins'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=Math.floor(Number(p.credits)||0).toLocaleString()});
-  const gems=$('#gems'),pearls=$('#pearls');if(gems)gems.textContent=(Number(p.gems)||0).toLocaleString();if(pearls)pearls.textContent=(Number(p.pearls)||0).toLocaleString();
+  ['coins','gcoins','slotCoins'].forEach(id=>{const e=document.getElementById(id),v=Math.floor(Number(p.credits)||0).toLocaleString();if(e&&e.textContent!==v)e.textContent=v});
+  const gems=$('#gems'),pearls=$('#pearls'),gv=(Number(p.gems)||0).toLocaleString(),pv=(Number(p.pearls)||0).toLocaleString();if(gems&&gems.textContent!==gv)gems.textContent=gv;if(pearls&&pearls.textContent!==pv)pearls.textContent=pv;
   const profileName=$('.v8-account .profile b');if(profileName&&/OceanHunterX/i.test(profileName.textContent))profileName.textContent='Guest Diver';
   const profileMeta=$('.v8-account .profile small');if(profileMeta&&/LV\s*88/i.test(profileMeta.textContent))profileMeta.textContent=`LOCAL GUEST · LV ${Math.max(1,Number(p.level)||1)}`;
-  const ownName=$('#youSeat .pname');if(ownName)ownName.innerHTML=ownName.innerHTML.replace(/OceanHunterX/g,'Guest Diver');
+  const ownName=$('#youSeat .pname');if(ownName&&/OceanHunterX/i.test(ownName.textContent))ownName.innerHTML=ownName.innerHTML.replace(/OceanHunterX/g,'Guest Diver');
 }
 function removePublicAdminDoor(){
   $$('.v8-nav a').filter(a=>/FOUNDER|admin\//i.test(`${a.textContent} ${a.getAttribute('href')||''}`)).forEach(a=>a.remove());
 }
-function labelSimulatedPlay(){
-  const h=$('#liveFeed')?.closest('.hudbox')?.querySelector('h3');if(h)h.textContent='TABLE EVENTS';
+function normalizeFeedRows(){
   $$('#liveFeed .live-row em').forEach(e=>{if(/^LIVE$/i.test(e.textContent.trim()))e.textContent='SIM'});
-  $$('.seatgun .pname').forEach((e,i)=>{if(i>0)e.innerHTML=e.innerHTML.replace(/Player\s+([234])/gi,'CPU $1')});
+}
+function labelSimulatedPlay(){
+  const h=$('#liveFeed')?.closest('.hudbox')?.querySelector('h3');if(h&&h.textContent!=='TABLE EVENTS')h.textContent='TABLE EVENTS';
+  normalizeFeedRows();
+  $$('.seatgun .pname').forEach((e,i)=>{if(i>0&&/Player\s+[234]/i.test(e.textContent))e.innerHTML=e.innerHTML.replace(/Player\s+([234])/gi,'CPU $1')});
   const right=$('.fsa-v14-right');if(right){
-    const panelHeads=$$('.v14-panel-head');
-    panelHeads.forEach(head=>{
+    $$('.v14-panel-head').forEach(head=>{
       const b=head.querySelector('b'),span=head.querySelector('span');
-      if(/LIVE COMMUNITY/i.test(b?.textContent||'')){b.textContent='LOCAL DEMO CREW';if(span)span.textContent='SIMULATED';}
-      if(/GLOBAL LEADERBOARD/i.test(b?.textContent||'')){b.textContent='DEMO SCOREBOARD';if(span)span.textContent='LOCAL SAMPLE';}
+      if(/LIVE COMMUNITY/i.test(b?.textContent||'')){b.textContent='LOCAL DEMO CREW';if(span&&span.textContent!=='SIMULATED')span.textContent='SIMULATED';}
+      if(/GLOBAL LEADERBOARD/i.test(b?.textContent||'')){b.textContent='DEMO SCOREBOARD';if(span&&span.textContent!=='LOCAL SAMPLE')span.textContent='LOCAL SAMPLE';}
     });
-    $$('.v14-msg b').forEach((b,i)=>{if(!/^YOU$/i.test(b.textContent))b.textContent=`CPU CREW ${i+1}`});
-    const note=$('.v14-reference-note');if(note)note.textContent='Demo crew and scoreboard entries are simulated locally. Real player accounts are shown only after authenticated cloud play.';
+    $$('.v14-msg b').forEach((b,i)=>{if(!/^YOU$/i.test(b.textContent)&&!/^CPU CREW/i.test(b.textContent))b.textContent=`CPU CREW ${i+1}`});
+    const note=$('.v14-reference-note'),copy='Demo crew and scoreboard entries are simulated locally. Real player accounts are shown only after authenticated cloud play.';if(note&&note.textContent!==copy)note.textContent=copy;
   }
 }
 function addRotateHint(){
   if($('#fsaRotateHint'))return;
   const hint=document.createElement('div');hint.id='fsaRotateHint';hint.className='fsa-v16-rotate';hint.innerHTML='<b>↻ Rotate for the best fish-table view</b><span>Landscape gives the cannon HUD more room.</span>';document.body.appendChild(hint);
-  const update=()=>hint.classList.toggle('on',matchMedia('(orientation: portrait)').matches&&innerWidth<820&&$('#game')?.classList.contains('on'));
-  addEventListener('resize',update,{passive:true});new MutationObserver(update).observe($('#game'),{attributes:true,attributeFilter:['class']});update();
+  const game=$('#game');const update=()=>hint.classList.toggle('on',matchMedia('(orientation: portrait)').matches&&innerWidth<820&&game?.classList.contains('on'));
+  addEventListener('resize',update,{passive:true});if(game)new MutationObserver(update).observe(game,{attributes:true,attributeFilter:['class']});update();
 }
 function tutorial(){
   if(localStorage.getItem(TUTORIAL_KEY)==='1'||$('#fsaTutorial'))return;
@@ -59,15 +61,15 @@ function tutorial(){
   e.querySelector('.fsa-v16-close').onclick=close;e.querySelector('.fsa-v16-start').onclick=close;
 }
 function tunePlayerCopy(){
-  const heroP=$('.hero-copy p');if(heroP)heroP.textContent='Aim, fire and switch cannons across fifteen original fish-shooter tables. Hunt bosses, build combos and review your own authenticated session stats after play.';
-  const quick=$('.v14-tools #v14Analyze');if(quick)quick.textContent='🧠 MY SESSION STATS';
-  const alliance=$('.v14-alliance p');if(alliance)alliance.textContent='Practice with simulated table companions, then use authenticated cloud play for your own saved progression and post-session statistics.';
+  const heroP=$('.hero-copy p'),heroCopy='Aim, fire and switch cannons across fifteen original fish-shooter tables. Hunt bosses, build combos and review your own authenticated session stats after play.';if(heroP&&heroP.textContent!==heroCopy)heroP.textContent=heroCopy;
+  const quick=$('.v14-tools #v14Analyze');if(quick&&quick.textContent!=='🧠 MY SESSION STATS')quick.textContent='🧠 MY SESSION STATS';
+  const alliance=$('.v14-alliance p'),allianceCopy='Practice with simulated table companions, then use authenticated cloud play for your own saved progression and post-session statistics.';if(alliance&&alliance.textContent!==allianceCopy)alliance.textContent=allianceCopy;
 }
-function observeDynamicLayers(){
-  let queued=false;const sync=()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;removePublicAdminDoor();labelSimulatedPlay();tunePlayerCopy();normalizeGuest()})};
-  new MutationObserver(sync).observe(document.body,{childList:true,subtree:true});sync();
+function observeTableFeed(){
+  const feed=$('#liveFeed');if(!feed)return;new MutationObserver(normalizeFeedRows).observe(feed,{childList:true,subtree:true});
 }
-function init(){injectCss();normalizeGuest();removePublicAdminDoor();labelSimulatedPlay();tunePlayerCopy();addRotateHint();tutorial();observeDynamicLayers();document.documentElement.dataset.releaseFinish=VERSION;}
+function sync(){normalizeGuest();removePublicAdminDoor();labelSimulatedPlay();tunePlayerCopy()}
+function init(){injectCss();sync();addRotateHint();tutorial();observeTableFeed();setTimeout(sync,250);setTimeout(sync,1000);document.documentElement.dataset.releaseFinish=VERSION;}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-window.__FSA_RELEASE_FINISH_V16__={version:VERSION,reapply:()=>{normalizeGuest();removePublicAdminDoor();labelSimulatedPlay();tunePlayerCopy()}};
+window.__FSA_RELEASE_FINISH_V16__={version:VERSION,reapply:sync};
 })();
