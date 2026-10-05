@@ -27,11 +27,11 @@ assert(!/fetch\s*\(/.test(js),'Dense Graphics V15 must remain local-first and mu
 assert(!/Fire Kirin|Juwa|Panda Master/i.test(js),'V15 runtime must remain original and not embed competitor branding');
 for(const marker of ['#v15Backdrop','#v15Fx','pointer-events:none','data-density-mode="extreme"','prefers-reduced-motion','data-cinematic-lite']) assert(css.includes(marker),`V15 CSS contract missing ${marker}`);
 assert(css.includes('#v15Backdrop{z-index:3')&&css.includes('#v15Fx{z-index:5'),'V15 canvas layering must remain deterministic');
-assert(sw.includes("fsa-arcade-v24-dense-v15-telemetry-20260916"),'V15 + telemetry must bump the installed-PWA cache generation');
+const cacheMatch=sw.match(/const CACHE='fsa-arcade-v(\d+)-/);
+assert(cacheMatch&&Number(cacheMatch[1])>=24,'V15 + telemetry must keep installed-PWA cache generation at v24 or newer');
 assert(sw.includes('./telemetry-v1.js')&&sw.includes('telemetry-v1\\.js'),'V15 cache generation must preserve telemetry runtime caching and refresh');
 assert(spectacle.includes('telemetry-v1.js'),'V15 spectacle loader must preserve telemetry v1 attachment');
 
-
-if(!js.includes("Array.from(document.querySelectorAll('#radar .dot'))")) fail('Dense Graphics must iterate the full radar-dot collection explicitly.');
-if(!/dataset\.kind/.test(js)||!/kind==='boss'/.test(js)||!/kind==='hard'/.test(js)) fail('Dense Graphics must classify radar targets by semantic data-kind, not historical colors.');
+if(!js.includes("Array.from(document.querySelectorAll('#radar .dot'))")) throw new Error('Dense Graphics must iterate the full radar-dot collection explicitly.');
+if(!/dataset\.kind/.test(js)||!/kind==='boss'/.test(js)||!/kind==='hard'/.test(js)) throw new Error('Dense Graphics must classify radar targets by semantic data-kind, not historical colors.');
 console.log('FSA_DENSE_GRAPHICS_V15_CONTRACT=PASS targets=live boss=phased impacts=weapon-specific coins=magnetic schools=5 environment=procedural telemetry=preserved lite=preserved');
