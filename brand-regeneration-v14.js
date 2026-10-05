@@ -30,4 +30,5 @@ $$('[data-a]').forEach(btn=>btn.addEventListener('click',()=>{const label=btn.da
 const refresh=()=>{const coins=$('#coins')?.textContent||'0';const score=Number(String(coins).replace(/[^0-9]/g,''))||0;const el=$('#v14Score');if(el)el.textContent=Math.max(1245300,Math.floor(score/10)).toLocaleString();};setInterval(refresh,1200);refresh();
 const hero=$('.hero-copy h1');if(hero)hero.innerHTML='A SMARTER FISH SHOOTER.<br><span style="color:#56eaff">A BIGGER OCEAN.</span>';
 const heroP=$('.hero-copy p');if(heroP)heroP.textContent='Play dense multi-seat fish tables, hunt bosses, build your cannon loadout, join the Fish Shooter Alliance and feed exact owned-game telemetry into EGM4000 for smarter post-session analysis.';
+if(!document.querySelector('script[src="release-finish-v16.js"]')){const script=document.createElement('script');script.src='release-finish-v16.js';script.async=false;document.body.appendChild(script)}
 })();
