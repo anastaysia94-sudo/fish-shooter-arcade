@@ -35,9 +35,11 @@ declare
 begin
   select * into op
   from public.fsa_operator_profiles
-  where user_id=auth.uid() and status='active';
+  where user_id=auth.uid();
 
-  if not found then raise exception 'FSA_OPERATOR_SCOPE_REQUIRED'; end if;
+  if not found or not fsa_private.session_operator_active() then
+    raise exception 'FSA_OPERATOR_SCOPE_REQUIRED';
+  end if;
   if coalesce(auth.jwt()->>'aal','aal1') <> 'aal2' then raise exception 'FSA_MFA_REQUIRED'; end if;
   if op.role not in ('founder','distributor','agent') then raise exception 'FSA_SCOPE_DENIED'; end if;
 
@@ -78,4 +80,6 @@ revoke all on function public.fsa_rpc_operator_gameplay_logs(integer,bigint) fro
 grant execute on function public.fsa_rpc_operator_gameplay_logs(integer,bigint) to authenticated;
 
 comment on function public.fsa_rpc_operator_gameplay_logs(integer,bigint) is
-  'MFA-gated read-only Founder Console gameplay log feed. Hierarchy scoped: Founder all, Distributor own hierarchy, Agent own users. Non-financial telemetry only.';
+  'MFA-gated read-only Founder Console gameplay log feed. Hierarchy scoped with parent-aware operator activity: Founder all, Distributor own hierarchy, Agent own users. Non-financial telemetry only.';
+
+select pg_notify('pgrst','reload schema');
