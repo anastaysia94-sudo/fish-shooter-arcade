@@ -26,6 +26,7 @@ function normalizeGuest(){
   const profileName=$('.v8-account .profile b');if(profileName&&/OceanHunterX/i.test(profileName.textContent))profileName.textContent='Guest Diver';
   const profileMeta=$('.v8-account .profile small');if(profileMeta&&/LV\s*88/i.test(profileMeta.textContent))profileMeta.textContent=`LOCAL GUEST · LV ${Math.max(1,Number(p.level)||1)}`;
   const ownName=$('#youSeat .pname');if(ownName&&/OceanHunterX/i.test(ownName.textContent))ownName.innerHTML=ownName.innerHTML.replace(/OceanHunterX/g,'Guest Diver');
+  $$('.v14-rank .you span').forEach(e=>{if(/OceanHunterX/i.test(e.textContent))e.textContent='Guest Diver'});
 }
 function removePublicAdminDoor(){
   $$('.v8-nav a').filter(a=>/FOUNDER|admin\//i.test(`${a.textContent} ${a.getAttribute('href')||''}`)).forEach(a=>a.remove());
