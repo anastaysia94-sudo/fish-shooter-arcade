@@ -1,0 +1,36 @@
+name: Release Finish v16
+
+on:
+  pull_request:
+    paths:
+      - 'release-finish-v16.js'
+      - 'release-finish-v16.css'
+      - 'brand-regeneration-v14.js'
+      - 'admin/**'
+      - 'backend/supabase/migrations/20261004_fsa_operator_gameplay_logs_v5.sql'
+      - 'tests/release-finish-v16-contract.mjs'
+      - 'tests/founder-gameplay-logs-v5-contract.mjs'
+      - '.github/workflows/release-finish-v16.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check release-finish-v16.js
+          node --check brand-regeneration-v14.js
+          node --check admin/gameplay-logs.js
+          node --check admin/security-completion.js
+      - name: Release finish contracts
+        run: node tests/release-finish-v16-contract.mjs
+      - name: Founder gameplay logs contracts
+        run: node tests/founder-gameplay-logs-v5-contract.mjs
