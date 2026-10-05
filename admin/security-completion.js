@@ -126,3 +126,7 @@ for(const eventName of ['pointerdown','keydown','touchstart'])addEventListener(e
 resetIdle()
 
 if(new URLSearchParams(location.search).get('expired')==='1')setMessage('#authMessage','Signed out after 30 minutes of inactivity.')
+
+// Load the hierarchy-scoped gameplay-log panel as a separate module so the
+// security/recovery path stays stable and the log feature can fail closed.
+import('./gameplay-logs.js').catch(error=>console.error('FSA gameplay logs module failed to load',error))
