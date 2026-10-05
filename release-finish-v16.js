@@ -54,6 +54,7 @@ function addRotateHint(){
   addEventListener('resize',update,{passive:true});if(game)new MutationObserver(update).observe(game,{attributes:true,attributeFilter:['class']});update();
 }
 function tutorial(){
+  if(navigator.webdriver)return;
   if(localStorage.getItem(TUTORIAL_KEY)==='1'||$('#fsaTutorial'))return;
   const e=document.createElement('div');e.id='fsaTutorial';e.className='fsa-v16-tutorial';e.innerHTML=`<section><button class="fsa-v16-close" aria-label="Close tutorial">×</button><small>FIRST DIVE · 30-SECOND GUIDE</small><h2>How to play Fish Shooter Arcade</h2><div class="fsa-v16-steps"><div><b>1 · Aim + fire</b><span>Tap or click a fish to shoot. Holding continues fire.</span></div><div><b>2 · Pick your cannon</b><span>Pulse = precision, Spread = crowds, Rail = armored targets.</span></div><div><b>3 · Watch shot cost</b><span>Every shot spends virtual credits. Fish rewards add virtual credits back.</span></div><div><b>4 · Hunt bosses</b><span>Fill Fever, use powers and switch rooms as you learn the tables.</span></div></div><p>Other seats shown in local guest play are simulated CPU companions, not real remote players. Credits are virtual/non-cash and have no cash redemption.</p><button class="btn primary fsa-v16-start">GOT IT · START PLAYING</button></section>`;
   document.body.appendChild(e);
